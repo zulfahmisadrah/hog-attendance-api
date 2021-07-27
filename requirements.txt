@@ -6,3 +6,4 @@ starlette~=0.14.2
 pydantic~=1.8.2
 SQLAlchemy~=1.4.22
 mysqlclient~=2.0.3
+alembic~=1.6.5
