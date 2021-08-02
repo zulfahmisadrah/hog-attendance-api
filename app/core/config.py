@@ -1,31 +1,17 @@
+import os
 import secrets
 from typing import List, Union
 
-from pydantic import BaseSettings, AnyHttpUrl, validator, EmailStr
-from starlette.config import Config
-from starlette.datastructures import Secret
+from pydantic import BaseSettings, AnyHttpUrl, validator
+from dotenv import load_dotenv
 
-config = Config(".env")
-
-
-PROJECT_NAME = config("APP_NAME")
-SQLALCHEMY_DATABASE_URI = config("DB_URL")
-
-API_PREFIX = "/api"
-
-DEBUG = config("DEBUG", cast=bool, default=False)
-
-DB_URL: str = config("DB_URL")
-HOST: str = config("DB_HOST", default="127.0.0.1")
-PORT: int = config("DB_PORT", cast=int, default=3306)
-USERNAME: str = config("DB_USERNAME", default="root")
-PASSWORD: str = config("DB_PASSWORD", default="")
-DB_NAME: str = config("DB_NAME", default="")
-
-SECRET_KEY: Secret = config("SECRET_KEY", cast=Secret)
+load_dotenv()
 
 
 class Settings(BaseSettings):
+    PROJECT_NAME = os.getenv("PROJECT_NAME", "PROJECT")
+    DEBUG: bool = os.getenv("DEBUG", False)
+
     API_PREFIX: str = "/api"
     SECRET_KEY: str = secrets.token_urlsafe(32)
 
@@ -40,8 +26,17 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
-    FIRST_SUPERUSER: str = "sadmin"
-    FIRST_SUPERUSER_PASSWORD: str = "123456"
+    DB_USERNAME: str = os.getenv("DB_USERNAME", "root")
+    DB_PASSWORD: str = os.getenv("DB_PASSWORD", "")
+    DB_HOST: str = os.getenv("DB_HOST", "localhost")
+    DB_PORT: str = os.getenv("DB_PORT", "localhost")
+    DB_NAME: str = os.getenv("DB_NAME", "app")
+
+    SQLALCHEMY_DATABASE_URI: str = f"mysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+    FIRST_SUPERUSER_NAME: str = os.getenv("FIRST_SUPERUSER_NAME", "admin")
+    FIRST_SUPERUSER_USERNAME: str = os.getenv("FIRST_SUPERUSER_USERNAME", "admin")
+    FIRST_SUPERUSER_PASSWORD: str = os.getenv("FIRST_SUPERUSER_PASSWORD", "123456")
     USERS_OPEN_REGISTRATION: bool = False
 
     class Config:
