@@ -9,7 +9,12 @@ load_dotenv()
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME = os.getenv("PROJECT_NAME", "PROJECT")
+    PROJECT_NAME: str = os.getenv("PROJECT_NAME", "PROJECT")
+
+    WEB_HOST: str = os.getenv("WEB_HOST", "127.0.0.1")
+    WEB_PORT: int = os.getenv("WEB_PORT", 8000)
+    AUTO_RELOAD: bool = os.getenv("DEBUG", False)
+
     DEBUG: bool = os.getenv("DEBUG", False)
 
     API_PREFIX: str = "/api"
@@ -29,7 +34,7 @@ class Settings(BaseSettings):
     DB_USERNAME: str = os.getenv("DB_USERNAME", "root")
     DB_PASSWORD: str = os.getenv("DB_PASSWORD", "")
     DB_HOST: str = os.getenv("DB_HOST", "localhost")
-    DB_PORT: str = os.getenv("DB_PORT", "localhost")
+    DB_PORT: int = os.getenv("DB_PORT", 3306)
     DB_NAME: str = os.getenv("DB_NAME", "app")
 
     SQLALCHEMY_DATABASE_URI: str = f"mysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
