@@ -1,0 +1,23 @@
+from typing import TYPE_CHECKING
+
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
+
+from app.db.base_class import Base
+from .core import CommonModel
+
+if TYPE_CHECKING:
+    from .course import Course
+    from .schedule import Schedule
+
+
+class Meeting(Base, CommonModel):
+    name = Column(String(50))
+    number = Column(Integer)
+
+    course_id = Column(Integer, ForeignKey("course.id"))
+    course = relationship("Course", back_populates="meetings")
+
+    schedule_id = Column(Integer, ForeignKey("schedule.id"))
+    schedule = relationship("Schedule", back_populates="courses")
+
