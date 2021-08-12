@@ -11,6 +11,8 @@ load_dotenv()
 class Settings(BaseSettings):
     PROJECT_NAME: str = os.getenv("PROJECT_NAME", "PROJECT")
 
+    INITIAL_DATA_FOLDER: str = "app/db/data/"
+
     WEB_HOST: str = os.getenv("WEB_HOST", "127.0.0.1")
     WEB_PORT: int = os.getenv("WEB_PORT", 8000)
     AUTO_RELOAD: bool = os.getenv("DEBUG", False)
