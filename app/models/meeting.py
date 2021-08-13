@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, BigInteger, String, ForeignKey
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
@@ -15,9 +15,11 @@ class Meeting(Base, CommonModel):
     name = Column(String(50))
     number = Column(Integer)
 
-    course_id = Column(Integer, ForeignKey("course.id"))
+    course_id = Column(BigInteger, ForeignKey("course.id"))
     course = relationship("Course", back_populates="meetings")
 
-    schedule_id = Column(Integer, ForeignKey("schedule.id"))
-    schedule = relationship("Schedule", back_populates="courses")
+    schedule_id = Column(BigInteger, ForeignKey("schedule.id"))
+    schedule = relationship("Schedule", back_populates="meetings")
+
+    attendances = relationship("Attendance", back_populates="meeting")
 

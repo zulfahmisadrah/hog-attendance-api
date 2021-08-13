@@ -1,10 +1,17 @@
-from sqlalchemy import Column, Integer, String
+from typing import TYPE_CHECKING
+
+from sqlalchemy import Column, String
+from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
+from .core import CommonModel
+
+if TYPE_CHECKING:
+    from .department import Department
 
 
-class Faculty(Base):
-    # __tablename__ = "faculties"
+class Faculty(Base, CommonModel):
+    name = Column(String(50), unique=True, nullable=False)
+    code = Column(String(3), unique=True, nullable=False)
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(50), nullable=False)
+    departments = relationship("Department", back_populates="faculty")

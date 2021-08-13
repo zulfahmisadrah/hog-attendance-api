@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, BigInteger, String, ForeignKey
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
@@ -13,6 +13,9 @@ if TYPE_CHECKING:
 
 class Department(Base, CommonModel):
     name = Column(String(50), unique=True, nullable=False)
-    faculty_id = Column(Integer, ForeignKey("faculty.id"))
+    code = Column(String(3), unique=True, nullable=False)
+
+    faculty_id = Column(BigInteger, ForeignKey("faculty.id"))
     faculty = relationship("Faculty", back_populates="departments")
+
     courses = relationship("Course", back_populates="department")
