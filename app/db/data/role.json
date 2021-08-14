@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "code": "ROLE_SUPERUSER",
+    "name": "Superuser"
+  },
+  {
+    "id": 2,
+    "code": "ROLE_ADMIN",
+    "name": "Admin"
+  },
+  {
+    "id": 3,
+    "code": "ROLE_LECTURER",
+    "name": "Dosen"
+  },
+  {
+    "id": 4,
+    "code": "ROLE_STUDENT",
+    "name": "Mahasiswa"
+  }
+]

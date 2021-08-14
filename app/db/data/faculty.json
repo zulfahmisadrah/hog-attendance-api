@@ -1,0 +1,77 @@
+[
+  {
+    "id": 1,
+    "name": "Ekonomi dan Bisnis",
+    "code": "A"
+  },
+  {
+    "id": 2,
+    "name": "Farmasi",
+    "code": "N"
+  },
+  {
+    "id": 3,
+    "name": "Hukum",
+    "code": "B"
+  },
+  {
+    "id": 4,
+    "name": "Ilmu Budaya",
+    "code": "F"
+  },
+  {
+    "id": 5,
+    "name": "Ilmu Kelautan dan Perikanan",
+    "code": "L"
+  },
+  {
+    "id": 6,
+    "name": "Ilmu Sosial dan Ilmu Politik",
+    "code": "E"
+  },
+  {
+    "id": 7,
+    "name": "Kedokteran",
+    "code": "C"
+  },
+  {
+    "id": 8,
+    "name": "Kedokteran Gigi",
+    "code": "J"
+  },
+  {
+    "id": 9,
+    "name": "Kehutanan",
+    "code": "M"
+  },
+  {
+    "id": 10,
+    "name": "Keperawatan",
+    "code": "R"
+  },
+  {
+    "id": 11,
+    "name": "Kesehatan Masyarakat",
+    "code": "K"
+  },
+  {
+    "id": 12,
+    "name": "Matematika dan Ilmu Pengetahuan Alam",
+    "code": "H"
+  },
+  {
+    "id": 13,
+    "name": "Pertanian",
+    "code": "G"
+  },
+  {
+    "id": 14,
+    "name": "Peternakan",
+    "code": "I"
+  },
+  {
+    "id": 15,
+    "name": "Teknik",
+    "code": "D"
+  }
+]
