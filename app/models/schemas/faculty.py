@@ -3,7 +3,7 @@ from typing import Optional, List
 from fastapi_permissions import Allow, Authenticated
 from pydantic import BaseModel
 
-from app.schemas.department import Department
+from app.models.schemas.department import Department
 
 
 class FacultyBase(BaseModel):

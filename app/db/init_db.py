@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.crud import crud_user, crud_role, crud_faculty, crud_department
-from app.schemas import UserCreate, RoleCreate, FacultyCreate, DepartmentCreate
+from app.models.schemas import UserCreate, RoleCreate, FacultyCreate, DepartmentCreate
 
 
 def init_db(db: Session) -> None:

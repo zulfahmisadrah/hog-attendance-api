@@ -2,7 +2,7 @@ from typing import Optional, List
 
 from pydantic import BaseModel
 
-from app.schemas.course import Course
+from app.models.schemas.course import Course
 
 
 class DepartmentBase(BaseModel):

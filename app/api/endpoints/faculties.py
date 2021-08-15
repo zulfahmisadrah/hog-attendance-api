@@ -2,7 +2,8 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app import models, schemas, crud
+from app import crud
+from app.models import domains, schemas
 from app.api import deps
 from app.db import session
 
@@ -11,7 +12,7 @@ router = APIRouter()
 
 @router.get("/", response_model=List[schemas.Faculty])
 def index(db: Session = Depends(session.get_db), offset: int = 0, limit: int = 10,
-          current_user: models.User = Depends(deps.get_current_active_user)):
+          current_user: domains.User = Depends(deps.get_current_active_user)):
     faculties = crud.faculty.get_list(db, offset=offset, limit=limit)
     return faculties
 

@@ -1,12 +1,10 @@
-from typing import Optional, Union, Dict, Any
+from typing import Optional
 
-from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
-from app.core.security import get_password_hash, verify_password
 from app.crud.base import CRUDBase
-from app.models.role import Role
-from app.schemas.role import RoleCreate, RoleUpdate
+from app.models.domains import Role
+from app.models.schemas.role import RoleCreate, RoleUpdate
 
 
 class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):

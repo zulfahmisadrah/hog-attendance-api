@@ -1,11 +1,12 @@
 from datetime import timedelta
-from typing import List, Any
+from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status, Body
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from app import schemas, models, crud
+from app import crud
+from app.models import domains, schemas
 
 from app.api import deps
 from app.core import security
@@ -35,5 +36,5 @@ def login_access_token(
 
 
 @router.post("/check", response_model=schemas.User)
-def check_access_token(current_user: models.User = Depends(deps.get_current_user)) -> Any:
+def check_access_token(current_user: domains.User = Depends(deps.get_current_user)) -> Any:
     return current_user

@@ -2,7 +2,7 @@ from typing import Optional, List
 
 from pydantic import BaseModel
 
-from app.schemas.meeting import Meeting
+from app.models.schemas.meeting import Meeting
 
 
 class CourseBase(BaseModel):

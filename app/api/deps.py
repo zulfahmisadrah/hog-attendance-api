@@ -7,7 +7,8 @@ from jose import jwt, JWTError
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from app import models, crud
+from app import crud
+from app.models import domains
 from app.core import security
 from app.core.config import settings
 from app.db.session import SessionLocal
@@ -25,7 +26,7 @@ def get_db() -> Generator:
         db.close()
 
 
-def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)) -> models.User:
+def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)) -> domains.User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -44,25 +45,25 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_
     return user
 
 
-def get_current_active_user(current_user: models.User = Depends(get_current_user)) -> models.User:
+def get_current_active_user(current_user: domains.User = Depends(get_current_user)) -> domains.User:
     if not crud.user.is_active(current_user):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User is inactive")
     return current_user
 
 
-def get_current_superuser(current_user: models.User = Depends(get_current_active_user)) -> models.User:
+def get_current_superuser(current_user: domains.User = Depends(get_current_active_user)) -> domains.User:
     if not crud.user.is_superuser(current_user):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User doesn't have enough privileges")
     return current_user
 
 
-def get_current_admin(current_user: models.User = Depends(get_current_active_user)) -> models.User:
+def get_current_admin(current_user: domains.User = Depends(get_current_active_user)) -> domains.User:
     if not crud.user.is_admin(current_user):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User doesn't have enough privileges")
     return current_user
 
 
-def get_active_principals(user: models.User = Depends(get_current_active_user)):
+def get_active_principals(user: domains.User = Depends(get_current_active_user)):
     if user:
         # user is logged in
         principals = [Everyone, Authenticated]

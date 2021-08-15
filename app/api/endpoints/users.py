@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, status, Body
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
-from app import schemas, models, crud
+from app import crud
+from app.models import domains, schemas
 
 from app.api import deps
 from app.core.config import settings
@@ -17,7 +18,7 @@ def index(
         db: Session = Depends(deps.get_db),
         offset: int = 0,
         limit: int = 10,
-        current_user: models.User = Depends(deps.get_current_superuser)
+        current_user: domains.User = Depends(deps.get_current_superuser)
 ) -> Any:
     users = crud.user.get_list(db, offset=offset, limit=limit)
     return users
@@ -28,7 +29,7 @@ def create_user(
         *,
         db: Session = Depends(deps.get_db),
         user_in: schemas.UserCreate,
-        current_user: models.User = Depends(deps.get_current_superuser)
+        current_user: domains.User = Depends(deps.get_current_superuser)
 ) -> Any:
     user = crud.user.get_by_username(db, username=user_in.email)
     if user:
@@ -46,7 +47,7 @@ def create_superuser(
         *,
         db: Session = Depends(deps.get_db),
         user_in: schemas.UserCreate,
-        current_user: models.User = Depends(deps.get_current_superuser)
+        current_user: domains.User = Depends(deps.get_current_superuser)
 ) -> Any:
     user = crud.user.get_by_username(db, username=user_in.username)
     if user:
@@ -64,7 +65,7 @@ def create_admin(
         *,
         db: Session = Depends(deps.get_db),
         user_in: schemas.UserCreate,
-        current_user: models.User = Depends(deps.get_current_superuser)
+        current_user: domains.User = Depends(deps.get_current_superuser)
 ) -> Any:
     user = crud.user.get_by_username(db, username=user_in.username)
     if user:
@@ -82,7 +83,7 @@ def create_user(
         *,
         db: Session = Depends(deps.get_db),
         user_in: schemas.UserCreate,
-        current_user: models.User = Depends(deps.get_current_admin)
+        current_user: domains.User = Depends(deps.get_current_admin)
 ) -> Any:
     user = crud.user.get_by_username(db, username=user_in.username)
     if user:
@@ -97,7 +98,7 @@ def create_user(
 @router.get("/me", response_model=schemas.User)
 def read_user_me(
     db: Session = Depends(deps.get_db),
-    current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: domains.User = Depends(deps.get_current_active_user),
 ) -> Any:
     return current_user
 
@@ -109,7 +110,7 @@ def update_user_me(
         username: str = Body(None),
         password: str = Body(None),
         name: str = Body(None),
-        current_user: models.User = Depends(deps.get_current_active_user)
+        current_user: domains.User = Depends(deps.get_current_active_user)
 ) -> Any:
     current_user_data = jsonable_encoder(current_user)
     user_in = schemas.UserUpdate(**current_user_data)
@@ -150,7 +151,7 @@ def create_user_open(
 @router.get("/{user_id}", response_model=schemas.User)
 def read_user_by_id(
         user_id: int,
-        current_user: models.User = Depends(deps.get_current_active_user),
+        current_user: domains.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db),
 ) -> Any:
     user = crud.user.get(db, id=user_id)
@@ -169,7 +170,7 @@ def update_user(
         db: Session = Depends(deps.get_db),
         user_id: int,
         user_in: schemas.UserUpdate,
-        current_user: models.User = Depends(deps.get_current_superuser)
+        current_user: domains.User = Depends(deps.get_current_superuser)
 ) -> Any:
     user = crud.user.get(db, id=user_id)
     if not user:
