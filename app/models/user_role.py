@@ -1,12 +1,9 @@
-from sqlalchemy import Column, BigInteger, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, ForeignKey, Table
 
 from app.db.base_class import Base
 
 
-class UserRole(Base):
-    user_id = Column(BigInteger, ForeignKey("user.id"), primary_key=True)
-    role_id = Column(BigInteger, ForeignKey("role.id"), primary_key=True)
-
-    user = relationship("User", backref="roles")
-    role = relationship("Role", backref="users")
+user_role = Table('user_role', Base.metadata,
+                  Column("user_id", ForeignKey("user.id", ondelete="CASCADE"), primary_key=True),
+                  Column("role_id", ForeignKey("role.id", ondelete="CASCADE"), primary_key=True)
+                  )

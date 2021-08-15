@@ -9,7 +9,6 @@ class UserBase(BaseModel):
     phone_number: Optional[str] = None
     avatar: Optional[str] = None
     is_active: Optional[bool] = True
-    is_superuser: Optional[bool] = False
 
 
 class UserOut(UserBase):

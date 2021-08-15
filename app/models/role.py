@@ -8,3 +8,6 @@ class Role(Base, CommonModel):
     code = Column(String(50), nullable=False, unique=True)
     name = Column(String(100), nullable=False)
     description = Column(String(255))
+
+    def __str__(self):
+        return str(self.__dict__)
