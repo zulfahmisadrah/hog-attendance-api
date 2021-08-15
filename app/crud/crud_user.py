@@ -34,16 +34,16 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         return new_user
 
     def create_superuser(self, db: Session, *, obj_in: UserCreate) -> User:
-        return self._create(db, obj_in=obj_in, role_id=1)
+        return self.create(db, obj_in=obj_in, role_id=1)
 
     def create_admin(self, db: Session, *, obj_in: UserCreate) -> User:
-        return self._create(db, obj_in=obj_in, role_id=2)
+        return self.create(db, obj_in=obj_in, role_id=2)
 
     def create_lecturer(self, db: Session, *, obj_in: UserCreate) -> User:
-        return self._create(db, obj_in=obj_in, role_id=3)
+        return self.create(db, obj_in=obj_in, role_id=3)
 
     def create_student(self, db: Session, *, obj_in: UserCreate) -> User:
-        return self._create(db, obj_in=obj_in, role_id=4)
+        return self.create(db, obj_in=obj_in, role_id=4)
 
     def update(self, db: Session, *, db_obj: User, obj_in: Union[UserUpdate, Dict[str, Any]]) -> User:
         if isinstance(db_obj, dict):
