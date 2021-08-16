@@ -77,7 +77,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def is_admin(self, user: User):
         list_user_roles = [role_dict.code for role_dict in user.roles]
         is_admin = False
-        if "ROLE_ADMIN" in list_user_roles:
+        if "ROLE_SUPERUSER" in list_user_roles or "ROLE_ADMIN" in list_user_roles:
             is_admin = True
         return is_admin
 
