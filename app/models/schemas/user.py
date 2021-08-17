@@ -4,7 +4,7 @@ from pydantic import BaseModel, EmailStr
 
 class UserBase(BaseModel):
     username: Optional[str] = None
-    name: str
+    name: Optional[str] = None
     email: Optional[EmailStr] = None
     phone_number: Optional[str] = None
     avatar: Optional[str] = None
@@ -16,6 +16,7 @@ class UserOut(UserBase):
 
 
 class UserCreate(UserBase):
+    name: str
     username: str
     password: str
 

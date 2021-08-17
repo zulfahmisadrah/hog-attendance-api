@@ -26,8 +26,8 @@ def index(
 
 @router.post("/", response_model=schemas.User)
 def create_user(
-        *,
         db: Session = Depends(deps.get_db),
+        *,
         user_in: schemas.UserCreate,
         current_user: domains.User = Depends(deps.get_current_superuser)
 ) -> Any:
@@ -43,9 +43,8 @@ def create_user(
 
 @router.post("/create_superuser", response_model=schemas.User)
 def create_superuser(
-        role_id: int,
-        *,
         db: Session = Depends(deps.get_db),
+        *,
         user_in: schemas.UserCreate,
         current_user: domains.User = Depends(deps.get_current_superuser)
 ) -> Any:
@@ -61,7 +60,6 @@ def create_superuser(
 
 @router.post("/create_admin", response_model=schemas.User)
 def create_admin(
-        role_id: int,
         *,
         db: Session = Depends(deps.get_db),
         user_in: schemas.UserCreate,
@@ -97,8 +95,8 @@ def create_user(
 
 @router.get("/me", response_model=schemas.User)
 def read_user_me(
-    db: Session = Depends(deps.get_db),
-    current_user: domains.User = Depends(deps.get_current_active_user),
+        db: Session = Depends(deps.get_db),
+        current_user: domains.User = Depends(deps.get_current_active_user),
 ) -> Any:
     return current_user
 
@@ -107,20 +105,13 @@ def read_user_me(
 def update_user_me(
         *,
         db: Session = Depends(deps.get_db),
-        username: str = Body(None),
-        password: str = Body(None),
-        name: str = Body(None),
+        user_in: schemas.UserUpdate,
         current_user: domains.User = Depends(deps.get_current_active_user)
 ) -> Any:
     current_user_data = jsonable_encoder(current_user)
-    user_in = schemas.UserUpdate(**current_user_data)
-    if username is not None:
-        user_in.username = username
-    if password is not None:
-        user_in.password = password
-    if name is not None:
-        user_in.name = name
-    user = crud.user.update(db, db_obj=current_user, obj_in=user_in)
+    current_user_data.update((k, v) for k, v in user_in.dict().items() if v is not None)
+    updated_user = schemas.UserUpdate(**current_user_data)
+    user = crud.user.update(db, db_obj=current_user, obj_in=updated_user)
     return user
 
 
