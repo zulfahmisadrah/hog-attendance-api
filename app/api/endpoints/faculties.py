@@ -18,7 +18,8 @@ def index(db: Session = Depends(session.get_db), offset: int = 0, limit: int = 1
 
 
 @router.post("/", response_model=schemas.Faculty, status_code=201)
-def create(faculty: schemas.FacultyCreate, db: Session = Depends(session.get_db)):
+def create(faculty: schemas.FacultyCreate, db: Session = Depends(session.get_db),
+           current_user: domains.User = Depends(deps.get_current_admin)):
     return crud.faculty.create(db=db, obj_in=faculty)
 
 
