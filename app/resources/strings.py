@@ -1,0 +1,5 @@
+USERNAME_TAKEN = "Username telah digunakan"
+ERROR_DATA_NOT_FOUND = "Data tidak ditemukan"
+ERROR_DATA_ID_NOT_EXIST = "Data dengan id {0} tidak ditemukan"
+ERROR_FACULTY_NAME_CODE_EXIST = "Nama atau kode fakultas telah digunakan"
+SUCCESS_DATA_DELETED = "Data berhasil dihapus"
