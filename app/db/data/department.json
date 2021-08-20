@@ -1,79 +1,79 @@
 [
   {
     "id": 1,
-    "faculty": 15,
+    "faculty_id": 15,
     "name": "Teknik Arsitektur",
     "code": "D05"
   },
   {
     "id": 2,
-    "faculty": 15,
+    "faculty_id": 15,
     "name": "Teknik Elektro",
     "code": "D04"
   },
   {
     "id": 3,
-    "faculty": 15,
+    "faculty_id": 15,
     "name": "Teknik Geologi",
     "code": "D06"
   },
   {
     "id": 4,
-    "faculty": 15,
+    "faculty_id": 15,
     "name": "Teknik Industri",
     "code": "D07"
   },
   {
     "id": 5,
-    "faculty": 15,
+    "faculty_id": 15,
     "name": "Teknik Informatika",
     "code": "D12"
   },
   {
     "id": 6,
-    "faculty": 15,
+    "faculty_id": 15,
     "name": "Teknik Kelautan",
     "code": "D08"
   },
   {
     "id": 7,
-    "faculty": 15,
+    "faculty_id": 15,
     "name": "Teknik Lingkungan",
     "code": "D13"
   },
   {
     "id": 8,
-    "faculty": 15,
+    "faculty_id": 15,
     "name": "Teknik Mesin",
     "code": "D02"
   },
   {
     "id": 9,
-    "faculty": 15,
+    "faculty_id": 15,
     "name": "Teknik Perkapalan",
     "code": "D03"
   },
   {
     "id": 10,
-    "faculty": 15,
+    "faculty_id": 15,
     "name": "Teknik Pertambangan",
     "code": "D11"
   },
   {
     "id": 11,
-    "faculty": 15,
+    "faculty_id": 15,
     "name": "Teknik Perencanaan Wilayah dan Kota",
     "code": "D10"
   },
   {
     "id": 12,
-    "faculty": 15,
+    "faculty_id": 15,
     "name": "Teknik Sipil",
     "code": "D01"
   },
   {
     "id": 13,
-    "faculty": 15,
+    "faculty_id": 15,
     "name": "Teknik Sistem Perkapalan",
     "code": "D09"
   }

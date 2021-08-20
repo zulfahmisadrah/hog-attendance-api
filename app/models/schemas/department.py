@@ -8,6 +8,7 @@ from app.models.schemas.course import Course
 class DepartmentBase(BaseModel):
     name: str
     code: str = None
+    faculty_id: int
 
 
 class DepartmentCreate(DepartmentBase):
@@ -17,6 +18,7 @@ class DepartmentCreate(DepartmentBase):
 class DepartmentUpdate(DepartmentBase):
     name: Optional[str] = None
     code: Optional[str] = None
+    faculty_id: Optional[str] = None
 
 
 class Department(DepartmentBase):
