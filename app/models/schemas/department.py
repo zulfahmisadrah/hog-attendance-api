@@ -18,7 +18,7 @@ class DepartmentCreate(DepartmentBase):
 class DepartmentUpdate(DepartmentBase):
     name: Optional[str] = None
     code: Optional[str] = None
-    faculty_id: Optional[str] = None
+    faculty_id: Optional[int] = None
 
 
 class Department(DepartmentBase):
