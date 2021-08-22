@@ -6,98 +6,57 @@ from sqlalchemy.orm import Session
 
 from app import crud
 from app.models import domains, schemas
-
 from app.api import deps
 from app.core.config import settings
+from app.resources import strings
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.User])
-def index(
-        db: Session = Depends(deps.get_db),
-        offset: int = 0,
-        limit: int = 10,
-        current_user: domains.User = Depends(deps.get_current_superuser)
-) -> Any:
+@router.get("/", response_model=List[schemas.User], dependencies=[Depends(deps.get_current_superuser)])
+def index(db: Session = Depends(deps.get_db), offset: int = 0, limit: int = 10) -> Any:
     users = crud.user.get_list(db, offset=offset, limit=limit)
     return users
 
 
-@router.post("/", response_model=schemas.User)
-def create_user(
-        db: Session = Depends(deps.get_db),
-        *,
-        user_in: schemas.UserCreate,
-        current_user: domains.User = Depends(deps.get_current_superuser)
-) -> Any:
+@router.post("/", response_model=schemas.User, dependencies=[Depends(deps.get_current_superuser)])
+def create_user(user_in: schemas.UserCreate, db: Session = Depends(deps.get_db)) -> Any:
     user = crud.user.get_by_username(db, username=user_in.email)
     if user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already exist"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=strings.USERNAME_TAKEN)
     user = crud.user.create(db, obj_in=user_in)
     return user
 
 
-@router.post("/create_superuser", response_model=schemas.User)
-def create_superuser(
-        db: Session = Depends(deps.get_db),
-        *,
-        user_in: schemas.UserCreate,
-        current_user: domains.User = Depends(deps.get_current_superuser)
-) -> Any:
+@router.post("/create_superuser", response_model=schemas.User, dependencies=[Depends(deps.get_current_superuser)])
+def create_superuser(user_in: schemas.UserCreate, db: Session = Depends(deps.get_db)) -> Any:
     user = crud.user.get_by_username(db, username=user_in.username)
     if user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already exist"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=strings.USERNAME_TAKEN)
     user = crud.user.create_superuser(db, obj_in=user_in)
     return user
 
 
-@router.post("/create_admin", response_model=schemas.User)
-def create_admin(
-        *,
-        db: Session = Depends(deps.get_db),
-        user_in: schemas.UserCreate,
-        current_user: domains.User = Depends(deps.get_current_superuser)
-) -> Any:
+@router.post("/create_admin", response_model=schemas.User, dependencies=[Depends(deps.get_current_superuser)])
+def create_admin(user_in: schemas.UserCreate, db: Session = Depends(deps.get_db)) -> Any:
     user = crud.user.get_by_username(db, username=user_in.username)
     if user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already exist"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=strings.USERNAME_TAKEN)
     user = crud.user.create_admin(db, obj_in=user_in)
     return user
 
 
-@router.post("/role/{role_id}", response_model=schemas.User)
-def create_user(
-        role_id: int,
-        *,
-        db: Session = Depends(deps.get_db),
-        user_in: schemas.UserCreate,
-        current_user: domains.User = Depends(deps.get_current_admin)
-) -> Any:
+@router.post("/role/{role_id}", response_model=schemas.User, dependencies=[Depends(deps.get_current_superuser)])
+def create_user(role_id: int, user_in: schemas.UserCreate, db: Session = Depends(deps.get_db)) -> Any:
     user = crud.user.get_by_username(db, username=user_in.username)
     if user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already exist"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=strings.USERNAME_TAKEN)
     user = crud.user.create(db, obj_in=user_in, role_id=role_id)
     return user
 
 
-@router.get("/me", response_model=schemas.User)
-def read_user_me(
-        db: Session = Depends(deps.get_db),
-        current_user: domains.User = Depends(deps.get_current_active_user),
-) -> Any:
+@router.get("/me", response_model=schemas.User, dependencies=[Depends(deps.get_db)])
+def read_user_me(current_user: domains.User = Depends(deps.get_current_active_user)) -> Any:
     return current_user
 
 
@@ -115,7 +74,7 @@ def update_user_me(
     return user
 
 
-@router.post("/open", response_model=schemas.User)
+@router.post("/open", response_model=schemas.User, dependencies=[Depends(deps.get_current_superuser)])
 def create_user_open(
         *,
         db: Session = Depends(deps.get_db),
@@ -132,14 +91,14 @@ def create_user_open(
     if user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already exist"
+            detail=strings.USERNAME_TAKEN
         )
     user_in = schemas.UserCreate(username=username, password=password, name=name)
     user = crud.user.create(db, obj_in=user_in)
     return user
 
 
-@router.get("/{user_id}", response_model=schemas.User)
+@router.get("/{user_id}", response_model=schemas.User, dependencies=[Depends(deps.get_current_superuser)])
 def read_user_by_id(
         user_id: int,
         current_user: domains.User = Depends(deps.get_current_active_user),
@@ -155,7 +114,7 @@ def read_user_by_id(
     return user
 
 
-@router.put("/{user_id}", response_model=schemas.User)
+@router.put("/{user_id}", response_model=schemas.User, dependencies=[Depends(deps.get_current_superuser)])
 def update_user(
         *,
         db: Session = Depends(deps.get_db),
