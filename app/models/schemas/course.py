@@ -2,17 +2,29 @@ from typing import Optional, List
 
 from pydantic import BaseModel
 
+from app.models.domains.course import CourseType
 from app.models.schemas.meeting import Meeting
 
 
 class CourseBase(BaseModel):
-    name: str
-    code: str
-    sks: int
+    name: Optional[str] = None
+    code: Optional[str] = None
+    sks: Optional[int] = None
+    semester: Optional[int] = None
+    quota: Optional[int] = None
+    type: CourseType
     department_id: int
 
 
 class CourseCreate(CourseBase):
+    name: str
+    code: str
+    sks: int
+    semester: int
+    quota: int
+
+
+class CourseUpdate(CourseBase):
     pass
 
 
