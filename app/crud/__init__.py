@@ -4,3 +4,4 @@ from .crud_department import department
 from .crud_semester import semester
 from .crud_schedule import schedule
 from .crud_course import course
+from .crud_meeting import meeting

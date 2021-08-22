@@ -5,4 +5,5 @@ from .department import Department, DepartmentCreate, DepartmentUpdate, Departme
 from .semester import Semester, SemesterCreate, SemesterUpdate
 from .schedule import Schedule, ScheduleCreate, ScheduleUpdate
 from .course import Course, CourseCreate, CourseUpdate
+from .meeting import Meeting, MeetingCreate, MeetingUpdate
 from .token import Token, TokenPayload
