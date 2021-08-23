@@ -3,8 +3,9 @@ from typing import Any, Generic, List, TypeVar, Type, Optional, Union, Dict
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from sqlalchemy.orm import Session
+from starlette.responses import Response
 
 from app.db.base_class import Base
 
@@ -30,10 +31,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             db.add(db_obj)
             db.commit()
             db.refresh(db_obj)
-        except SQLAlchemyError as e:
-            print(e.__dict__['orig'])
+        except IntegrityError as e:
+            print(e.args)
             db.rollback()
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e.__dict__['orig']))
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e.args[0]))
+        except SQLAlchemyError as e:
+            print(e.args)
+            db.rollback()
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e.args[0]))
         return db_obj
 
     def update(
@@ -56,11 +61,11 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.refresh(db_obj)
         return db_obj
 
-    def delete(self, db: Session, *, id: int) -> ModelType:
+    def delete(self, db: Session, *, id: int) -> Any:
         obj = db.query(self.model).get(id)
         db.delete(obj)
         db.commit()
-        return obj
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 
