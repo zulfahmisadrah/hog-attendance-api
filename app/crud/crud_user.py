@@ -39,18 +39,11 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def create_admin(self, db: Session, *, obj_in: UserCreate) -> User:
         return self.create(db, obj_in=obj_in, role_id=2)
 
-    def create_lecturer(self, db: Session, *, obj_in: UserCreate) -> User:
-        return self.create(db, obj_in=obj_in, role_id=3)
-
-    def create_student(self, db: Session, *, obj_in: UserCreate) -> User:
-        return self.create(db, obj_in=obj_in, role_id=4)
-
     def update(self, db: Session, *, db_obj: User, obj_in: Union[UserUpdate, Dict[str, Any]]) -> User:
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
             update_data = obj_in.dict(exclude_unset=True)
-        print("update_data", update_data)
         if update_data["password"]:
             hashed_password = get_password_hash(update_data["password"])
             update_data["password"] = hashed_password
