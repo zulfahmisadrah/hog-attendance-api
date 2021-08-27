@@ -9,7 +9,7 @@ from .core import CommonModel
 
 if TYPE_CHECKING:
     from .meeting import Meeting
-    from .user import User
+    from .student import Student
 
 
 class AttendanceStatus(str, Enum):
@@ -20,8 +20,8 @@ class AttendanceStatus(str, Enum):
 
 
 class Attendance(Base, CommonModel):
-    name = Column(String(50))
     status = Column(SQLEnum(AttendanceStatus), default=AttendanceStatus.ABSENT)
+    note = Column(String(255))
 
     meeting_id = Column(BigInteger, ForeignKey("meeting.id"))
     meeting = relationship("Meeting", back_populates="attendances")
