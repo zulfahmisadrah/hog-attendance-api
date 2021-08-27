@@ -21,7 +21,7 @@ def index(db: Session = Depends(deps.get_db), offset: int = 0, limit: int = 10) 
 
 @router.post("/", response_model=schemas.User, dependencies=[Depends(deps.get_current_superuser)])
 def create_user(user_in: schemas.UserCreate, db: Session = Depends(deps.get_db)) -> Any:
-    user = crud.user.get_by_username(db, username=user_in.email)
+    user = crud.user.get_by_username(db, username=user_in.username)
     if user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=strings.USERNAME_TAKEN)
     user = crud.user.create(db, obj_in=user_in)
@@ -62,16 +62,17 @@ def read_user_me(current_user: domains.User = Depends(deps.get_current_active_us
 
 @router.put("/me", response_model=schemas.User)
 def update_user_me(
-        *,
-        db: Session = Depends(deps.get_db),
         user_in: schemas.UserUpdate,
-        current_user: domains.User = Depends(deps.get_current_active_user)
+        db: Session = Depends(deps.get_db),
+        current_user: domains.User = Depends(deps.get_current_user)
 ) -> Any:
-    current_user_data = jsonable_encoder(current_user)
-    current_user_data.update((k, v) for k, v in user_in.dict().items() if v is not None)
-    updated_user = schemas.UserUpdate(**current_user_data)
-    user = crud.user.update(db, db_obj=current_user, obj_in=updated_user)
-    return user
+    if user_in.username and user_in.username != current_user.username:
+        user = crud.user.get_by_username(db, username=user_in.username)
+        if user is not None:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=strings.USERNAME_TAKEN)
+    current_user_data = schemas.UserUpdate(**jsonable_encoder(current_user))
+    updated_user = current_user_data.copy(update=user_in.dict(exclude_unset=True))
+    return crud.user.update(db, db_obj=current_user, obj_in=updated_user)
 
 
 @router.post("/open", response_model=schemas.User, dependencies=[Depends(deps.get_current_superuser)])
