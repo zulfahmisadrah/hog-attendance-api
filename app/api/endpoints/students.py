@@ -21,6 +21,9 @@ def get_list_students(db: Session = Depends(session.get_db), offset: int = 0, li
 @router.post("/", response_model=schemas.Student, status_code=status.HTTP_201_CREATED,
              dependencies=[Depends(deps.get_current_admin)])
 def create_student(student: schemas.StudentCreate, db: Session = Depends(session.get_db)):
+    user = crud.user.get_by_username(db, username=student.user.username)
+    if user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=strings.USERNAME_TAKEN)
     return crud.student.create(db=db, obj_in=student)
 
 
