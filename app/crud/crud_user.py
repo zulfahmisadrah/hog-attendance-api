@@ -2,6 +2,7 @@ from typing import Optional, Union, Dict, Any
 
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.core.security import get_password_hash, verify_password
@@ -9,6 +10,7 @@ from app.crud import crud_role
 from app.crud.base import CRUDBase
 from app.models.domains import User
 from app.models.schemas import UserCreate, UserUpdate
+from app.resources import strings
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
@@ -23,14 +25,16 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             obj_in_data["password"] = hashed_password
         try:
             new_user = User(**obj_in_data)
-            role_superuser = crud_role.role.get(db, id=role_id)
-            new_user.roles.append(role_superuser)
+            user_role = crud_role.role.get(db, id=role_id)
+            new_user.roles.append(user_role)
             db.add(new_user)
             db.commit()
             db.refresh(new_user)
-        except:
+        except SQLAlchemyError as e:
+            print(e.args)
             db.rollback()
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error Creating User")
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                detail=strings.ERROR_INTERNAL_SERVER_ERROR)
         return new_user
 
     def create_superuser(self, db: Session, *, obj_in: UserCreate) -> User:
