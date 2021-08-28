@@ -1,5 +1,7 @@
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel, EmailStr
+
+from .role import Role
 
 
 class UserBase(BaseModel):
@@ -27,6 +29,7 @@ class UserUpdate(UserBase):
 
 class User(UserBase):
     id: Optional[int] = None
+    roles: List[Role]
 
     class Config:
         orm_mode = True

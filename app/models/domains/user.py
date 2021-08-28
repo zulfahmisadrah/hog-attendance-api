@@ -15,7 +15,7 @@ class User(Base, CommonModel):
     avatar = Column(String(255))
     is_active = Column(Boolean(), default=True)
 
-    roles = relationship("Role", secondary=user_role, backref="users", lazy="dynamic")
+    roles = relationship("Role", secondary=user_role, back_populates="users", cascade="all, delete")
 
     def __str__(self):
         return str(self.__dict__)
