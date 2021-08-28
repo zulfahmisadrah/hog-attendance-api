@@ -56,7 +56,7 @@ def create_user(role_id: int, user_in: schemas.UserCreate, db: Session = Depends
 
 
 @router.get("/me", response_model=schemas.User, dependencies=[Depends(deps.get_db)])
-def read_user_me(current_user: domains.User = Depends(deps.get_current_active_user)) -> Any:
+def read_user_me(current_user: domains.User = Depends(deps.get_current_user)) -> Any:
     return current_user
 
 
