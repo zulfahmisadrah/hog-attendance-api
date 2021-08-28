@@ -35,6 +35,6 @@ def login_access_token(
     return payload
 
 
-@router.post("/check", response_model=schemas.User)
+@router.post("/me", response_model=schemas.User)
 def check_access_token(current_user: domains.User = Depends(deps.get_current_user)) -> Any:
     return current_user
