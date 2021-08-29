@@ -14,5 +14,5 @@ class DateTimeModelMixin(BaseModel):
     updated_at: Optional[datetime]
 
     @validator("created_at", "updated_at", pre=True)
-    def default_datetime(self, value: datetime) -> datetime:
-        return value or datetime.datetime.now()
+    def default_datetime(cls, value: datetime) -> datetime:
+        return value or datetime.now()
