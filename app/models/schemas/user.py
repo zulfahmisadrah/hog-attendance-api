@@ -1,6 +1,7 @@
 from typing import Optional, List
 from pydantic import BaseModel, EmailStr
 
+from .core import DateTimeModelMixin
 from .role import Role
 
 
@@ -27,7 +28,7 @@ class UserUpdate(UserBase):
     password: Optional[str] = None
 
 
-class User(UserBase):
+class User(UserBase, DateTimeModelMixin):
     id: Optional[int] = None
     roles: List[Role]
 
