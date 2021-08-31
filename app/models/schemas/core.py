@@ -4,9 +4,8 @@ from datetime import datetime
 from pydantic import BaseModel, validator
 
 
-class CoreModel(BaseModel):
+class IDMixin(BaseModel):
     id: int
-    pass
 
 
 class DateTimeModelMixin(BaseModel):
