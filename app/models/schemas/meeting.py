@@ -1,12 +1,14 @@
-from typing import Optional, List
+from typing import Optional
+
 from pydantic import BaseModel
+
+from .schedule import Schedule
+from .core import DateTimeModelMixin, IDMixin
 
 
 class MeetingBase(BaseModel):
     name: Optional[str] = None
     number: Optional[int] = None
-    course_id: Optional[int] = None
-    schedule_id: Optional[int] = None
 
 
 class MeetingCreate(MeetingBase):
@@ -17,12 +19,22 @@ class MeetingCreate(MeetingBase):
 
 
 class MeetingUpdate(MeetingBase):
-    pass
+    course_id: Optional[int] = None
+    schedule_id: Optional[int] = None
 
 
-class Meeting(MeetingBase):
+class MeetingCourse(BaseModel):
     id: Optional[int] = None
+    name: Optional[str] = None
+    code: Optional[str] = None
 
     class Config:
         orm_mode = True
 
+
+class Meeting(DateTimeModelMixin, MeetingBase, IDMixin):
+    course: MeetingCourse
+    schedule: Schedule
+
+    class Config:
+        orm_mode = True
