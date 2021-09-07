@@ -14,7 +14,6 @@ class LecturerBase(BaseModel):
 
 class LecturerCreate(LecturerBase):
     user: UserCreate
-    department_id: int
 
 
 class LecturerUpdate(LecturerBase):

@@ -14,7 +14,6 @@ class StudentBase(BaseModel):
 
 class StudentCreate(StudentBase):
     user: UserCreate
-    department_id: int
 
 
 class StudentUpdate(StudentBase):
