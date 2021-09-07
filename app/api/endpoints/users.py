@@ -19,30 +19,12 @@ def index(db: Session = Depends(deps.get_db), offset: int = 0, limit: int = 10) 
     return users
 
 
-@router.post("/", response_model=schemas.User, dependencies=[Depends(deps.get_current_superuser)])
+@router.post("/", response_model=schemas.User, dependencies=[Depends(deps.get_current_admin)])
 def create_user(user_in: schemas.UserCreate, db: Session = Depends(deps.get_db)) -> Any:
     user = crud.user.get_by_username(db, username=user_in.username)
     if user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=strings.USERNAME_TAKEN)
     user = crud.user.create(db, obj_in=user_in)
-    return user
-
-
-@router.post("/create_superuser", response_model=schemas.User, dependencies=[Depends(deps.get_current_superuser)])
-def create_superuser(user_in: schemas.UserCreate, db: Session = Depends(deps.get_db)) -> Any:
-    user = crud.user.get_by_username(db, username=user_in.username)
-    if user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=strings.USERNAME_TAKEN)
-    user = crud.user.create_superuser(db, obj_in=user_in)
-    return user
-
-
-@router.post("/create_admin", response_model=schemas.User, dependencies=[Depends(deps.get_current_superuser)])
-def create_admin(user_in: schemas.UserCreate, db: Session = Depends(deps.get_db)) -> Any:
-    user = crud.user.get_by_username(db, username=user_in.username)
-    if user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=strings.USERNAME_TAKEN)
-    user = crud.user.create_admin(db, obj_in=user_in)
     return user
 
 
