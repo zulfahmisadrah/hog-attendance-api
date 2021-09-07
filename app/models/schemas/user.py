@@ -5,6 +5,14 @@ from pydantic import BaseModel, EmailStr
 from .core import DateTimeModelMixin, IDMixin
 
 
+class UserRole(BaseModel):
+    id: Optional[int] = None
+    code: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+
+
 class UserBase(BaseModel):
     username: Optional[str] = None
     name: Optional[str] = None
@@ -12,16 +20,14 @@ class UserBase(BaseModel):
     phone_number: Optional[str] = None
     avatar: Optional[str] = None
     is_active: Optional[bool] = True
-
-
-class UserOut(UserBase):
-    pass
+    roles: Optional[List[UserRole]] = None
 
 
 class UserCreate(UserBase):
     name: str
     username: str
     password: str
+    roles: List[UserRole]
 
 
 class UserUpdate(UserBase):
