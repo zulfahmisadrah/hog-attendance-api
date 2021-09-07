@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "department_id": 12,
+    "user": {
+      "name": "Lecturer",
+      "username": "lecturer",
+      "password": "Pass@1234",
+      "roles": [
+        {
+          "code": "ROLE_LECTURER"
+        }
+      ]
+    }
+  }
+]

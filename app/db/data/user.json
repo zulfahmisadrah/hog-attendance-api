@@ -1,0 +1,13 @@
+[
+  {
+    "id": 2,
+    "name": "Admin",
+    "username": "admin",
+    "password": "Pass@1234",
+    "roles": [
+      {
+        "code": "ROLE_ADMIN"
+      }
+    ]
+  }
+]
