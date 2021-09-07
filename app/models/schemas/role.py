@@ -6,13 +6,13 @@ from app.models.schemas.core import IDMixin, DateTimeModelMixin
 
 
 class RoleBase(BaseModel):
-    code: str
-    name: str
+    code: Optional[str] = None
+    name: Optional[str] = None
     description: Optional[str] = None
 
 
 class RoleCreate(RoleBase):
-    pass
+    code: str
 
 
 class RoleUpdate(RoleBase):
