@@ -3,7 +3,7 @@ from typing import Optional, List
 from pydantic import BaseModel
 
 from app.models.domains.course import CourseType
-from app.models.schemas.meeting import Meeting
+from app.models.schemas.core import DateTimeModelMixin, IDMixin
 
 
 class CourseBase(BaseModel):
@@ -28,16 +28,13 @@ class CourseUpdate(CourseBase):
     pass
 
 
-class Course(CourseBase):
-    id: Optional[int] = None
-
+class Course(DateTimeModelMixin, CourseBase, IDMixin):
     class Config:
         orm_mode = True
 
 
-class CourseMeetings(CourseBase):
-    id: int
-    meetings: List[Meeting] = []
+class CourseMeetings(DateTimeModelMixin, CourseBase, IDMixin):
+    meetings: "List[Meeting]" = []
 
     class Config:
         orm_mode = True

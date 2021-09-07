@@ -1,8 +1,8 @@
 from typing import Optional, List
+
 from pydantic import BaseModel, EmailStr
 
-from .core import DateTimeModelMixin
-from .role import Role
+from .core import DateTimeModelMixin, IDMixin
 
 
 class UserBase(BaseModel):
@@ -28,10 +28,7 @@ class UserUpdate(UserBase):
     password: Optional[str] = None
 
 
-class User(UserBase, DateTimeModelMixin):
-    id: Optional[int] = None
-    roles: List[Role]
-
+class User(DateTimeModelMixin, UserBase, IDMixin):
     class Config:
         orm_mode = True
 

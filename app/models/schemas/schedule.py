@@ -3,6 +3,7 @@ from datetime import time
 from pydantic import BaseModel
 
 from app.models.domains.schedule import DayOfWeek
+from app.models.schemas.core import IDMixin, DateTimeModelMixin
 
 
 class ScheduleBase(BaseModel):
@@ -21,9 +22,6 @@ class ScheduleUpdate(ScheduleBase):
     pass
 
 
-class Schedule(ScheduleBase):
-    id: Optional[int] = None
-
+class Schedule(DateTimeModelMixin, ScheduleBase, IDMixin):
     class Config:
         orm_mode = True
-

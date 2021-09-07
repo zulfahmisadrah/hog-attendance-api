@@ -3,6 +3,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 from app.models.domains.semester import SemesterType
+from app.models.schemas.core import IDMixin, DateTimeModelMixin
 
 
 class SemesterBase(BaseModel):
@@ -22,9 +23,6 @@ class SemesterUpdate(SemesterBase):
     pass
 
 
-class Semester(SemesterBase):
-    id: Optional[int] = None
-
+class Semester(DateTimeModelMixin, SemesterBase, IDMixin):
     class Config:
         orm_mode = True
-

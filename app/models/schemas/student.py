@@ -3,6 +3,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 from app.models.schemas import User, UserCreate, UserUpdate
+from app.models.schemas.core import IDMixin
 
 
 class StudentBase(BaseModel):
@@ -20,8 +21,7 @@ class StudentUpdate(StudentBase):
     user: Optional[UserUpdate] = None
 
 
-class Student(StudentBase):
-    id: Optional[int] = None
+class Student(StudentBase, IDMixin):
     user: User
 
     class Config:

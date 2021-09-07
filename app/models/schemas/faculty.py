@@ -1,20 +1,14 @@
 from typing import Optional, List
 
-from fastapi_permissions import Allow, Authenticated
 from pydantic import BaseModel
 
+from app.models.schemas.core import DateTimeModelMixin, IDMixin
 from app.models.schemas.department import Department
 
 
 class FacultyBase(BaseModel):
     name: str
     code: str
-
-    def __acl__(self):
-        return [
-            (Allow, Authenticated, "read"),
-            (Allow, "role:admin", ("create", "update", "delete")),
-        ]
 
 
 class FacultyCreate(FacultyBase):
@@ -26,15 +20,12 @@ class FacultyUpdate(FacultyBase):
     code: Optional[str] = None
 
 
-class Faculty(FacultyBase):
-    id: Optional[int] = None
-
+class Faculty(DateTimeModelMixin, FacultyBase, IDMixin):
     class Config:
         orm_mode = True
 
 
-class FacultyDepartments(FacultyBase):
-    id: int
+class FacultyDepartments(DateTimeModelMixin, FacultyBase, IDMixin):
     departments: List[Department] = []
 
     class Config:

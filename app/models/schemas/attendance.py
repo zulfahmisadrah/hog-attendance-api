@@ -3,6 +3,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 from app.models.domains.attendance import AttendanceStatus
+from app.models.schemas.core import DateTimeModelMixin, IDMixin
 
 
 class AttendanceBase(BaseModel):
@@ -23,9 +24,7 @@ class AttendanceUpdate(AttendanceBase):
     pass
 
 
-class Attendance(AttendanceBase):
-    id: Optional[int] = None
-
+class Attendance(DateTimeModelMixin, AttendanceBase, IDMixin):
     class Config:
         orm_mode = True
 
