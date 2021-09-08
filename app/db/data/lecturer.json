@@ -1,16 +1,11 @@
 [
   {
-    "id": 1,
-    "department_id": 12,
-    "user": {
-      "name": "Lecturer",
-      "username": "lecturer",
-      "password": "Pass@1234",
-      "roles": [
-        {
-          "code": "ROLE_LECTURER"
-        }
-      ]
+    "id": 3,
+    "name": "Lecturer",
+    "username": "lecturer",
+    "password": "Pass@1234",
+    "lecturer": {
+      "department_id": 12
     }
   }
 ]

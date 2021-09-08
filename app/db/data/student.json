@@ -1,16 +1,11 @@
 [
   {
-    "id": 1,
-    "department_id": 12,
-    "user": {
-      "name": "Student",
-      "username": "student",
-      "password": "Pass@1234",
-      "roles": [
-        {
-          "code": "ROLE_STUDENT"
-        }
-      ]
+    "id": 4,
+    "name": "Student",
+    "username": "student",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 12
     }
   }
 ]
