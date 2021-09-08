@@ -2,6 +2,8 @@ from typing import Optional, List
 
 from pydantic import BaseModel, EmailStr
 
+from .lecturer import LecturerCreate, LecturerUpdate, Lecturer
+from .student import StudentCreate, StudentUpdate, Student
 from .core import DateTimeModelMixin, IDMixin
 
 
@@ -20,21 +22,42 @@ class UserBase(BaseModel):
     phone_number: Optional[str] = None
     avatar: Optional[str] = None
     is_active: Optional[bool] = True
-    roles: Optional[List[UserRole]] = None
 
 
 class UserCreate(UserBase):
     name: str
     username: str
     password: str
-    roles: List[UserRole]
+
+
+class UserStudentCreate(UserCreate):
+    student: StudentCreate
+
+
+class UserLecturerCreate(UserCreate):
+    lecturer: LecturerCreate
+
+
+class UserRolesCreate(UserCreate):
+    roles: List[int] = []
 
 
 class UserUpdate(UserBase):
     password: Optional[str] = None
+    student: Optional[StudentUpdate] = None
+    lecturer: Optional[LecturerUpdate] = None
 
 
 class User(DateTimeModelMixin, UserBase, IDMixin):
+    roles: List[UserRole] = []
+
     class Config:
         orm_mode = True
 
+
+class UserStudent(User):
+    student: Student
+
+
+class UserLecturer(User):
+    lecturer: Lecturer

@@ -1,9 +1,6 @@
 from typing import Optional
-
 from pydantic import BaseModel
-
-from app.models.schemas import User, UserCreate, UserUpdate
-from app.models.schemas.core import IDMixin, DateTimeModelMixin
+from app.models.schemas.core import IDMixin
 
 
 class LecturerBase(BaseModel):
@@ -13,15 +10,13 @@ class LecturerBase(BaseModel):
 
 
 class LecturerCreate(LecturerBase):
-    user: UserCreate
+    department_id: int
 
 
 class LecturerUpdate(LecturerBase):
-    user: Optional[UserUpdate] = None
+    pass
 
 
-class Lecturer(DateTimeModelMixin, LecturerBase, IDMixin):
-    user: User
-
+class Lecturer(LecturerBase, IDMixin):
     class Config:
         orm_mode = True
