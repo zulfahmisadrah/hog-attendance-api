@@ -3,14 +3,15 @@ from sqlalchemy.orm import Session
 
 from app import crud
 from app.crud.base import CRUDBase
-from app.models.domains import Student
+from app.models.domains import Student, User
 from app.core.security import get_password_hash
 from app.models.schemas.student import StudentCreate, StudentUpdate
+from app.models.schemas.user import UserStudentCreate
 
 
 class CRUDStudent(CRUDBase[Student, StudentCreate, StudentUpdate]):
-    def create(self, db: Session, *, obj_in: StudentCreate) -> Student:
-        return crud.user.create(db, obj_in=obj_in.user)
+    def create(self, db: Session, *, obj_in: UserStudentCreate) -> User:
+        return crud.user.create_student(db, obj_in=obj_in)
 
     def update(self, db: Session, *, db_obj: Student, obj_in: StudentUpdate) -> Student:
         update_data = obj_in.dict(exclude_unset=True)
