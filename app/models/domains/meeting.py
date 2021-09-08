@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Column, Integer, BigInteger, String, ForeignKey
+from sqlalchemy import Column, Integer, BigInteger, String, ForeignKey, Date
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 class Meeting(Base, CommonModel):
     name = Column(String(50))
     number = Column(Integer)
+    date = Column(Date)
 
     course_id = Column(BigInteger, ForeignKey("course.id"))
     course = relationship("Course", back_populates="meetings")

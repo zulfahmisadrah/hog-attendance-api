@@ -9,11 +9,13 @@ from .core import DateTimeModelMixin, IDMixin
 class MeetingBase(BaseModel):
     name: Optional[str] = None
     number: Optional[int] = None
+    date: Optional[str] = None
 
 
 class MeetingCreate(MeetingBase):
     name: str
     number: int
+    date: str
     course_id: int
     schedule_id: int
 

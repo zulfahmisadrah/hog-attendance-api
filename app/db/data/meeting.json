@@ -3,6 +3,7 @@
     "id": 1,
     "name": "Pertemuan 1",
     "number": 1,
+    "date": "2021-10-18",
     "course_id": 1,
     "schedule_id": 1
   },
@@ -10,6 +11,7 @@
     "id": 2,
     "name": "Pertemuan 2",
     "number": 2,
+    "date": "2021-10-25",
     "course_id": 1,
     "schedule_id": 2
   },
@@ -17,13 +19,15 @@
     "id": 3,
     "name": "Pertemuan 1",
     "number": 1,
+    "date": "2021-10-19",
     "course_id": 2,
     "schedule_id": 1
   },
   {
     "id": 4,
     "name": "Pertemuan 2",
-    "number": 1,
+    "number": 2,
+    "date": "2021-10-26",
     "course_id": 2,
     "schedule_id": 2
   },
@@ -31,13 +35,15 @@
     "id": 5,
     "name": "Pertemuan 1",
     "number": 1,
+    "date": "2021-10-20",
     "course_id": 3,
     "schedule_id": 1
   },
   {
     "id": 6,
     "name": "Pertemuan 2",
-    "number": 1,
+    "number": 2,
+    "date": "2021-10-27",
     "course_id": 3,
     "schedule_id": 2
   }
