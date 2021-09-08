@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "day_of_week": 1,
+    "start_time": "10:00",
+    "end_time": "12:00"
+  },
+  {
+    "id": 2,
+    "day_of_week": 2,
+    "start_time": "13:00",
+    "end_time": "15:00"
+  }
+]

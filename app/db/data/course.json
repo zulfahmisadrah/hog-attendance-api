@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "Dasar Pemrograman Komputer",
+    "code": "D12123123",
+    "sks": 3,
+    "semester": 1,
+    "quota": 30,
+    "type": "Wajib",
+    "department_id": 12
+  },
+  {
+    "id": 2,
+    "name": "Algoritma dan Struktur Data",
+    "code": "D1213456",
+    "sks": 3,
+    "semester": 2,
+    "quota": 30,
+    "type": "Wajib",
+    "department_id": 12
+  },
+  {
+    "id": 3,
+    "name": "Pemrograman Web",
+    "code": "D1212356",
+    "sks": 3,
+    "semester": 3,
+    "quota": 30,
+    "type": "Wajib",
+    "department_id": 12
+  }
+]

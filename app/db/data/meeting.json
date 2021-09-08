@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "name": "Pertemuan 1",
+    "number": 1,
+    "course_id": 1,
+    "schedule_id": 1
+  },
+  {
+    "id": 2,
+    "name": "Pertemuan 2",
+    "number": 2,
+    "course_id": 1,
+    "schedule_id": 2
+  },
+  {
+    "id": 3,
+    "name": "Pertemuan 1",
+    "number": 1,
+    "course_id": 2,
+    "schedule_id": 1
+  },
+  {
+    "id": 4,
+    "name": "Pertemuan 2",
+    "number": 1,
+    "course_id": 2,
+    "schedule_id": 2
+  },
+  {
+    "id": 5,
+    "name": "Pertemuan 1",
+    "number": 1,
+    "course_id": 3,
+    "schedule_id": 1
+  },
+  {
+    "id": 6,
+    "name": "Pertemuan 2",
+    "number": 1,
+    "course_id": 3,
+    "schedule_id": 2
+  }
+]

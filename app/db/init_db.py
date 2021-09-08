@@ -25,3 +25,8 @@ def init_db(db: Session) -> None:
     DBSeeder(db, crud.student, schemas.StudentCreate).load_from_json("student.json")
     DBSeeder(db, crud.faculty, schemas.FacultyCreate).load_from_json("faculty.json")
     DBSeeder(db, crud.department, schemas.DepartmentCreate).load_from_json("department.json")
+    DBSeeder(db, crud.semester, schemas.SemesterCreate).load_from_json("semester.json")
+    DBSeeder(db, crud.schedule, schemas.ScheduleCreate).load_from_json("schedule.json")
+    DBSeeder(db, crud.course, schemas.CourseCreate).load_from_json("course.json")
+    DBSeeder(db, crud.meeting, schemas.MeetingCreate).load_from_json("meeting.json")
+

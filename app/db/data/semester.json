@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "year": 2021,
+    "type": "Ganjil",
+    "code": "20211",
+    "academic_year": "2021/2022",
+    "is_active": true
+  },
+  {
+    "id": 2,
+    "year": 2021,
+    "type": "Genap",
+    "code": "20212",
+    "academic_year": "2021/2022"
+  }
+]
