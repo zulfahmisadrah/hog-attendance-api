@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, Boolean
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
 from .core import CommonModel
@@ -15,7 +15,7 @@ class User(Base, CommonModel):
     avatar = Column(String(255))
     is_active = Column(Boolean(), default=True)
 
-    roles = relationship("Role", secondary=user_role, back_populates="users", cascade="all, delete")
+    roles = relationship("Role", secondary=user_role, back_populates="users")
 
     def __str__(self):
         return str(self.__dict__)
