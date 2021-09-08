@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Any
+from typing import Any, Union
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
@@ -35,6 +35,6 @@ def login_access_token(
     return payload
 
 
-@router.post("/me", response_model=schemas.User)
+@router.post("/me", response_model=Union[schemas.UserStudent, schemas.UserLecturer, schemas.User])
 def check_access_token(current_user: domains.User = Depends(deps.get_current_user)) -> Any:
     return current_user

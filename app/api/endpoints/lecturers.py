@@ -18,13 +18,13 @@ def get_list_lecturers(db: Session = Depends(session.get_db), offset: int = 0, l
     return list_data
 
 
-@router.post("/", response_model=schemas.Lecturer, status_code=status.HTTP_201_CREATED,
+@router.post("/", response_model=schemas.User, status_code=status.HTTP_201_CREATED,
              dependencies=[Depends(deps.get_current_admin)])
-def create_lecturer(lecturer: schemas.LecturerCreate, db: Session = Depends(session.get_db)):
-    user = crud.user.get_by_username(db, username=lecturer.user.username)
+def create_lecturer(user_in: schemas.UserLecturerCreate, db: Session = Depends(deps.get_db)):
+    user = crud.user.get_by_username(db, username=user_in.username)
     if user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=strings.USERNAME_TAKEN)
-    return crud.lecturer.create(db=db, obj_in=lecturer)
+    return crud.lecturer.create(db, obj_in=user_in)
 
 
 @router.get("/{lecturer_id}", response_model=schemas.Lecturer, dependencies=[Depends(deps.get_current_active_user)])

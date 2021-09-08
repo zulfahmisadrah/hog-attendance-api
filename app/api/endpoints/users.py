@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import List, Any, Union
 
 from fastapi import APIRouter, Depends, HTTPException, status, Body
 from fastapi.encoders import jsonable_encoder
@@ -15,31 +15,34 @@ router = APIRouter()
 
 @router.get("/", response_model=List[schemas.User], dependencies=[Depends(deps.get_current_superuser)])
 def index(db: Session = Depends(deps.get_db), offset: int = 0, limit: int = 10) -> Any:
-    users = crud.user.get_list(db, offset=offset, limit=limit)
-    return users
+    return crud.user.get_list(db, offset=offset, limit=limit)
 
 
-@router.post("/", response_model=schemas.User, dependencies=[Depends(deps.get_current_admin)])
-def create_user(user_in: schemas.UserCreate, db: Session = Depends(deps.get_db)) -> Any:
+@router.post("/", response_model=schemas.User, status_code=status.HTTP_201_CREATED,
+             dependencies=[Depends(deps.get_current_superuser)])
+def create_user(user_in: schemas.UserRolesCreate, db: Session = Depends(deps.get_db)) -> Any:
     user = crud.user.get_by_username(db, username=user_in.username)
     if user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=strings.USERNAME_TAKEN)
-    user = crud.user.create(db, obj_in=user_in)
-    return user
+    return crud.user.create(db, obj_in=user_in)
 
 
-@router.post("/role/{role_id}", response_model=schemas.User, dependencies=[Depends(deps.get_current_superuser)])
-def create_user(role_id: int, user_in: schemas.UserCreate, db: Session = Depends(deps.get_db)) -> Any:
+@router.post("/create_student", response_model=schemas.UserStudent, status_code=status.HTTP_201_CREATED,
+             dependencies=[Depends(deps.get_current_admin)])
+def create_student(user_in: schemas.UserStudentCreate, db: Session = Depends(deps.get_db)) -> Any:
     user = crud.user.get_by_username(db, username=user_in.username)
     if user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=strings.USERNAME_TAKEN)
-    user = crud.user.create(db, obj_in=user_in, role_id=role_id)
-    return user
+    return crud.student.create(db, obj_in=user_in)
 
 
-@router.get("/me", response_model=schemas.User, dependencies=[Depends(deps.get_db)])
-def read_user_me(current_user: domains.User = Depends(deps.get_current_user)) -> Any:
-    return current_user
+@router.post("/create_lecturer", response_model=schemas.UserLecturer, status_code=status.HTTP_201_CREATED,
+             dependencies=[Depends(deps.get_current_admin)])
+def create_lecturer(user_in: schemas.UserLecturerCreate, db: Session = Depends(deps.get_db)) -> Any:
+    user = crud.user.get_by_username(db, username=user_in.username)
+    if user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=strings.USERNAME_TAKEN)
+    return crud.lecturer.create(db, obj_in=user_in)
 
 
 @router.put("/me", response_model=schemas.User)
@@ -81,7 +84,7 @@ def create_user_open(
     return user
 
 
-@router.get("/{user_id}", response_model=schemas.User, dependencies=[Depends(deps.get_current_superuser)])
+@router.get("/{user_id}", response_model=Union[schemas.UserStudent, schemas.UserLecturer, schemas.User])
 def read_user_by_id(
         user_id: int,
         current_user: domains.User = Depends(deps.get_current_active_user),
@@ -90,7 +93,7 @@ def read_user_by_id(
     user = crud.user.get(db, id=user_id)
     if user == current_user:
         return user
-    if not crud.user.is_superuser(current_user):
+    if not crud.user.is_admin(current_user):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="The user doesn't have enough privileges"
         )
@@ -103,10 +106,18 @@ def update_user(
         db: Session = Depends(deps.get_db),
         user_id: int,
         user_in: schemas.UserUpdate,
-        current_user: domains.User = Depends(deps.get_current_superuser)
 ) -> Any:
     user = crud.user.get(db, id=user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     user = crud.user.update(db, db_obj=user, obj_in=user_in)
-    return current_user
+    return user
+
+
+@router.delete('/{user_id}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(deps.get_current_admin)])
+def delete_user(user_id: int, db: Session = Depends(deps.get_db)):
+    user = crud.user.get(db, user_id)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=strings.ERROR_DATA_ID_NOT_EXIST.format(user_id))
+    return crud.user.delete(db, id=user_id)
