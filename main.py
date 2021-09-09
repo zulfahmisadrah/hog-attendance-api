@@ -1,3 +1,5 @@
+import argparse
+
 import uvicorn
 import logging
 
@@ -16,6 +18,10 @@ logger = logging.getLogger(__name__)
 security = HTTPBearer()
 app = FastAPI()
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--seed', default=False, action='store_true', help="Seed database with initial data")
+args = vars(parser.parse_args())
+
 
 def init() -> None:
     db = SessionLocal()
@@ -24,9 +30,12 @@ def init() -> None:
 
 def main() -> None:
     LOGGING_CONFIG["formatters"]["default"]["fmt"] = "%(asctime)s %(levelprefix)s %(message)s"
-    logger.info("Create initial data")
-    init()
-    logger.info("Initial data created")
+
+    if args["seed"]:
+        logger.info("Create initial data")
+        init()
+        logger.info("Initial data created")
+
     uvicorn.run("main:app", host=settings.WEB_HOST, port=settings.WEB_PORT, reload=settings.AUTO_RELOAD)
 
 
@@ -45,7 +54,7 @@ app.include_router(api_router, prefix=settings.API_PREFIX)
 
 @app.get('/')
 def index():
-    return {"messages": "Neo Presensi API"}
+    return {"messages": settings.PROJECT_NAME}
 
 
 if __name__ == "__main__":
