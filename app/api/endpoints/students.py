@@ -8,11 +8,12 @@ from app.models import schemas
 from app.api import deps
 from app.db import session
 from app.resources import strings
+from app.api.endpoints.semesters import get_semester
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.Student], dependencies=[Depends(deps.get_current_active_user)])
+@router.get("/", response_model=List[schemas.StudentUser], dependencies=[Depends(deps.get_current_active_user)])
 def get_list_students(db: Session = Depends(session.get_db), offset: int = 0, limit: int = 20):
     list_data = crud.student.get_list(db, offset=offset, limit=limit)
     return list_data
@@ -27,15 +28,18 @@ def create_student(student: schemas.UserStudentCreate, db: Session = Depends(dep
     return crud.student.create(db, obj_in=student)
 
 
-@router.get("/{student_id}", response_model=schemas.Student, dependencies=[Depends(deps.get_current_active_user)])
+@router.get("/{student_id}", response_model=schemas.StudentUser, dependencies=[Depends(deps.get_current_active_user)])
 def get_student(student_id: int, db: Session = Depends(session.get_db)):
-    data = crud.student.get(db, student_id)
-    if not data:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=strings.ERROR_DATA_NOT_FOUND)
-    return data
+    student = crud.student.get(db, student_id)
+    if not student:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=strings.ERROR_MODEL_ID_NOT_EXIST.format(strings.MODEL_STUDENT, student_id)
+        )
+    return student
 
 
-@router.put('/{student_id}', response_model=schemas.Student, dependencies=[Depends(deps.get_current_admin)])
+@router.put('/{student_id}', response_model=schemas.StudentUser, dependencies=[Depends(deps.get_current_admin)])
 def update_student(student_id: int, student: schemas.StudentUpdate, db: Session = Depends(session.get_db)):
     db_obj = crud.student.get(db, student_id)
     if db_obj is None:
@@ -50,3 +54,20 @@ def delete_student(student_id: int, db: Session = Depends(session.get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=strings.ERROR_DATA_ID_NOT_EXIST.format(student_id))
     return crud.student.delete(db=db, id=student_id)
+
+
+@router.get("/{student_id}/courses", response_model=schemas.StudentCourses,
+            dependencies=[Depends(deps.get_current_active_user)])
+def get_student_courses(student_id: int, semester_id: int = 0, db: Session = Depends(session.get_db)):
+    student = get_student(student_id, db)
+    if semester_id == 0:
+        semester = crud.semester.get_active_semester(db)
+    else:
+        semester = get_semester(semester_id, db)
+    data = crud.student.get_student_courses(db, student_id=student_id, semester_id=semester_id)
+    list_courses = []
+    for student_course in data:
+        course = schemas.Course.from_orm(student_course.course)
+        list_courses.append(course)
+    student_courses = schemas.StudentCourses(semester=semester, student=student, courses=list_courses)
+    return student_courses
