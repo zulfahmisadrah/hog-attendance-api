@@ -26,3 +26,11 @@ class SemesterUpdate(SemesterBase):
 class Semester(DateTimeModelMixin, SemesterBase, IDMixin):
     class Config:
         orm_mode = True
+
+
+class SemesterSimple(IDMixin):
+    academic_year: Optional[str] = None
+    type: Optional[SemesterType] = None
+
+    class Config:
+        orm_mode = True
