@@ -3,13 +3,19 @@ from sqlalchemy.orm import Session
 
 from app import crud
 from app.crud.base import CRUDBase
-from app.models.domains import Student, User
+from app.models.domains import Student, User, CourseStudent
 from app.core.security import get_password_hash
 from app.models.schemas.student import StudentCreate, StudentUpdate
 from app.models.schemas.user import UserStudentCreate
 
 
 class CRUDStudent(CRUDBase[Student, StudentCreate, StudentUpdate]):
+    def get_student_courses(self, db: Session, *, student_id: int, semester_id: int) -> CourseStudent:
+        return db.query(CourseStudent).filter(
+            CourseStudent.semester_id == semester_id,
+            CourseStudent.student_id == student_id
+        ).all()
+
     def create(self, db: Session, *, obj_in: UserStudentCreate) -> User:
         return crud.user.create_student(db, obj_in=obj_in)
 
