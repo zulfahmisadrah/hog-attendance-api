@@ -10,5 +10,10 @@ class CourseStudent(Base):
     student_id = Column(ForeignKey("student.id"), primary_key=True)
 
     semester = relationship("Semester")
-    course = relationship("Course")
-    student = relationship("Student")
+    course = relationship("Course", back_populates="students")
+    student = relationship("Student", back_populates="courses")
+
+    def __init__(self, semester_id=None, course_id=None, student_id=None):
+        self.semester_id = semester_id
+        self.course_id = course_id
+        self.student_id = student_id
