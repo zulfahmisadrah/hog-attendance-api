@@ -9,3 +9,5 @@ ROLE_INVALID = "Role tidak valid"
 
 MODEL_LECTURER = "Dosen"
 MODEL_STUDENT = "Mahasiswa"
+MODEL_COURSE = "Mata Kuliah"
+MODEL_SEMESTER = "Semester"
