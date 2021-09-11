@@ -55,9 +55,31 @@ class User(DateTimeModelMixin, UserBase, IDMixin):
         orm_mode = True
 
 
+class UserSimple(IDMixin):
+    username: Optional[str] = None
+    name: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+
+
 class UserStudent(User):
     student: Student
 
 
 class UserLecturer(User):
     lecturer: Lecturer
+
+
+class LecturerUser(DateTimeModelMixin, Lecturer, IDMixin):
+    user: UserSimple
+
+    class Config:
+        orm_mode = True
+
+
+class StudentUser(DateTimeModelMixin, Student, IDMixin):
+    user: UserSimple
+
+    class Config:
+        orm_mode = True
