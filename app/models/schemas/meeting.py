@@ -1,4 +1,5 @@
-from typing import Optional
+from datetime import date
+from typing import Optional, Union
 
 from pydantic import BaseModel
 
@@ -9,13 +10,13 @@ from .core import DateTimeModelMixin, IDMixin
 class MeetingBase(BaseModel):
     name: Optional[str] = None
     number: Optional[int] = None
-    date: Optional[str] = None
+    date: Optional[Union[date, str]]
 
 
 class MeetingCreate(MeetingBase):
     name: str
     number: int
-    date: str
+    date: Union[date, str]
     course_id: int
     schedule_id: int
 
