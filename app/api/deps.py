@@ -63,6 +63,10 @@ def get_current_admin(current_user: domains.User = Depends(get_current_active_us
     return current_user
 
 
+def get_active_semester(db: Session = Depends(get_db)) -> domains.Semester:
+    return crud.semester.get_active_semester(db)
+
+
 def get_active_principals(user: domains.User = Depends(get_current_active_user)):
     if user:
         # user is logged in
