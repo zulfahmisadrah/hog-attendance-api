@@ -13,14 +13,14 @@ if TYPE_CHECKING:
 
 
 class AttendanceStatus(str, Enum):
-    ABSENT = "Tanpa Keterangan"
-    PRESENT = "Hadir"
-    EXCUSED = "Izin"
-    SICK = "Sakit"
+    ABSEN = "Tanpa Keterangan"
+    HADIR = "Hadir"
+    IZIN = "Izin"
+    SAKIT = "Sakit"
 
 
 class Attendance(Base, CommonModel):
-    status = Column(SQLEnum(AttendanceStatus), default=AttendanceStatus.ABSENT)
+    status = Column(SQLEnum(AttendanceStatus), default=AttendanceStatus.ABSEN)
     note = Column(String(255))
 
     meeting_id = Column(BigInteger, ForeignKey("meeting.id"))
