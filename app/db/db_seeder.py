@@ -4,8 +4,8 @@ from typing import Generic, TypeVar, Type
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from app.core.config import settings
 from app.crud.base import CRUDBase
+from app.utils.file_helper import get_initial_data_file
 
 ModelCRUD = TypeVar("ModelCRUD", bound=CRUDBase)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -17,8 +17,8 @@ class DBSeeder(Generic[ModelCRUD, CreateSchemaType]):
         self.crud = model_crud
         self.create_schema_type = create_schema_type
 
-    def load_from_json(self, file_path: str):
-        json_file = open(settings.INITIAL_DATA_FOLDER + file_path)
+    def load_from_json(self, file_name: str):
+        json_file = open(get_initial_data_file(file_name))
         for data_dict in json.load(json_file):
             data = self.crud.get(self.db, id=data_dict.get("id"))
             if not data:
