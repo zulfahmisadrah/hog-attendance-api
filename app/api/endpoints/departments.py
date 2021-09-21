@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -12,8 +12,22 @@ router = APIRouter()
 
 
 @router.get("/", response_model=List[schemas.Department], dependencies=[Depends(deps.get_current_active_user)])
-def get_list_departments(db: Session = Depends(session.get_db), offset: int = 0, limit: int = 20):
-    list_data = crud.department.get_list(db, offset=offset, limit=limit)
+def get_list_departments(
+        faculty_id: Optional[int] = None,
+        offset: int = 0,
+        limit: int = 20,
+        db: Session = Depends(session.get_db)
+):
+    if faculty_id:
+        data = crud.faculty.get(db, faculty_id)
+        if not data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=strings.ERROR_MODEL_ID_NOT_EXIST.format(strings.MODEL_FACULTY, faculty_id)
+            )
+        list_data = crud.department.get_by_faculty_id(db, faculty_id)
+    else:
+        list_data = crud.department.get_list(db, offset=offset, limit=limit)
     return list_data
 
 
@@ -58,10 +72,10 @@ def delete_department(department_id: int, db: Session = Depends(session.get_db))
     return crud.department.delete(db=db, id=department_id)
 
 
-@router.get("/{department_id}/courses", response_model=schemas.DepartmentCourses,
-            dependencies=[Depends(deps.get_current_active_user)])
-def get_with_departments(department_id: int, db: Session = Depends(session.get_db)):
-    department = crud.department.get(db, department_id)
-    if not department:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=strings.ERROR_DATA_NOT_FOUND)
-    return department
+# @router.get("/{department_id}/courses", response_model=schemas.DepartmentCourses,
+#             dependencies=[Depends(deps.get_current_active_user)])
+# def get_with_departments(department_id: int, db: Session = Depends(session.get_db)):
+#     department = crud.department.get(db, department_id)
+#     if not department:
+#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=strings.ERROR_DATA_NOT_FOUND)
+#     return department

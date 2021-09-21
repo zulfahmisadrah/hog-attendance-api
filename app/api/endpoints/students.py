@@ -28,7 +28,7 @@ def create_student(student: schemas.UserStudentCreate, db: Session = Depends(dep
     return crud.student.create(db, obj_in=student)
 
 
-@router.get("/{student_id}", response_model=schemas.StudentUser, dependencies=[Depends(deps.get_current_active_user)])
+@router.get("/{student_id}", response_model=schemas.StudentUserSimple, dependencies=[Depends(deps.get_current_active_user)])
 def get_student(student_id: int, db: Session = Depends(session.get_db)):
     student = crud.student.get(db, student_id)
     if not student:
@@ -39,7 +39,7 @@ def get_student(student_id: int, db: Session = Depends(session.get_db)):
     return student
 
 
-@router.put('/{student_id}', response_model=schemas.StudentUser, dependencies=[Depends(deps.get_current_admin)])
+@router.put('/{student_id}', response_model=schemas.StudentUserSimple, dependencies=[Depends(deps.get_current_admin)])
 def update_student(student_id: int, student: schemas.StudentUpdate, db: Session = Depends(session.get_db)):
     db_obj = crud.student.get(db, student_id)
     if db_obj is None:

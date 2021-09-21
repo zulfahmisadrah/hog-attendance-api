@@ -80,7 +80,7 @@ def get_course_students(course_id: int, semester_id: int = 0, db: Session = Depe
     data = crud.course.get_course_students(db, course_id=course_id, semester_id=semester_id)
     list_students = []
     for course_student in data:
-        student = schemas.StudentUser.from_orm(course_student.student)
+        student = schemas.StudentUserSimple.from_orm(course_student.student)
         list_students.append(student)
     course_students = schemas.CourseStudents(semester=semester, course=course, students=list_students)
     return course_students

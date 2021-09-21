@@ -1,9 +1,9 @@
-from .user import User, UserCreate, UserUpdate, UserStudent, UserStudentCreate, UserLecturer, UserLecturerCreate, UserRolesCreate, LecturerUser, StudentUser
+from .user import User, UserCreate, UserUpdate, UserStudent, UserStudentCreate, UserLecturer, UserLecturerCreate, UserRolesCreate, LecturerUser, StudentUser, StudentUserSimple
 from .role import Role, RoleCreate, RoleUpdate
 from .student import Student, StudentCreate, StudentUpdate
 from .lecturer import Lecturer, LecturerCreate, LecturerUpdate
 from .faculty import Faculty, FacultyCreate, FacultyUpdate, FacultyDepartments
-from .department import Department, DepartmentCreate, DepartmentUpdate, DepartmentCourses
+from .department import Department, DepartmentCreate, DepartmentUpdate
 from .semester import Semester, SemesterCreate, SemesterUpdate
 from .schedule import Schedule, ScheduleCreate, ScheduleUpdate
 from .course import Course, CourseCreate, CourseUpdate, CourseLecturers, CourseStudents, LecturerCourses, StudentCourses

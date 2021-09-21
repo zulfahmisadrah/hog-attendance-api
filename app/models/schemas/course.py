@@ -2,7 +2,8 @@ from typing import Optional, List
 
 from pydantic import BaseModel
 
-from .user import LecturerUser, StudentUser
+from .department import DepartmentSimple
+from .user import LecturerUser, StudentUserSimple
 from .semester import SemesterSimple
 from app.models.domains.course import CourseType
 from app.models.schemas.core import DateTimeModelMixin, IDMixin
@@ -15,7 +16,6 @@ class CourseBase(BaseModel):
     semester: Optional[int] = None
     quota: Optional[int] = None
     type: CourseType
-    department_id: int
 
 
 class CourseCreate(CourseBase):
@@ -26,13 +26,16 @@ class CourseCreate(CourseBase):
     quota: int
     lecturers: List[int] = []
     students: List[int] = []
+    department_id: int
 
 
 class CourseUpdate(CourseBase):
-    pass
+    department_id: Optional[int] = None
 
 
 class Course(DateTimeModelMixin, CourseBase, IDMixin):
+    department: DepartmentSimple
+
     class Config:
         orm_mode = True
 
@@ -61,7 +64,7 @@ class CourseLecturers(BaseModel):
 
 
 class CourseStudents(BaseModel):
-    students: List[StudentUser]
+    students: List[StudentUserSimple]
     course: CourseSimple
     semester: SemesterSimple
 
@@ -81,7 +84,7 @@ class LecturerCourses(BaseModel):
 class StudentCourses(BaseModel):
     courses: List[Course]
     semester: SemesterSimple
-    student: StudentUser
+    student: StudentUserSimple
 
     class Config:
         orm_mode = True

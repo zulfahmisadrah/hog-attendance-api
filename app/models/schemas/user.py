@@ -78,8 +78,15 @@ class LecturerUser(DateTimeModelMixin, Lecturer, IDMixin):
         orm_mode = True
 
 
-class StudentUser(DateTimeModelMixin, Student, IDMixin):
+class StudentUserSimple(DateTimeModelMixin, Student, IDMixin):
     user: UserSimple
+
+    class Config:
+        orm_mode = True
+
+
+class StudentUser(Student, IDMixin):
+    user: User
 
     class Config:
         orm_mode = True
