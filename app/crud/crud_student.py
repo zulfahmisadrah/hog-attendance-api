@@ -3,8 +3,9 @@ from sqlalchemy.orm import Session
 
 from app import crud
 from app.crud.base import CRUDBase
-from app.models.domains import Student, User, CourseStudent
+from app.models.domains import Student, CourseStudent
 from app.core.security import get_password_hash
+from app.models.schemas import UserStudent
 from app.models.schemas.student import StudentCreate, StudentUpdate
 from app.models.schemas.user import UserStudentCreate
 
@@ -16,7 +17,7 @@ class CRUDStudent(CRUDBase[Student, StudentCreate, StudentUpdate]):
             CourseStudent.student_id == student_id
         ).all()
 
-    def create(self, db: Session, *, obj_in: UserStudentCreate) -> User:
+    def create(self, db: Session, *, obj_in: UserStudentCreate) -> UserStudent:
         return crud.user.create_student(db, obj_in=obj_in)
 
     def update(self, db: Session, *, db_obj: Student, obj_in: StudentUpdate) -> Student:
