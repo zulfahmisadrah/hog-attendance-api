@@ -3,15 +3,15 @@ from enum import Enum
 from sqlalchemy import Column, String, Integer, Enum as SQLEnum, Boolean
 
 from app.db.base_class import Base
-from .core import BlameModel
+from .core import CommonModel
 
 
 class SemesterType(str, Enum):
-    ODD = "Ganjil"
-    EVEN = "Genap"
+    GANJIL = "Ganjil"
+    GENAP = "Genap"
 
 
-class Semester(Base, BlameModel):
+class Semester(Base, CommonModel):
     year = Column(Integer, nullable=False)
     type = Column(SQLEnum(SemesterType), nullable=False)
     code = Column(String(5))
