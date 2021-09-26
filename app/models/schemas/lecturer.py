@@ -6,7 +6,6 @@ from app.models.schemas.core import IDMixin
 class LecturerBase(BaseModel):
     nip: Optional[str] = None
     last_education: Optional[str] = None
-    department_id: Optional[int] = None
 
 
 class LecturerCreate(LecturerBase):
@@ -14,9 +13,19 @@ class LecturerCreate(LecturerBase):
 
 
 class LecturerUpdate(LecturerBase):
-    pass
+    department_id: Optional[int] = None
+
+
+class LecturerDepartment(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        orm_mode = True
 
 
 class Lecturer(LecturerBase, IDMixin):
+    department: LecturerDepartment
+
     class Config:
         orm_mode = True

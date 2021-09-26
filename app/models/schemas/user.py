@@ -10,6 +10,7 @@ from .core import DateTimeModelMixin, IDMixin
 class UserRole(BaseModel):
     id: Optional[int] = None
     code: Optional[str] = None
+    name: Optional[str] = None
 
     class Config:
         orm_mode = True
@@ -71,8 +72,15 @@ class UserLecturer(User):
     lecturer: Lecturer
 
 
-class LecturerUser(DateTimeModelMixin, Lecturer, IDMixin):
+class LecturerUserSimple(DateTimeModelMixin, Lecturer, IDMixin):
     user: UserSimple
+
+    class Config:
+        orm_mode = True
+
+
+class LecturerUser(DateTimeModelMixin, Lecturer, IDMixin):
+    user: User
 
     class Config:
         orm_mode = True
@@ -85,7 +93,7 @@ class StudentUserSimple(DateTimeModelMixin, Student, IDMixin):
         orm_mode = True
 
 
-class StudentUser(Student, IDMixin):
+class StudentUser(DateTimeModelMixin, Student, IDMixin):
     user: User
 
     class Config:

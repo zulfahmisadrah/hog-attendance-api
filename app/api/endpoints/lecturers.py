@@ -28,7 +28,7 @@ def create_lecturer(user_in: schemas.UserLecturerCreate, db: Session = Depends(d
     return crud.lecturer.create(db, obj_in=user_in)
 
 
-@router.get("/{lecturer_id}", response_model=schemas.LecturerUser, dependencies=[Depends(deps.get_current_active_user)])
+@router.get("/{lecturer_id}", response_model=schemas.LecturerUserSimple, dependencies=[Depends(deps.get_current_active_user)])
 def get_lecturer(lecturer_id: int, db: Session = Depends(session.get_db)):
     lecturer = crud.lecturer.get(db, lecturer_id)
     if not lecturer:
@@ -39,7 +39,7 @@ def get_lecturer(lecturer_id: int, db: Session = Depends(session.get_db)):
     return lecturer
 
 
-@router.put('/{lecturer_id}', response_model=schemas.LecturerUser, dependencies=[Depends(deps.get_current_admin)])
+@router.put('/{lecturer_id}', response_model=schemas.LecturerUserSimple, dependencies=[Depends(deps.get_current_admin)])
 def update_lecturer(lecturer_id: int, lecturer: schemas.LecturerUpdate, db: Session = Depends(session.get_db)):
     db_obj = crud.lecturer.get(db, lecturer_id)
     if db_obj is None:

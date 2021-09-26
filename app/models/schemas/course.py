@@ -3,7 +3,7 @@ from typing import Optional, List
 from pydantic import BaseModel
 
 from .department import DepartmentSimple
-from .user import LecturerUser, StudentUserSimple
+from .user import LecturerUserSimple, StudentUserSimple
 from .semester import SemesterSimple
 from app.models.domains.course import CourseType
 from app.models.schemas.core import DateTimeModelMixin, IDMixin
@@ -55,7 +55,7 @@ class CourseMeetings(DateTimeModelMixin, CourseBase, IDMixin):
 
 
 class CourseLecturers(BaseModel):
-    lecturers: List[LecturerUser]
+    lecturers: List[LecturerUserSimple]
     course: CourseSimple
     semester: SemesterSimple
 
@@ -75,7 +75,7 @@ class CourseStudents(BaseModel):
 class LecturerCourses(BaseModel):
     courses: List[Course]
     semester: SemesterSimple
-    lecturer: LecturerUser
+    lecturer: LecturerUserSimple
 
     class Config:
         orm_mode = True

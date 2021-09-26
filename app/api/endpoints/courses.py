@@ -63,7 +63,7 @@ def get_course_lecturers(course_id: int, semester_id: int = 0, db: Session = Dep
     data = crud.course.get_course_lecturers(db, course_id=course_id, semester_id=semester_id)
     list_lecturers = []
     for course_lecturer in data:
-        lecturer = schemas.LecturerUser.from_orm(course_lecturer.lecturer)
+        lecturer = schemas.LecturerUserSimple.from_orm(course_lecturer.lecturer)
         list_lecturers.append(lecturer)
     course_lecturers = schemas.CourseLecturers(semester=semester, course=course, lecturers=list_lecturers)
     return course_lecturers
