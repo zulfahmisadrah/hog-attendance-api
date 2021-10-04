@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 
 from app import crud
@@ -14,8 +14,25 @@ router = APIRouter()
 
 
 @router.get("/", response_model=List[schemas.StudentUser], dependencies=[Depends(deps.get_current_active_user)])
-def get_list_students(db: Session = Depends(session.get_db), offset: int = 0, limit: int = 20):
-    list_data = crud.student.get_list(db, offset=offset, limit=limit)
+def get_list_students(
+        department_id: Optional[int] = Query(None),
+        keyword: Optional[str] = Query(None, min_length=3),
+        offset: int = 0,
+        limit: int = 20,
+        db: Session = Depends(session.get_db)
+):
+    if department_id:
+        if keyword:
+            list_data = crud.student.get_by_department_id_and_username_or_name(db, department_id=department_id,
+                                                                               keyword=keyword, offset=offset,
+                                                                               limit=limit)
+        else:
+            list_data = crud.student.get_by_department_id(db, department_id=department_id)
+    else:
+        if keyword:
+            list_data = crud.student.get_by_username_or_name(db, keyword=keyword, offset=offset, limit=limit)
+        else:
+            list_data = crud.student.get_list(db, offset=offset, limit=limit)
     return list_data
 
 
@@ -28,7 +45,8 @@ def create_student(student: schemas.UserStudentCreate, db: Session = Depends(dep
     return crud.student.create(db, obj_in=student)
 
 
-@router.get("/{student_id}", response_model=schemas.StudentUserSimple, dependencies=[Depends(deps.get_current_active_user)])
+@router.get("/{student_id}", response_model=schemas.StudentUserSimple,
+            dependencies=[Depends(deps.get_current_active_user)])
 def get_student(student_id: int, db: Session = Depends(session.get_db)):
     student = crud.student.get(db, student_id)
     if not student:
