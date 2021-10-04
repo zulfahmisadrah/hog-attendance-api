@@ -46,11 +46,3 @@ def delete_faculty(faculty_id: int, db: Session = Depends(session.get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=strings.ERROR_DATA_ID_NOT_EXIST.format(faculty_id))
     return crud.faculty.delete(db=db, id=faculty_id)
-
-
-@router.get("/{faculty_id}/departments", response_model=schemas.FacultyDepartments)
-def get_with_departments(faculty_id: int, db: Session = Depends(session.get_db)):
-    faculty = crud.faculty.get(db, faculty_id)
-    if not faculty:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=strings.ERROR_DATA_NOT_FOUND)
-    return faculty
