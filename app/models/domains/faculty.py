@@ -13,5 +13,6 @@ if TYPE_CHECKING:
 class Faculty(Base, CommonModel):
     name = Column(String(50), unique=True, nullable=False)
     code = Column(String(3), unique=True, nullable=False)
+    alias = Column(String(10))
 
     departments = relationship("Department", back_populates="faculty")
