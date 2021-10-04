@@ -63,6 +63,10 @@ class CourseLecturers(BaseModel):
         orm_mode = True
 
 
+class CourseLecturersUpdate(BaseModel):
+    lecturers: List[int]
+
+
 class CourseStudents(BaseModel):
     students: List[StudentUserSimple]
     course: CourseSimple
@@ -70,6 +74,10 @@ class CourseStudents(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class CourseStudentsUpdate(BaseModel):
+    students: List[int]
 
 
 class LecturerCourses(BaseModel):

@@ -1,32 +1,25 @@
-from typing import Optional, List
+from typing import Optional
 
 from pydantic import BaseModel
 
 from app.models.schemas.core import DateTimeModelMixin, IDMixin
-from app.models.schemas.department import Department
 
 
 class FacultyBase(BaseModel):
+    name: Optional[str] = None
+    alias: Optional[str] = None
+    code: Optional[str] = None
+
+
+class FacultyCreate(FacultyBase):
     name: str
     code: str
 
 
-class FacultyCreate(FacultyBase):
+class FacultyUpdate(FacultyBase):
     pass
 
 
-class FacultyUpdate(FacultyBase):
-    name: Optional[str] = None
-    code: Optional[str] = None
-
-
 class Faculty(DateTimeModelMixin, FacultyBase, IDMixin):
-    class Config:
-        orm_mode = True
-
-
-class FacultyDepartments(DateTimeModelMixin, FacultyBase, IDMixin):
-    departments: List[Department] = []
-
     class Config:
         orm_mode = True

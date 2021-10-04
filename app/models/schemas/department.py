@@ -1,13 +1,14 @@
-from typing import Optional, List
+from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
-# from .course import Course
-from app.models.schemas.core import DateTimeModelMixin, IDMixin
+from .faculty import Faculty
+from .core import DateTimeModelMixin, IDMixin
 
 
 class DepartmentBase(BaseModel):
     name: Optional[str] = None
+    alias: Optional[str] = None
     code: Optional[str] = None
 
 
@@ -31,12 +32,7 @@ class DepartmentSimple(BaseModel):
 
 
 class Department(DateTimeModelMixin, DepartmentBase, IDMixin):
+    faculty: Faculty
+    
     class Config:
         orm_mode = True
-#
-#
-# class DepartmentCourses(DateTimeModelMixin, DepartmentBase, IDMixin):
-#     courses: List[Course] = []
-#
-#     class Config:
-#         orm_mode = True
