@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class AttendanceStatus(str, Enum):
-    ABSEN = "Tanpa Keterangan"
+    ABSEN = "Absen"
     HADIR = "Hadir"
     IZIN = "Izin"
     SAKIT = "Sakit"
