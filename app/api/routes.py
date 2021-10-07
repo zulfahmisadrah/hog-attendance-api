@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
-from app.api.endpoints import auth, users, students, lecturers, faculties, departments, semesters, schedules, courses, meetings, datasets
+from app.api.endpoints import auth, users, students, lecturers, faculties, departments, semesters, schedules, courses, \
+    meetings, datasets, roles, attendances
 
 api_router = APIRouter()
 api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
@@ -14,3 +15,5 @@ api_router.include_router(schedules.router, prefix="/schedules", tags=["schedule
 api_router.include_router(courses.router, prefix="/courses", tags=["courses"])
 api_router.include_router(meetings.router, prefix="/meetings", tags=["meetings"])
 api_router.include_router(datasets.router, prefix="/datasets", tags=["datasets"])
+api_router.include_router(roles.router, prefix="/roles", tags=["roles"])
+api_router.include_router(attendances.router, prefix="/attendances", tags=["attendances"])
