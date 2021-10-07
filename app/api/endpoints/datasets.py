@@ -14,12 +14,22 @@ from app.services import datasets
 router = APIRouter()
 
 
-@router.get("/train", dependencies=[Depends(deps.get_current_admin)])
-def train(db: Session = Depends(session.get_db)):
-    datasets.create_models()
-    # return {
-    #     "file": FileResponse(file_path)
-    # }
+@router.post("/train", dependencies=[Depends(deps.get_current_admin)])
+def train(course_id: int = Form(...), semester: schemas.Semester = Depends(deps.get_active_semester), db: Session = Depends(session.get_db)):
+    course = crud.course.get(db, course_id)
+    file_path = datasets.create_models(semester.code, course.code)
+    return {
+        "file_path": file_path
+    }
+
+
+@router.post("/recognize", dependencies=[Depends(deps.get_current_active_user)])
+def recognize(course_id: int = Form(...), file: bytes = File(...), semester: schemas.Semester = Depends(deps.get_active_semester), db: Session = Depends(session.get_db)):
+    course = crud.course.get(db, course_id)
+    result = datasets.recognize_face(file, semester.code, course.code)
+    return {
+        "result": result
+    }
 
 
 @router.post("/capture", dependencies=[Depends(deps.get_current_admin)])
@@ -27,7 +37,7 @@ def capture(student_id: int = Form(...), file: bytes = File(...), db: Session = 
     student = crud.student.get(db, student_id)
     file_path = datasets.save_user_image(file, student.user.username)
     return {
-        "file": FileResponse(file_path)
+        "file_path": file_path
     }
 
 

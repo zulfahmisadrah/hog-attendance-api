@@ -1,25 +1,18 @@
 import io
 import base64
-from os import path, mkdir, remove
+from os import path, remove
 
 from PIL import Image
 import cv2
 
-from app.core.config import settings
 from app.ml.face_detection import detect_face
 from app.ml.datasets_training import train_datasets
-from app.utils.file_helper import get_list_files, get_total_files
-
-
-def get_user_directory(username: str):
-    directory = path.join(settings.DATASETS_FOLDER, username)
-    if not path.isdir(directory):
-        mkdir(directory)
-    return directory
+from app.ml.face_recognition import recognize
+from app.utils.file_helper import get_list_files, get_total_files, get_user_datasets_directory
 
 
 def get_user_datasets(username: str):
-    user_dir = get_user_directory(username)
+    user_dir = get_user_datasets_directory(username)
     list_datasets = get_list_files(user_dir)
     # list_datasets = [path.join(user_dir, filename) for filename in list_data]
     return list_datasets
@@ -38,7 +31,7 @@ def generate_file_name(directory: str, username: str):
 
 
 def save_user_image(file: bytes, username: str):
-    user_dir = get_user_directory(username)
+    user_dir = get_user_datasets_directory(username)
     file_name = generate_file_name(user_dir, username)
     file_path = path.join(user_dir, file_name)
     image_bytes = file[file.find(b'/9'):]
@@ -54,5 +47,16 @@ def save_user_image(file: bytes, username: str):
     return file_path
 
 
-def create_models():
-    train_datasets()
+def create_models(semester_code: str, course_code: str):
+    file_path = train_datasets(semester_code, course_code)
+    print("FILE PATH", file_path)
+    return file_path
+
+
+def recognize_face(file: bytes, semester_code: str, course_code: str):
+    image_bytes = file[file.find(b'/9'):]
+    image = Image.open(io.BytesIO(base64.b64decode(image_bytes)))
+    # image.resize((220, 220))
+    recognized_user = recognize(image, semester_code, course_code)
+    print("RECOGNIZED USER", recognized_user)
+    return recognized_user
