@@ -3,7 +3,7 @@ from typing import Optional, Union
 
 from pydantic import BaseModel
 
-from .schedule import Schedule
+from .schedule import ScheduleSimple
 from .core import DateTimeModelMixin, IDMixin
 
 
@@ -37,7 +37,7 @@ class MeetingCourse(BaseModel):
 
 class Meeting(DateTimeModelMixin, MeetingBase, IDMixin):
     course: MeetingCourse
-    schedule: Schedule
+    schedule: ScheduleSimple
 
     class Config:
         orm_mode = True
