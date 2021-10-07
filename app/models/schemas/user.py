@@ -49,6 +49,11 @@ class UserUpdate(UserBase):
     lecturer: Optional[LecturerUpdate] = None
 
 
+class UserPasswordUpdate(BaseModel):
+    current_password: str
+    new_password: str
+
+
 class User(DateTimeModelMixin, UserBase, IDMixin):
     roles: List[UserRole] = []
 

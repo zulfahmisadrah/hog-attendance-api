@@ -1,4 +1,5 @@
 USERNAME_TAKEN = "Username telah digunakan"
+PASSWORD_INCORRECT = "Password yang Anda masukkan salah"
 ERROR_DATA_NOT_FOUND = "Data tidak ditemukan"
 ERROR_DATA_ID_NOT_EXIST = "Data dengan id {0} tidak ditemukan"
 ERROR_MODEL_ID_NOT_EXIST = "{0} dengan id {1} tidak ditemukan"

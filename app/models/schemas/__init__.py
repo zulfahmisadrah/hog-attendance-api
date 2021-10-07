@@ -1,4 +1,4 @@
-from .user import User, UserCreate, UserUpdate, UserStudent, UserStudentCreate, UserLecturer, UserLecturerCreate, UserRolesCreate, LecturerUser, LecturerUserSimple, StudentUser, StudentUserSimple
+from .user import User, UserCreate, UserUpdate, UserPasswordUpdate, UserStudent, UserStudentCreate, UserLecturer, UserLecturerCreate, UserRolesCreate, LecturerUser, LecturerUserSimple, StudentUser, StudentUserSimple
 from .role import Role, RoleCreate, RoleUpdate
 from .student import Student, StudentCreate, StudentUpdate
 from .lecturer import Lecturer, LecturerCreate, LecturerUpdate

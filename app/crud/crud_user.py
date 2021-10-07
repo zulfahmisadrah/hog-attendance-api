@@ -10,7 +10,8 @@ from app.crud.base import CRUDBase
 from app.resources import strings
 from app.resources.enums import RoleEnum
 from app.models.domains import User, Student, Lecturer
-from app.models.schemas import UserCreate, UserUpdate, UserStudentCreate, UserLecturerCreate, UserRolesCreate
+from app.models.schemas import UserCreate, UserUpdate, UserStudentCreate, UserLecturerCreate, UserRolesCreate, \
+    UserPasswordUpdate
 from app.core.security import get_password_hash, verify_password
 
 
@@ -73,6 +74,14 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             hashed_password = get_password_hash(update_data["password"])
             update_data["password"] = hashed_password
         return super().update(db, db_obj=db_obj, obj_in=update_data)
+
+    def update_password(self, db: Session, *, db_obj: User, obj_in: UserPasswordUpdate) -> User:
+        hashed_password = get_password_hash(obj_in.new_password)
+        db_obj.password = hashed_password
+        db.query(User).filter_by(username=db_obj.username).update({User.password: hashed_password})
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
 
     def authenticate(self, db: Session, *, username: str, password: str) -> Optional[User]:
         user = self.get_by_username(db, username=username)

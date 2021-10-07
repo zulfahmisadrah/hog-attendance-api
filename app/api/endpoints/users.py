@@ -45,6 +45,18 @@ def create_lecturer(user_in: schemas.UserLecturerCreate, db: Session = Depends(d
     return crud.lecturer.create(db, obj_in=user_in)
 
 
+@router.put("/update_password", response_model=schemas.UserLecturer)
+def update_password(
+        user_in: schemas.UserPasswordUpdate,
+        db: Session = Depends(deps.get_db),
+        current_user: domains.User = Depends(deps.get_current_user)
+) -> Any:
+    user = crud.user.authenticate(db, username=current_user.username, password=user_in.current_password)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=strings.PASSWORD_INCORRECT)
+    return crud.user.update_password(db, db_obj=current_user, obj_in=user_in)
+
+
 @router.put("/me", response_model=schemas.User)
 def update_user_me(
         user_in: schemas.UserUpdate,
