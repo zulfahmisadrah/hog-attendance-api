@@ -65,3 +65,12 @@ def delete_meeting(meeting_id: int, db: Session = Depends(session.get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=strings.ERROR_DATA_ID_NOT_EXIST.format(meeting_id))
     return crud.meeting.delete(db=db, id=meeting_id)
+
+
+@router.get("/{meeting_id}/attendances",
+            response_model=List[schemas.Attendance],
+            dependencies=[Depends(deps.get_current_active_user)])
+def get_meeting_attendances(meeting_id: int, db: Session = Depends(session.get_db)):
+    get_meeting(meeting_id, db)
+    data = crud.meeting.get_meeting_attendances(db, meeting_id=meeting_id)
+    return data
