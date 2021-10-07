@@ -22,6 +22,11 @@ class ScheduleUpdate(ScheduleBase):
     pass
 
 
+class ScheduleSimple(ScheduleBase, IDMixin):
+    class Config:
+        orm_mode = True
+
+
 class Schedule(DateTimeModelMixin, ScheduleBase, IDMixin):
     class Config:
         orm_mode = True
