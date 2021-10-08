@@ -7,5 +7,50 @@
     "student": {
       "department_id": 12
     }
+  },
+  {
+    "id": 2,
+    "name": "Zulfahmi",
+    "username": "D121171316",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 12
+    }
+  },
+  {
+    "id": 3,
+    "name": "Fahmi",
+    "username": "fahmi",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 12
+    }
+  },
+  {
+    "id": 4,
+    "name": "Fikar",
+    "username": "fikar",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 12
+    }
+  },
+  {
+    "id": 5,
+    "name": "Fikri",
+    "username": "fikri",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 12
+    }
+  },
+  {
+    "id": 6,
+    "name": "Dhila",
+    "username": "dhila",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 12
+    }
   }
 ]

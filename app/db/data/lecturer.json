@@ -7,5 +7,23 @@
     "lecturer": {
       "department_id": 12
     }
+  },
+  {
+    "id": 2,
+    "name": "Dosen",
+    "username": "dosen",
+    "password": "Pass@1234",
+    "lecturer": {
+      "department_id": 12
+    }
+  },
+  {
+    "id": 3,
+    "name": "Dosen Senior",
+    "username": "D124123",
+    "password": "Pass@1234",
+    "lecturer": {
+      "department_id": 12
+    }
   }
 ]
