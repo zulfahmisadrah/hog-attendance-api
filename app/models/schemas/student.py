@@ -13,7 +13,6 @@ class StudentCreate(StudentBase):
 
 class StudentUpdate(StudentBase):
     department_id: Optional[int] = None
-    pass
 
 
 class StudentDepartment(BaseModel):
