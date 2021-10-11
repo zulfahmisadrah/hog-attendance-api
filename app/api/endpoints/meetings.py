@@ -20,6 +20,9 @@ def get_list_meetings(db: Session = Depends(session.get_db), offset: int = 0, li
 @router.post("/", response_model=schemas.Meeting, status_code=status.HTTP_201_CREATED,
              dependencies=[Depends(deps.get_current_admin)])
 def create_meeting(meeting: schemas.MeetingCreate, db: Session = Depends(session.get_db)):
+    if not meeting.name:
+        course = crud.course.get(db, meeting.course_id)
+        meeting.name = f"{course.name} #{meeting.number}"
     return crud.meeting.create(db=db, obj_in=meeting)
 
 
@@ -55,6 +58,9 @@ def update_meeting(meeting_id: int, meeting: schemas.MeetingUpdate, db: Session 
     db_obj = crud.meeting.get(db, meeting_id)
     if db_obj is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=strings.ERROR_DATA_NOT_FOUND)
+    if not meeting.name:
+        course = crud.course.get(db, meeting.course_id)
+        meeting.name = f"{course.name} #{meeting.number}"
     return crud.meeting.update(db=db, db_obj=db_obj, obj_in=meeting)
 
 
