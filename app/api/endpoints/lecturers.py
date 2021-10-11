@@ -57,21 +57,16 @@ def get_lecturer(lecturer_id: int, db: Session = Depends(session.get_db)):
     return lecturer
 
 
-@router.put('/{lecturer_id}', response_model=schemas.LecturerUserSimple, dependencies=[Depends(deps.get_current_admin)])
-def update_lecturer(lecturer_id: int, lecturer: schemas.LecturerUpdate, db: Session = Depends(session.get_db)):
-    db_obj = crud.lecturer.get(db, lecturer_id)
-    if db_obj is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=strings.ERROR_DATA_NOT_FOUND)
-    return crud.lecturer.update(db=db, db_obj=db_obj, obj_in=lecturer)
+@router.put('/{lecturer_id}', response_model=schemas.UserLecturer, dependencies=[Depends(deps.get_current_admin)])
+def update_lecturer(lecturer_id: int, lecturer: schemas.UserUpdate, db: Session = Depends(session.get_db)):
+    db_obj = get_lecturer(lecturer_id, db)
+    return crud.lecturer.update(db=db, db_obj=db_obj.user, obj_in=lecturer)
 
 
 @router.delete('/{lecturer_id}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(deps.get_current_admin)])
 def delete_lecturer(lecturer_id: int, db: Session = Depends(session.get_db)):
-    db_obj = crud.lecturer.get(db, lecturer_id)
-    if db_obj is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=strings.ERROR_DATA_ID_NOT_EXIST.format(lecturer_id))
-    return crud.lecturer.delete(db=db, id=lecturer_id)
+    lecturer = get_lecturer(lecturer_id, db)
+    return crud.lecturer.delete(db=db, db_obj=lecturer)
 
 
 @router.get("/{lecturer_id}/courses", response_model=schemas.LecturerCourses,

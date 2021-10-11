@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 class Student(Base, CommonModel):
     user_id = Column(BigInteger, ForeignKey("user.id"))
-    user = relationship("User", backref=backref("student", uselist=False))
+    user = relationship("User", backref=backref("student", uselist=False, cascade="all,delete"))
 
     year = Column(Integer)
 

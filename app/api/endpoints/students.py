@@ -57,21 +57,16 @@ def get_student(student_id: int, db: Session = Depends(session.get_db)):
     return student
 
 
-@router.put('/{student_id}', response_model=schemas.StudentUserSimple, dependencies=[Depends(deps.get_current_admin)])
-def update_student(student_id: int, student: schemas.StudentUpdate, db: Session = Depends(session.get_db)):
-    db_obj = crud.student.get(db, student_id)
-    if db_obj is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=strings.ERROR_DATA_NOT_FOUND)
-    return crud.student.update(db=db, db_obj=db_obj, obj_in=student)
+@router.put('/{student_id}', response_model=schemas.UserStudent, dependencies=[Depends(deps.get_current_admin)])
+def update_student(student_id: int, student: schemas.UserUpdate, db: Session = Depends(session.get_db)):
+    db_obj = get_student(student_id, db)
+    return crud.student.update(db=db, db_obj=db_obj.user, obj_in=student)
 
 
 @router.delete('/{student_id}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(deps.get_current_admin)])
 def delete_student(student_id: int, db: Session = Depends(session.get_db)):
-    db_obj = crud.student.get(db, student_id)
-    if db_obj is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=strings.ERROR_DATA_ID_NOT_EXIST.format(student_id))
-    return crud.student.delete(db=db, id=student_id)
+    student = get_student(student_id, db)
+    return crud.student.delete(db=db, db_obj=student)
 
 
 @router.get("/{student_id}/courses", response_model=schemas.StudentCourses,
