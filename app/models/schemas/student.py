@@ -1,6 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel
 from app.models.schemas.core import IDMixin
+from .faculty import FacultySimple
 
 
 class StudentBase(BaseModel):
@@ -18,6 +19,7 @@ class StudentUpdate(StudentBase):
 class StudentDepartment(BaseModel):
     id: int
     name: str
+    faculty: FacultySimple
 
     class Config:
         orm_mode = True

@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from .faculty import Faculty
+from .faculty import FacultySimple
 from .core import DateTimeModelMixin, IDMixin
 
 
@@ -26,13 +26,14 @@ class DepartmentUpdate(DepartmentBase):
 class DepartmentSimple(BaseModel):
     id: int
     name: str
+    faculty: FacultySimple
 
     class Config:
         orm_mode = True
 
 
 class Department(DateTimeModelMixin, DepartmentBase, IDMixin):
-    faculty: Faculty
+    faculty: FacultySimple
     
     class Config:
         orm_mode = True

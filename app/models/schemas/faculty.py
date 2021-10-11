@@ -20,6 +20,13 @@ class FacultyUpdate(FacultyBase):
     pass
 
 
+class FacultySimple(IDMixin):
+    name: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+
+
 class Faculty(DateTimeModelMixin, FacultyBase, IDMixin):
     class Config:
         orm_mode = True
