@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = os.getenv("PROJECT_NAME", "PROJECT")
 
     INITIAL_DATA_FOLDER: str = os.path.join("app", "db", "data")
+    ASSETS_AVATAR_FOLDER: str = os.path.join("app", "assets", "avatar")
     DATASETS_FOLDER: str = os.path.join("app", "ml", "datasets")
     ML_OUTPUTS_FOLDER: str = os.path.join("app", "ml", "outputs")
     ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models")
