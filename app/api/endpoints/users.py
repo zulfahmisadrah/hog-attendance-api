@@ -1,6 +1,6 @@
 from typing import List, Any, Union
 
-from fastapi import APIRouter, Depends, HTTPException, status, Body
+from fastapi import APIRouter, Depends, HTTPException, status, Body, UploadFile, File
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
@@ -43,6 +43,12 @@ def create_lecturer(user_in: schemas.UserLecturerCreate, db: Session = Depends(d
     if user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=strings.USERNAME_TAKEN)
     return crud.lecturer.create(db, obj_in=user_in)
+
+
+@router.post("/upload_avatar", dependencies=[Depends(deps.get_current_active_user)])
+async def upload_user_avatar(username: str = Body(...), avatar: UploadFile = File(...)):
+    file_path = await crud.user.upload_avatar(avatar, username)
+    return file_path
 
 
 @router.put("/update_password", response_model=schemas.UserLecturer)

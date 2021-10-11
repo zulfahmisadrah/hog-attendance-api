@@ -1,10 +1,13 @@
 from typing import Optional, Union, Dict, Any
 
-from fastapi import HTTPException, status
+import aiofiles
+from os import path
+from fastapi import HTTPException, status, UploadFile
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.crud import crud_role
 from app.crud.base import CRUDBase
 from app.resources import strings
@@ -13,6 +16,7 @@ from app.models.domains import User, Student, Lecturer
 from app.models.schemas import UserCreate, UserUpdate, UserStudentCreate, UserLecturerCreate, UserRolesCreate, \
     UserPasswordUpdate
 from app.core.security import get_password_hash, verify_password
+from app.utils.commons import get_current_datetime
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
@@ -112,6 +116,14 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         if "ROLE_SUPERUSER" in list_user_roles or "ROLE_ADMIN" in list_user_roles:
             is_admin = True
         return is_admin
+
+    async def upload_avatar(self, avatar: UploadFile, username: str) -> str:
+        file_name = username + "_" + get_current_datetime() + ".jpg"
+        file_path = path.join(settings.ASSETS_AVATAR_FOLDER, file_name)
+        async with aiofiles.open(file_path, 'wb') as out_file:
+            content = await avatar.read()
+            await out_file.write(content)
+        return file_name
 
 
 user = CRUDUser(User)
