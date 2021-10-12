@@ -1,14 +1,10 @@
-from typing import List
-
-from fastapi import File, APIRouter, Depends, HTTPException, status, Form
-from fastapi.responses import FileResponse
+from fastapi import File, APIRouter, Depends, Form
 from sqlalchemy.orm import Session
 
 from app import crud
 from app.models import schemas
 from app.api import deps
 from app.db import session
-from app.resources import strings
 from app.services import datasets
 
 router = APIRouter()
@@ -26,9 +22,10 @@ def train(course_id: int = Form(...), semester: schemas.Semester = Depends(deps.
 @router.post("/recognize", dependencies=[Depends(deps.get_current_active_user)])
 def recognize(course_id: int = Form(...), file: bytes = File(...), semester: schemas.Semester = Depends(deps.get_active_semester), db: Session = Depends(session.get_db)):
     course = crud.course.get(db, course_id)
-    result = datasets.recognize_face(file, semester.code, course.code)
+    result, box = datasets.recognize_face(file, semester.code, course.code)
     return {
-        "result": result
+        "result": result.tolist(),
+        "box": box
     }
 
 

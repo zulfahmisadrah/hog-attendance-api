@@ -3,6 +3,7 @@ import math
 import cv2
 import numpy as np
 from PIL import Image
+from PIL.JpegImagePlugin import JpegImageFile
 from mtcnn.mtcnn import MTCNN
 
 detector = MTCNN()
@@ -69,6 +70,19 @@ def detect_face(image_path: str):
             face = alignment_procedure(img, left_eye, right_eye)
             detected_face = face[int(y):int(y + h), int(x):int(x + w)]
             return detected_face
+
+
+def detect_face_on_image(image: JpegImageFile):
+    img = np.array(image)
+    detections = detector.detect_faces(np.array(img))
+    for detection in detections:
+        score = detection["confidence"]
+        print("DETECTION = ", detection)
+        print("CONFIDENCE = ", score)
+        if score >= 0.80:
+            x, y, w, h = detection["box"]
+            detected_face = img[int(y):int(y + h), int(x):int(x + w)]
+            return detected_face, detection["box"]
 #to draw faces on image
 # for result in faces:
 #     x, y, w, h = result['box']

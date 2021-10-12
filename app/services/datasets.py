@@ -5,7 +5,7 @@ from os import path, remove
 from PIL import Image
 import cv2
 
-from app.ml.face_detection import detect_face
+from app.ml.face_detection import detect_face, detect_face_on_image
 from app.ml.datasets_training import train_datasets
 from app.ml.face_recognition import recognize
 from app.utils.file_helper import get_list_files, get_total_files, get_user_datasets_directory
@@ -56,7 +56,8 @@ def create_models(semester_code: str, course_code: str):
 def recognize_face(file: bytes, semester_code: str, course_code: str):
     image_bytes = file[file.find(b'/9'):]
     image = Image.open(io.BytesIO(base64.b64decode(image_bytes)))
-    # image.resize((220, 220))
-    recognized_user = recognize(image, semester_code, course_code)
+    image.resize((220, 220))
+    detected_face, box = detect_face_on_image(image)
+    recognized_user = recognize(detected_face, semester_code, course_code)
     print("RECOGNIZED USER", recognized_user)
-    return recognized_user
+    return recognized_user, box
