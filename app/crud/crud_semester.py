@@ -23,7 +23,7 @@ class CRUDSemester(CRUDBase[Semester, SemesterCreate, SemesterUpdate]):
         latest_semester = latest_year_semesters[0]
         if len(latest_year_semesters) == 2:
             for latest_year_semester in latest_year_semesters:
-                if latest_year_semester.type == SemesterType.GANJIL:
+                if latest_year_semester.type == SemesterType.Ganjil:
                     latest_semester = latest_year_semester
         return latest_semester
 

@@ -12,13 +12,13 @@ if TYPE_CHECKING:
 
 
 class DayOfWeek(int, Enum):
-    Monday = 1
-    Tuesday = 2
-    Wednesday = 3
-    Thursday = 4
-    Friday = 5
-    Saturday = 6
-    Sunday = 7
+    Senin = 1
+    Selasa = 2
+    Rabu = 3
+    Kamis = 4
+    Jumat = 5
+    Sabtu = 6
+    Minggu = 7
 
 
 class Schedule(Base, CommonModel):

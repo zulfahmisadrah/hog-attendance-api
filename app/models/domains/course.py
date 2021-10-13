@@ -15,8 +15,8 @@ if TYPE_CHECKING:
 
 
 class CourseType(str, Enum):
-    WAJIB = "Wajib"
-    PILIHAN = "Pilihan"
+    Wajib = "Wajib"
+    Pilihan = "Pilihan"
 
 
 class Course(Base, CommonModel):
@@ -25,7 +25,7 @@ class Course(Base, CommonModel):
     sks = Column(Integer, nullable=False)
     semester = Column(Integer, nullable=False)
     quota = Column(Integer, nullable=False)
-    type = Column(SQLEnum(CourseType), default=CourseType.WAJIB)
+    type = Column(SQLEnum(CourseType), default=CourseType.Wajib)
 
     department_id = Column(BigInteger, ForeignKey("department.id"))
     department = relationship("Department", back_populates="courses")

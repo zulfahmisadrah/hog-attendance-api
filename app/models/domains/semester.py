@@ -7,8 +7,8 @@ from .core import CommonModel
 
 
 class SemesterType(str, Enum):
-    GANJIL = "Ganjil"
-    GENAP = "Genap"
+    Ganjil = "Ganjil"
+    Genap = "Genap"
 
 
 class Semester(Base, CommonModel):

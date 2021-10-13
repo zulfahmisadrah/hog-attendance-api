@@ -8,7 +8,7 @@ from app.models.schemas.core import DateTimeModelMixin, IDMixin
 
 
 class AttendanceBase(BaseModel):
-    status: AttendanceStatus = AttendanceStatus.ABSEN
+    status: AttendanceStatus = AttendanceStatus.Absen
     note: Optional[str] = None
 
 
