@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "name": "Pertemuan 1",
+    "name": "Dasar Pemrograman Komputer #1",
     "number": 1,
     "date": "2021-10-18",
     "course_id": 1,
@@ -9,7 +9,7 @@
   },
   {
     "id": 2,
-    "name": "Pertemuan 2",
+    "name": "Dasar Pemrograman Komputer #2",
     "number": 2,
     "date": "2021-10-25",
     "course_id": 1,
@@ -17,7 +17,7 @@
   },
   {
     "id": 3,
-    "name": "Pertemuan 1",
+    "name": "Algoritma dan Struktur Data #1",
     "number": 1,
     "date": "2021-10-19",
     "course_id": 2,
@@ -25,7 +25,7 @@
   },
   {
     "id": 4,
-    "name": "Pertemuan 2",
+    "name": "Algoritma dan Struktur Data #2",
     "number": 2,
     "date": "2021-10-26",
     "course_id": 2,
@@ -33,7 +33,7 @@
   },
   {
     "id": 5,
-    "name": "Pertemuan 1",
+    "name": "Pemrograman Web #1",
     "number": 1,
     "date": "2021-10-20",
     "course_id": 3,
@@ -41,7 +41,7 @@
   },
   {
     "id": 6,
-    "name": "Pertemuan 2",
+    "name": "Pemrograman Web #2",
     "number": 2,
     "date": "2021-10-27",
     "course_id": 3,
