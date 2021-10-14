@@ -14,8 +14,6 @@ class MeetingBase(BaseModel):
 
 
 class MeetingCreate(MeetingBase):
-    name: str
-    number: int
     date: Union[date, str]
     course_id: int
     schedule_id: int

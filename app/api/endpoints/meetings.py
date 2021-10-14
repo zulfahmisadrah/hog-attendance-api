@@ -22,7 +22,7 @@ def get_list_meetings(db: Session = Depends(session.get_db), offset: int = 0, li
 def create_meeting(meeting: schemas.MeetingCreate, db: Session = Depends(session.get_db)):
     if not meeting.name:
         course = crud.course.get(db, meeting.course_id)
-        meeting.name = f"{course.name} #{meeting.number}"
+        meeting.name = f"{course.name} #{meeting.number}" if meeting.number else course.name
     return crud.meeting.create(db=db, obj_in=meeting)
 
 
