@@ -22,6 +22,14 @@ def create_attendance(attendance: schemas.AttendanceCreate, db: Session = Depend
     return crud.attendance.create(db=db, obj_in=attendance)
 
 
+@router.get("/me", response_model=List[schemas.Attendance])
+def get_my_attendances(
+        db: Session = Depends(session.get_db),
+        current_user: schemas.UserStudent = Depends(deps.get_current_active_user)
+):
+    return crud.attendance.get_attendances_by_student_id(db, student_id=current_user.student.id)
+
+
 @router.get("/{attendance_id}", response_model=schemas.Attendance, dependencies=[Depends(deps.get_current_active_user)])
 def get_attendance(attendance_id: int, db: Session = Depends(session.get_db)):
     attendance = crud.attendance.get(db, attendance_id)

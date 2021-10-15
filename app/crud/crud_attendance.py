@@ -9,5 +9,8 @@ class CRUDAttendance(CRUDBase[Attendance, AttendanceCreate, AttendanceUpdate]):
     def get_attendances_by_meeting_id(self, db: Session, *, meeting_id: int):
         return db.query(Attendance).filter_by(meeting_id=meeting_id).all()
 
+    def get_attendances_by_student_id(self, db: Session, *, student_id: int):
+        return db.query(Attendance).filter_by(student_id=student_id).all()
+
 
 attendance = CRUDAttendance(Attendance)
