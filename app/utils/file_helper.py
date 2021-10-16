@@ -32,6 +32,11 @@ def get_user_datasets_directory(username: str) -> str:
     return directory
 
 
+def get_user_dataset_file(username: str, file_name: str) -> str:
+    file_path = path.join(settings.DATASETS_FOLDER, username, file_name)
+    return file_path
+
+
 def get_course_models_directory(course_code: str) -> str:
     directory = path.join(settings.ML_MODELS_FOLDER, course_code)
     directory = create_directory_if_not_exist(directory)
