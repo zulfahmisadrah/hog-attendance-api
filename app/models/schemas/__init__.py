@@ -10,3 +10,4 @@ from .course import Course, CourseCreate, CourseUpdate, CourseLecturers, CourseL
 from .meeting import Meeting, MeetingCreate, MeetingUpdate
 from .attendance import Attendance, AttendanceCreate, AttendanceUpdate
 from .token import Token, TokenPayload
+from .dataset import Dataset
