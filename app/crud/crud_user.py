@@ -117,6 +117,10 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             is_admin = True
         return is_admin
 
+    def is_lecturer(self, user: User):
+        list_user_roles = [role_dict.code for role_dict in user.roles]
+        return RoleEnum.LECTURER in list_user_roles
+
     async def upload_avatar(self, avatar: UploadFile, username: str) -> str:
         file_name = username + "_" + get_current_datetime() + ".jpg"
         file_path = path.join(settings.ASSETS_AVATAR_FOLDER, file_name)
