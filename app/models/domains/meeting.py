@@ -3,9 +3,9 @@ from typing import TYPE_CHECKING
 from sqlalchemy import Column, Integer, BigInteger, String, ForeignKey, Date, Time, Enum as SQLEnum
 from sqlalchemy.orm import relationship
 
-from app.db.base_class import Base
 from .core import CommonModel
-from ...resources.enums import DayOfWeek, MeetingStatus
+from app.db.base_class import Base
+from app.resources.enums import DayOfWeek, MeetingStatus
 
 if TYPE_CHECKING:
     from .course import Course
