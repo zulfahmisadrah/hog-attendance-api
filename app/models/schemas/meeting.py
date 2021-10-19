@@ -5,13 +5,14 @@ from pydantic import BaseModel
 
 from .schedule import ScheduleSimple
 from .core import DateTimeModelMixin, IDMixin
-from ...resources.enums import DayOfWeek
+from ...resources.enums import DayOfWeek, MeetingStatus
 
 
 class MeetingBase(BaseModel):
     name: Optional[str] = None
     number: Optional[int] = None
     date: Optional[Union[date, str]]
+    status: Optional[MeetingStatus] = None
     day_of_week: Optional[DayOfWeek] = None
     start_time: Optional[time] = None
     end_time: Optional[time] = None
