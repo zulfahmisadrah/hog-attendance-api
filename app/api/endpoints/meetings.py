@@ -53,15 +53,22 @@ def get_meeting(meeting_id: int, db: Session = Depends(session.get_db)):
     return data
 
 
-@router.put('/{meeting_id}', response_model=schemas.Meeting, dependencies=[Depends(deps.get_current_admin)])
-def update_meeting(meeting_id: int, meeting: schemas.MeetingUpdate, db: Session = Depends(session.get_db)):
+@router.put('/{meeting_id}', response_model=schemas.Meeting)
+def update_meeting(
+        meeting_id: int,
+        meeting: schemas.MeetingUpdate,
+        db: Session = Depends(session.get_db),
+        current_user: schemas.UserLecturer = Depends(deps.get_current_active_user)
+):
     db_obj = crud.meeting.get(db, meeting_id)
     if db_obj is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=strings.ERROR_DATA_NOT_FOUND)
-    if not meeting.name:
-        course = crud.course.get(db, meeting.course_id)
-        meeting.name = f"{course.name} #{meeting.number}"
-    return crud.meeting.update(db=db, db_obj=db_obj, obj_in=meeting)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=strings.ERROR_MODEL_ID_NOT_EXIST.format(strings.MODEL_MEETING))
+    if crud.user.is_lecturer(current_user):
+        if not meeting.name:
+            course = crud.course.get(db, meeting.course_id)
+            meeting.name = f"{course.name} #{meeting.number}"
+        return crud.meeting.update(db=db, db_obj=db_obj, obj_in=meeting)
 
 
 @router.delete('/{meeting_id}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(deps.get_current_admin)])

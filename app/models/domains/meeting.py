@@ -1,10 +1,11 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Column, Integer, BigInteger, String, ForeignKey, Date
+from sqlalchemy import Column, Integer, BigInteger, String, ForeignKey, Date, Time, Enum as SQLEnum
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
 from .core import CommonModel
+from ...resources.enums import DayOfWeek, MeetingStatus
 
 if TYPE_CHECKING:
     from .course import Course
@@ -14,7 +15,11 @@ if TYPE_CHECKING:
 class Meeting(Base, CommonModel):
     name = Column(String(50))
     number = Column(Integer)
+    status = Column(SQLEnum(MeetingStatus), default=MeetingStatus.Terjadwal)
     date = Column(Date)
+    day_of_week = Column(SQLEnum(DayOfWeek))
+    start_time = Column(Time)
+    end_time = Column(Time)
 
     course_id = Column(BigInteger, ForeignKey("course.id"))
     course = relationship("Course", back_populates="meetings")
