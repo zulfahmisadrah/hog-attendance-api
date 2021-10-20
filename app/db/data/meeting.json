@@ -3,7 +3,7 @@
     "id": 1,
     "name": "Dasar Pemrograman Komputer #1",
     "number": 1,
-    "date": "2021-10-18",
+    "date": "2021-11-15",
     "course_id": 1,
     "schedule_id": 1
   },
@@ -11,23 +11,23 @@
     "id": 2,
     "name": "Dasar Pemrograman Komputer #2",
     "number": 2,
-    "date": "2021-10-25",
+    "date": "2021-11-22",
     "course_id": 1,
-    "schedule_id": 2
+    "schedule_id": 1
   },
   {
     "id": 3,
     "name": "Algoritma dan Struktur Data #1",
     "number": 1,
-    "date": "2021-10-19",
+    "date": "2021-11-16",
     "course_id": 2,
-    "schedule_id": 1
+    "schedule_id": 2
   },
   {
     "id": 4,
     "name": "Algoritma dan Struktur Data #2",
     "number": 2,
-    "date": "2021-10-26",
+    "date": "2021-11-23",
     "course_id": 2,
     "schedule_id": 2
   },
@@ -35,16 +35,16 @@
     "id": 5,
     "name": "Pemrograman Web #1",
     "number": 1,
-    "date": "2021-10-20",
+    "date": "2021-11-17",
     "course_id": 3,
-    "schedule_id": 1
+    "schedule_id": 3
   },
   {
     "id": 6,
     "name": "Pemrograman Web #2",
     "number": 2,
-    "date": "2021-10-27",
+    "date": "2021-11-24",
     "course_id": 3,
-    "schedule_id": 2
+    "schedule_id": 3
   }
 ]

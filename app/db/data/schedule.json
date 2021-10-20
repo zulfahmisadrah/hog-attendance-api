@@ -3,12 +3,18 @@
     "id": 1,
     "day_of_week": 1,
     "start_time": "10:00",
-    "end_time": "12:00"
+    "end_time": "12:30"
   },
   {
     "id": 2,
     "day_of_week": 2,
     "start_time": "13:00",
-    "end_time": "15:00"
+    "end_time": "15:30"
+  },
+  {
+    "id": 3,
+    "day_of_week": 3,
+    "start_time": "16:00",
+    "end_time": "17:40"
   }
 ]
