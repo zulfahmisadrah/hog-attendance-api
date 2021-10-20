@@ -41,6 +41,7 @@ def get_my_meetings(
     list_meetings = []
     for lecturer_course in data:
         meetings: List[schemas.Meeting] = lecturer_course.course.meetings
+        crud.meeting.update_meetings_status(db, meetings)
         list_meetings.extend(meetings)
     return list_meetings
 
@@ -64,11 +65,13 @@ def update_meeting(
     if db_obj is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=strings.ERROR_MODEL_ID_NOT_EXIST.format(strings.MODEL_MEETING))
-    if crud.user.is_lecturer(current_user):
+    if crud.user.is_admin(current_user) or crud.user.is_lecturer(current_user):
         if not meeting.name:
             course = crud.course.get(db, meeting.course_id)
             meeting.name = f"{course.name} #{meeting.number}"
         return crud.meeting.update(db=db, db_obj=db_obj, obj_in=meeting)
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=strings.USER_FORBIDDEN)
 
 
 @router.delete('/{meeting_id}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(deps.get_current_admin)])
