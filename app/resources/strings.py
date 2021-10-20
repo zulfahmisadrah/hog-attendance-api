@@ -7,6 +7,7 @@ ERROR_FACULTY_NAME_CODE_EXIST = "Nama atau kode fakultas telah digunakan"
 SUCCESS_DATA_DELETED = "Data berhasil dihapus"
 ERROR_INTERNAL_SERVER_ERROR = "Terjadi Kesalahan"
 ROLE_INVALID = "Role tidak valid"
+USER_FORBIDDEN = "User tidak memiliki akses"
 
 MODEL_USER = "User"
 MODEL_LECTURER = "Dosen"
