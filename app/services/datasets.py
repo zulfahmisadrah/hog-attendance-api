@@ -45,9 +45,10 @@ async def save_user_image(file: Union[bytes, UploadFile], username: str):
         async with aiofiles.open(file_path, 'wb') as out_file:
             content = await file.read()
             await out_file.write(content)
-    detected_face = detect_face(file_path)
-    if detected_face is not None:
-        cv2.imwrite(file_path, detected_face)
+    detected_faces = detect_face(file_path)
+    if detected_faces is not None:
+        for detected_face in detected_faces:
+            cv2.imwrite(file_path, detected_face)
     else:
         remove(file_path)
         file_path = None
