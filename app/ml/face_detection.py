@@ -57,7 +57,10 @@ def rotate_image(img, angle):
 
 def detect_face(image_path: str):
     img = cv2.imread(image_path)
+    img = cv2.resize(img, (1200, 1600))
     detections = detector.detect_faces(img)
+    detected_faces = []
+    print("TOTAL DETECTIONS = ", len(detections))
     for detection in detections:
         score = detection["confidence"]
         print("DETECTION = ", detection)
@@ -68,8 +71,9 @@ def detect_face(image_path: str):
             left_eye = keypoints["left_eye"]
             right_eye = keypoints["right_eye"]
             face = alignment_procedure(img, left_eye, right_eye)
-            detected_face = face[int(y):int(y + h), int(x):int(x + w)]
-            return detected_face
+            detected_face = face[int(y):int(y + h + 20), int(x):int(x + w + 20)]
+            detected_faces.append(detected_face)
+    return detected_faces
 
 
 def detect_face_on_image(image: JpegImageFile):
