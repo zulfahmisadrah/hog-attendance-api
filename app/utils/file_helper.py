@@ -32,6 +32,12 @@ def get_user_datasets_directory(username: str) -> str:
     return directory
 
 
+def get_user_datasets_raw_directory(username: str) -> str:
+    directory = path.join(settings.ASSETS_DATASETS_RAW_FOLDER, username)
+    directory = create_directory_if_not_exist(directory)
+    return directory
+
+
 def get_user_dataset_file(username: str, file_name: str) -> str:
     file_path = path.join(settings.DATASETS_FOLDER, username, file_name)
     return file_path
