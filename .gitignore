@@ -144,4 +144,5 @@ app/ml/datasets/
 app/ml/outputs/
 app/ml/models/
 app/assets/avatar/
+app/assets/datasets_raw/
 *.diff
