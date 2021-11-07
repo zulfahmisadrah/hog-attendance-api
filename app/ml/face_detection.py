@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from PIL import Image
 from PIL.JpegImagePlugin import JpegImageFile
-from mtcnn.mtcnn import MTCNN
+from mtcnn import MTCNN
 
 detector = MTCNN()
 
@@ -46,6 +46,7 @@ def alignment_procedure(img, left_eye, right_eye):
             angle = 90 - angle
         img = Image.fromarray(img)
         img = np.array(img.rotate(direction * angle))
+        print("ROTATED = ", direction, angle)
     return img
 
 
@@ -58,35 +59,53 @@ def rotate_image(img, angle):
 def detect_face(image_path: str):
     img = cv2.imread(image_path)
     img = cv2.resize(img, (1200, 1600))
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     detections = detector.detect_faces(img)
     detected_faces = []
     print("TOTAL DETECTIONS = ", len(detections))
     for detection in detections:
         score = detection["confidence"]
         print("DETECTION = ", detection)
-        print("CONFIDENCE = ", score)
-        if score >= 0.80:
+        # print("CONFIDENCE = ", score)
+        if score >= 0.97:
             x, y, w, h = detection["box"]
             keypoints = detection["keypoints"]
             left_eye = keypoints["left_eye"]
             right_eye = keypoints["right_eye"]
-            face = alignment_procedure(img, left_eye, right_eye)
-            detected_face = face[int(y):int(y + h + 20), int(x):int(x + w + 20)]
+            extra = 0
+            # aligned_image = alignment_procedure(img, left_eye, right_eye)
+            # detected_face = aligned_image[int(y)-extra:int(y + h)+extra, int(x)-extra:int(x + w)+extra]
+            detected_face = img[int(y)-extra:int(y + h)+extra, int(x)-extra:int(x + w)+extra]
+            detected_face = alignment_procedure(detected_face, left_eye, right_eye)
+            detected_face = cv2.cvtColor(detected_face, cv2.COLOR_RGB2BGR)
             detected_faces.append(detected_face)
+    if not detected_faces:
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+        detected_faces.append(img)
     return detected_faces
 
 
 def detect_face_on_image(image: JpegImageFile):
     img = np.array(image)
+    img = cv2.resize(img, (1200, 1600))
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     detections = detector.detect_faces(np.array(img))
+    detected_faces = []
+    print("TOTAL DETECTIONS = ", len(detections))
     for detection in detections:
         score = detection["confidence"]
         print("DETECTION = ", detection)
-        print("CONFIDENCE = ", score)
-        if score >= 0.80:
+        # print("CONFIDENCE = ", score)
+        if score >= 0.97:
             x, y, w, h = detection["box"]
+            keypoints = detection["keypoints"]
+            left_eye = keypoints["left_eye"]
+            right_eye = keypoints["right_eye"]
             detected_face = img[int(y):int(y + h), int(x):int(x + w)]
-            return detected_face, detection["box"]
+            detected_face = alignment_procedure(detected_face, left_eye, right_eye)
+            detected_face = cv2.cvtColor(detected_face, cv2.COLOR_RGB2BGR)
+            detected_faces.append((detected_face, detection["box"]))
+    return detected_faces
 #to draw faces on image
 # for result in faces:
 #     x, y, w, h = result['box']

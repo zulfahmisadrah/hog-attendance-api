@@ -11,7 +11,8 @@ from fastapi import UploadFile
 from app.ml.face_detection import detect_face, detect_face_on_image
 from app.ml.datasets_training import train_datasets
 from app.ml.face_recognition import recognize
-from app.utils.file_helper import get_list_files, get_total_files, get_user_datasets_directory
+from app.utils.file_helper import get_list_files, get_total_files, get_user_datasets_directory, \
+    get_user_datasets_raw_directory
 
 
 def get_user_datasets(username: str):
@@ -46,13 +47,28 @@ async def save_user_image(file: Union[bytes, UploadFile], username: str):
             content = await file.read()
             await out_file.write(content)
     detected_faces = detect_face(file_path)
-    if detected_faces is not None:
+    if detected_faces:
         for detected_face in detected_faces:
             cv2.imwrite(file_path, detected_face)
     else:
-        remove(file_path)
+        # remove(file_path)
         file_path = None
     return file_path
+
+
+def detect_faces_from_datasets_raw(username: str):
+    user_dir = get_user_datasets_raw_directory(username)
+    list_images = get_list_files(user_dir)
+    for file_name in list_images:
+        file_path = path.join(user_dir, file_name)
+        detected_faces = detect_face(file_path)
+        user_dataset_dir = get_user_datasets_directory(username)
+        file_name = generate_file_name(user_dataset_dir, username)
+        dataset_path = path.join(user_dataset_dir, file_name)
+        if detected_faces:
+            for detected_face in detected_faces:
+                cv2.imwrite(dataset_path, detected_face)
+    return "DONE"
 
 
 def create_models(semester_code: str, course_code: str):
@@ -64,8 +80,13 @@ def create_models(semester_code: str, course_code: str):
 def recognize_face(file: bytes, semester_code: str, course_code: str):
     image_bytes = file[file.find(b'/9'):]
     image = Image.open(io.BytesIO(base64.b64decode(image_bytes)))
-    image.resize((220, 220))
-    detected_face, box = detect_face_on_image(image)
-    recognized_user = recognize(detected_face, semester_code, course_code)
-    print("RECOGNIZED USER", recognized_user)
-    return recognized_user, box
+    # image.resize((220, 220))
+    detected_faces = detect_face_on_image(image)
+    recognized_users = []
+    if detected_faces:
+        for result in detected_faces:
+            detected_face, box = result
+            recognized_user = recognize(detected_face, semester_code, course_code)
+            recognized_users.extend(recognized_user)
+            print("RECOGNIZED USER", recognized_user)
+    return recognized_users
