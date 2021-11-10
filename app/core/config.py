@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     DATASETS_FOLDER: str = os.path.join("app", "ml", "datasets")
     ML_OUTPUTS_FOLDER: str = os.path.join("app", "ml", "outputs")
     ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models")
+    ML_TEST_FOLDER: str = os.path.join("app", "ml", "test")
+
+    HOG_RESIZE_WIDTH: int = 64
+    HOG_RESIZE_HEIGHT: int = 128
 
     WEB_HOST: str = os.getenv("WEB_HOST", "127.0.0.1")
     WEB_PORT: int = os.getenv("WEB_PORT", 8000)
