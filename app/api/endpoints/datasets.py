@@ -33,10 +33,10 @@ def train(course_id: int = Form(...), semester: schemas.Semester = Depends(deps.
 def recognize(course_id: int = Form(...), file: bytes = File(...),
               semester: schemas.Semester = Depends(deps.get_active_semester), db: Session = Depends(session.get_db)):
     course = crud.course.get(db, course_id)
-    result, box = datasets.recognize_face(file, semester.code, course.code)
+    result = datasets.recognize_face(file, semester.code, course.code)
+    # result, box = datasets.recognize_face(file, semester.code, course.code)
     return {
-        "result": result.tolist(),
-        "box": box
+        "result": result,
     }
 
 
@@ -45,6 +45,14 @@ async def capture(username: str = Form(...), file: Union[bytes, UploadFile] = Fi
     file_path = await datasets.save_user_image(file, username)
     return {
         "file_path": file_path
+    }
+
+
+@router.post("/detect_from_raw", dependencies=[Depends(deps.get_current_admin)])
+def detect_from_raw(username: str = Form(...)):
+    file_path = datasets.detect_faces_from_datasets_raw(username)
+    return {
+        "result": file_path
     }
 
 
