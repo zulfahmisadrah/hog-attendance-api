@@ -5,6 +5,10 @@ import numpy as np
 from PIL import Image
 from PIL.JpegImagePlugin import JpegImageFile
 from mtcnn import MTCNN
+from os import path
+
+from app.core.config import settings
+from app.utils.commons import get_current_datetime
 
 detector = MTCNN()
 
@@ -87,9 +91,12 @@ def detect_face(image_path: str):
 
 def detect_face_on_image(image: JpegImageFile):
     img = np.array(image)
-    img = cv2.resize(img, (1200, 1600))
+    # img = cv2.resize(img, (1200, 1600))
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    detections = detector.detect_faces(np.array(img))
+    current_datetime = get_current_datetime()
+    capture_path = path.join(settings.ML_TEST_FOLDER, f"{current_datetime}_0.capture.jpg")
+    cv2.imwrite(capture_path, img)
+    detections = detector.detect_faces(img)
     detected_faces = []
     print("TOTAL DETECTIONS = ", len(detections))
     for detection in detections:
@@ -103,7 +110,7 @@ def detect_face_on_image(image: JpegImageFile):
             right_eye = keypoints["right_eye"]
             detected_face = img[int(y):int(y + h), int(x):int(x + w)]
             detected_face = alignment_procedure(detected_face, left_eye, right_eye)
-            detected_face = cv2.cvtColor(detected_face, cv2.COLOR_RGB2BGR)
+            # detected_face = cv2.cvtColor(detected_face, cv2.COLOR_RGB2BGR)
             detected_faces.append((detected_face, detection["box"]))
     return detected_faces
 #to draw faces on image
