@@ -8,6 +8,7 @@ from PIL import Image
 import cv2
 from fastapi import UploadFile
 
+from app.core.config import settings
 from app.ml.face_detection import detect_face, detect_face_on_image
 from app.ml.datasets_training import train_datasets
 from app.ml.face_recognition import recognize
@@ -61,13 +62,30 @@ def detect_faces_from_datasets_raw(username: str):
     list_images = get_list_files(user_dir)
     for file_name in list_images:
         file_path = path.join(user_dir, file_name)
-        detected_faces = detect_face(file_path)
+        detected_faces = detect_face(file_path, save_preprocessing=True)
         user_dataset_dir = get_user_datasets_directory(username)
         file_name = generate_file_name(user_dataset_dir, username)
         dataset_path = path.join(user_dataset_dir, file_name)
         if detected_faces:
             for detected_face in detected_faces:
                 cv2.imwrite(dataset_path, detected_face)
+    return "DONE"
+
+
+def detect_faces_from_datasets_raw_all():
+    image_paths = get_list_files(settings.ASSETS_DATASETS_RAW_FOLDER)
+    for username in image_paths:
+        user_dir = get_user_datasets_raw_directory(username)
+        list_images = get_list_files(user_dir)
+        for file_name in list_images:
+            file_path = path.join(user_dir, file_name)
+            detected_faces = detect_face(file_path)
+            user_dataset_dir = get_user_datasets_directory(username)
+            file_name = generate_file_name(user_dataset_dir, username)
+            dataset_path = path.join(user_dataset_dir, file_name)
+            if detected_faces:
+                for detected_face in detected_faces:
+                    cv2.imwrite(dataset_path, detected_face)
     return "DONE"
 
 
