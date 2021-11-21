@@ -43,12 +43,18 @@ class CRUDMeeting(CRUDBase[Meeting, MeetingCreate, MeetingUpdate]):
                     and attendance_open_time.time() <= current_datetime.time() < attendance_close_time.time() \
                     and meeting_data.status is not MeetingStatus.Berlangsung:
                 meeting_status = MeetingStatus.Berlangsung
-            elif current_datetime.date() <= meeting_data.date \
+            elif current_datetime.date() < meeting_data.date \
+                    and meeting_data.status is not MeetingStatus.Terjadwal:
+                meeting_status = MeetingStatus.Terjadwal
+            elif current_datetime.date() == meeting_data.date \
                     and current_datetime.time() < attendance_open_time.time() \
                     and meeting_data.status is not MeetingStatus.Terjadwal:
                 meeting_status = MeetingStatus.Terjadwal
-            elif current_datetime.date() >= meeting_data.date \
+            elif current_datetime.date() == meeting_data.date \
                     and current_datetime.time() >= attendance_close_time.time() \
+                    and meeting_data.status is not MeetingStatus.Selesai:
+                meeting_status = MeetingStatus.Selesai
+            elif current_datetime.date() > meeting_data.date \
                     and meeting_data.status is not MeetingStatus.Selesai:
                 meeting_status = MeetingStatus.Selesai
             else:
