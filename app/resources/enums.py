@@ -22,3 +22,10 @@ class MeetingStatus(str, Enum):
     Terjadwal = "Terjadwal"
     Berlangsung = "Berlangsung"
     Selesai = "Selesai"
+
+
+class AttendanceStatus(str, Enum):
+    Absen = "Absen"
+    Hadir = "Hadir"
+    Izin = "Izin"
+    Sakit = "Sakit"
