@@ -1,11 +1,12 @@
-from typing import Optional, Union
+from typing import Optional, Union, List
 from datetime import date, time
 
 from pydantic import BaseModel
 
+from . import StudentUserSimple
 from .schedule import ScheduleSimple
 from .core import DateTimeModelMixin, IDMixin
-from app.resources.enums import DayOfWeek, MeetingStatus
+from app.resources.enums import DayOfWeek, MeetingStatus, AttendanceStatus
 
 
 class MeetingBase(BaseModel):
@@ -38,9 +39,18 @@ class MeetingCourse(BaseModel):
         orm_mode = True
 
 
+class AttendanceSimple(IDMixin):
+    status: AttendanceStatus = AttendanceStatus.Absen
+    student: StudentUserSimple
+
+    class Config:
+        orm_mode = True
+
+
 class Meeting(DateTimeModelMixin, MeetingBase, IDMixin):
     course: MeetingCourse
     schedule: ScheduleSimple
+    attendances: List[AttendanceSimple] = []
 
     class Config:
         orm_mode = True

@@ -17,16 +17,23 @@ class CRUDMeeting(CRUDBase[Meeting, MeetingCreate, MeetingUpdate]):
         active_semester = crud.semester.get_active_semester(db)
         course_students = crud.course.get_course_students(db, course_id=course_id, semester_id=active_semester.id)
         attendances = crud.attendance.get_attendances_by_meeting_id(db, meeting_id=meeting_id)
-        attendances_student_id = [attendance.student.id for attendance in attendances]
-        if not attendances or len(attendances) != len(course_students):
-            for course_student in course_students:
-                student_id = course_student.student.id
-                if student_id not in attendances_student_id:
-                    attendance = Attendance(meeting_id=meeting_id, student_id=student_id)
-                    db.add(attendance)
-            db.commit()
-            attendances = crud.attendance.get_attendances_by_meeting_id(db, meeting_id=meeting_id)
+        if meeting_data.status != MeetingStatus.Terjadwal:
+            attendances_student_id = [attendance.student.id for attendance in attendances]
+            if not attendances or len(attendances) != len(course_students):
+                for course_student in course_students:
+                    student_id = course_student.student.id
+                    if student_id not in attendances_student_id:
+                        attendance = Attendance(meeting_id=meeting_id, student_id=student_id)
+                        db.add(attendance)
+                db.commit()
+                attendances = crud.attendance.get_attendances_by_meeting_id(db, meeting_id=meeting_id)
         return attendances
+
+    def get_list_meeting(self, db: Session, *, offset: int = 0, limit: int = 10) -> List[Meeting]:
+        meetings = db.query(self.model).offset(offset).limit(limit).all()
+        # for meeting_data in meetings:
+        #     meeting_data.attendances = self.get_meeting_attendances(db, meeting_id=meeting_data.id)
+        return meetings
 
     def get_meeting_today(self, db: Session):
         current_datetime = datetime.now()

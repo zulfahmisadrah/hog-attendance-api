@@ -13,7 +13,7 @@ router = APIRouter()
 
 @router.get("/", response_model=List[schemas.Meeting], dependencies=[Depends(deps.get_current_active_user)])
 def get_list_meetings(db: Session = Depends(session.get_db), offset: int = 0, limit: int = 20):
-    list_data = crud.meeting.get_list(db, offset=offset, limit=limit)
+    list_data = crud.meeting.get_list_meeting(db, offset=offset, limit=limit)
     return list_data
 
 
