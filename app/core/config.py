@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     ML_TEST_FOLDER: str = os.path.join("app", "ml", "test")
     ML_VALIDATION_FOLDER: str = os.path.join("app", "ml", "validation")
 
+    IMAGE_RESIZE_1: int = 1200
+    IMAGE_RESIZE_2: int = 1600
     HOG_RESIZE_WIDTH: int = 64
     HOG_RESIZE_HEIGHT: int = 128
 
