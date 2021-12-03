@@ -2,7 +2,7 @@
   {
     "id": 1,
     "name": "Dasar Pemrograman Komputer",
-    "code": "D12123123",
+    "code": "D121001",
     "sks": 3,
     "semester": 1,
     "quota": 30,
@@ -14,7 +14,7 @@
   {
     "id": 2,
     "name": "Algoritma dan Struktur Data",
-    "code": "D1213456",
+    "code": "D121002",
     "sks": 3,
     "semester": 2,
     "quota": 30,
@@ -26,7 +26,7 @@
   {
     "id": 3,
     "name": "Pemrograman Web",
-    "code": "D1212356",
+    "code": "D121003",
     "sks": 3,
     "semester": 3,
     "quota": 30,
