@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     IMAGE_RESIZE_1: int = 1200
     IMAGE_RESIZE_2: int = 1600
     IMAGE_ALPHA: float = 1.5  # Contrast control (1.0-3.0)
-    IMAGE_BETA: float = 10  # Brightness control (0-100)
+    IMAGE_BETA: float = 15  # Brightness control (0-100)
     HOG_CELLS_PER_BLOCK: Tuple[int, int] = (2, 2)
     HOG_RESIZE_WIDTH: int = 90
     HOG_RESIZE_HEIGHT: int = 90
