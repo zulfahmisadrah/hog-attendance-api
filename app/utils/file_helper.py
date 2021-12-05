@@ -10,6 +10,10 @@ def create_directory_if_not_exist(directory: str) -> str:
     return directory
 
 
+def get_dir(dir_path: str) -> str:
+    return create_directory_if_not_exist(dir_path)
+
+
 def get_list_files(directory: str) -> List:
     return listdir(directory)
 
