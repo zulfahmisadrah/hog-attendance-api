@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     INITIAL_DATA_FOLDER: str = os.path.join("app", "db", "data")
     ASSETS_AVATAR_FOLDER: str = os.path.join("app", "assets", "avatar")
     ASSETS_DATASETS_RAW_FOLDER: str = os.path.join("app", "assets", "datasets_raw")
+    ASSETS_RESULT_FOLDER: str = os.path.join("app", "assets", "result")
     DATASETS_FOLDER: str = os.path.join("app", "ml", "datasets")
     ML_OUTPUTS_FOLDER: str = os.path.join("app", "ml", "outputs")
     ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models")
