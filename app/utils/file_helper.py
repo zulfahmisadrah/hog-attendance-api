@@ -10,6 +10,10 @@ def create_directory_if_not_exist(directory: str) -> str:
     return directory
 
 
+def get_dir(dir_path: str) -> str:
+    return create_directory_if_not_exist(dir_path)
+
+
 def get_list_files(directory: str) -> List:
     return listdir(directory)
 
@@ -24,6 +28,10 @@ def get_initial_data_file(file_name: str) -> str:
 
 def get_avatar_file(file_name: str) -> str:
     return path.join(settings.ASSETS_AVATAR_FOLDER, file_name)
+
+
+def get_result_file(file_name: str) -> str:
+    return path.join(settings.ASSETS_RESULT_FOLDER, file_name)
 
 
 def get_user_datasets_directory(username: str) -> str:

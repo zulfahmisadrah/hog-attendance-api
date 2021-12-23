@@ -142,8 +142,11 @@ alembic/
 app/auth.py
 app/ml/datasets/
 app/ml/outputs/
+app/ml/output_test/
 app/ml/models/
+app/ml/validation/
 app/ml/test/
 app/assets/avatar/
 app/assets/datasets_raw/
+app/assets/result/
 *.diff

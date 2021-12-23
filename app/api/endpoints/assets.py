@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from fastapi.responses import FileResponse
 
-from app.utils.file_helper import get_avatar_file, get_user_dataset_file
+from app.utils.file_helper import get_avatar_file, get_user_dataset_file, get_result_file
 
 router = APIRouter()
 
@@ -16,3 +16,9 @@ def get_avatar(file_name: str):
 def get_dataset(username: str, file_name: str):
     dataset = get_user_dataset_file(username, file_name)
     return FileResponse(dataset)
+
+
+@router.get("/result/{file_name}")
+def get_result(file_name: str):
+    result = get_result_file(file_name)
+    return FileResponse(result)

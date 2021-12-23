@@ -2,37 +2,37 @@
   {
     "id": 1,
     "name": "Dasar Pemrograman Komputer",
-    "code": "D12123123",
+    "code": "D121001",
     "sks": 3,
     "semester": 1,
     "quota": 30,
     "type": "Wajib",
-    "department_id": 12,
+    "department_id": 5,
     "lecturers": [1],
-    "students": [1]
+    "students": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
   },
   {
     "id": 2,
     "name": "Algoritma dan Struktur Data",
-    "code": "D1213456",
+    "code": "D121002",
     "sks": 3,
     "semester": 2,
     "quota": 30,
     "type": "Wajib",
-    "department_id": 12,
+    "department_id": 5,
     "lecturers": [1],
-    "students": [1]
+    "students": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
   },
   {
     "id": 3,
     "name": "Pemrograman Web",
-    "code": "D1212356",
+    "code": "D121003",
     "sks": 3,
     "semester": 3,
     "quota": 30,
     "type": "Wajib",
-    "department_id": 12,
+    "department_id": 5,
     "lecturers": [1],
-    "students": [1]
+    "students": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
   }
 ]

@@ -1,6 +1,6 @@
 import os
 import secrets
-from typing import List, Union
+from typing import List, Union, Tuple
 
 from pydantic import BaseSettings, AnyHttpUrl, validator
 from dotenv import load_dotenv
@@ -14,14 +14,24 @@ class Settings(BaseSettings):
     INITIAL_DATA_FOLDER: str = os.path.join("app", "db", "data")
     ASSETS_AVATAR_FOLDER: str = os.path.join("app", "assets", "avatar")
     ASSETS_DATASETS_RAW_FOLDER: str = os.path.join("app", "assets", "datasets_raw")
+    ASSETS_RESULT_FOLDER: str = os.path.join("app", "assets", "result")
     DATASETS_FOLDER: str = os.path.join("app", "ml", "datasets")
     ML_OUTPUTS_FOLDER: str = os.path.join("app", "ml", "outputs")
     ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models")
     ML_TEST_FOLDER: str = os.path.join("app", "ml", "test")
+    ML_TEST_OUTPUT_FOLDER: str = os.path.join("app", "ml", "output_test")
     ML_VALIDATION_FOLDER: str = os.path.join("app", "ml", "validation")
 
-    HOG_RESIZE_WIDTH: int = 64
-    HOG_RESIZE_HEIGHT: int = 128
+    IMAGE_RESIZE_1: int = 1200
+    IMAGE_RESIZE_2: int = 1600
+    IMAGE_ALPHA: float = 1.5  # Contrast control (1.0-3.0)
+    IMAGE_BETA: float = 15  # Brightness control (0-100)
+
+    HOG_ORIENTATIONS: int = 9
+    HOG_PIXELS_PER_CELL: Tuple[int, int] = (8, 8)
+    HOG_CELLS_PER_BLOCK: Tuple[int, int] = (2, 2)
+    HOG_RESIZE_WIDTH: int = 90
+    HOG_RESIZE_HEIGHT: int = 90
 
     WEB_HOST: str = os.getenv("WEB_HOST", "127.0.0.1")
     WEB_PORT: int = os.getenv("WEB_PORT", 8000)

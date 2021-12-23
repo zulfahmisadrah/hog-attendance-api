@@ -4,6 +4,7 @@ pyjwt~=2.1.0
 passlib[bcrypt]~=1.7.4
 starlette~=0.14.2
 pydantic~=1.8.2
+pydantic[email]
 SQLAlchemy~=1.4.22
 mysqlclient~=2.0.3
 alembic~=1.6.5
@@ -16,3 +17,5 @@ opencv-python~=4.5.3.56
 mtcnn~=0.1.1
 scikit-image~=0.18.3
 scikit-learn~=0.24.2
+joblib~=1.0.1
+aiofiles~=0.7.0
