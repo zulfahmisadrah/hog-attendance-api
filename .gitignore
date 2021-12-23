@@ -148,4 +148,5 @@ app/ml/validation/
 app/ml/test/
 app/assets/avatar/
 app/assets/datasets_raw/
+app/assets/result/
 *.diff
