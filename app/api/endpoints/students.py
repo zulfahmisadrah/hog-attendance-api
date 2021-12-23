@@ -16,7 +16,7 @@ router = APIRouter()
 @router.get("/", response_model=List[schemas.StudentUser], dependencies=[Depends(deps.get_current_active_user)])
 def get_list_students(
         department_id: Optional[int] = Query(None),
-        keyword: Optional[str] = Query(None, min_length=3),
+        keyword: Optional[str] = Query(None, min_length=0),
         offset: int = 0,
         limit: int = 20,
         db: Session = Depends(session.get_db)
