@@ -2,13 +2,14 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from app.models.domains.attendance import AttendanceStatus
 from app.models.schemas import Meeting, StudentUserSimple
 from app.models.schemas.core import DateTimeModelMixin, IDMixin
+from app.resources.enums import AttendanceStatus
 
 
 class AttendanceBase(BaseModel):
     status: AttendanceStatus = AttendanceStatus.Absen
+    status_by_student: Optional[AttendanceStatus] = None
     note: Optional[str] = None
 
 

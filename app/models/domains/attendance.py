@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import Column, BigInteger, String, ForeignKey, Enum as SQLEnum
@@ -6,21 +5,16 @@ from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
 from .core import CommonModel
+from app.resources.enums import AttendanceStatus
 
 if TYPE_CHECKING:
     from .meeting import Meeting
     from .student import Student
 
 
-class AttendanceStatus(str, Enum):
-    Absen = "Absen"
-    Hadir = "Hadir"
-    Izin = "Izin"
-    Sakit = "Sakit"
-
-
 class Attendance(Base, CommonModel):
     status = Column(SQLEnum(AttendanceStatus), default=AttendanceStatus.Absen)
+    status_by_student = Column(SQLEnum(AttendanceStatus))
     note = Column(String(255))
 
     meeting_id = Column(BigInteger, ForeignKey("meeting.id"))

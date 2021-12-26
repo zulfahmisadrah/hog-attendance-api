@@ -57,9 +57,11 @@ def delete_attendance(attendance_id: int, db: Session = Depends(session.get_db))
     return crud.attendance.delete(db=db, id=attendance_id)
 
 
-# @router.put('/batch', response_model=List[schemas.Attendance], dependencies=[Depends(deps.get_current_admin)])
-# def update_attendance(attendances: List[schemas.Attendance], db: Session = Depends(session.get_db)):
-#     db_obj = crud.attendance.get(db, attendance_id)
-#     if db_obj is None:
-#         raise HTTPException(status_code=404, detail=strings.ERROR_DATA_NOT_FOUND)
-#     return crud.attendance.update(db=db, db_obj=db_obj, obj_in=attendance)
+@router.get("/{meeting_id}/me", response_model=schemas.Attendance)
+def get_my_meeting_attendance(
+        meeting_id: int,
+        db: Session = Depends(session.get_db),
+        current_user: schemas.UserStudent = Depends(deps.get_current_active_user)
+):
+    return crud.attendance.get_attendances_by_meeting_id_and_student_id(db, meeting_id=meeting_id,
+                                                                        student_id=current_user.student.id)
