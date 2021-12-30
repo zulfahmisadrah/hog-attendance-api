@@ -141,8 +141,8 @@ cython_debug/
 alembic/
 app/auth.py
 app/ml/datasets/
-app/ml/outputs/
-app/ml/output_test/
+app/ml/extracted_images/
+app/ml/preprocessed_images/
 app/ml/models/
 app/ml/validation/
 app/ml/test/
