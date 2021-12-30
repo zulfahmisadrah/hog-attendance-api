@@ -16,10 +16,10 @@ class Settings(BaseSettings):
     ASSETS_DATASETS_RAW_FOLDER: str = os.path.join("app", "assets", "datasets_raw")
     ASSETS_RESULT_FOLDER: str = os.path.join("app", "assets", "result")
     DATASETS_FOLDER: str = os.path.join("app", "ml", "datasets")
-    ML_OUTPUTS_FOLDER: str = os.path.join("app", "ml", "outputs")
+    ML_EXTRACTED_IMAGES_FOLDER: str = os.path.join("app", "ml", "extracted_images")
     ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models")
     ML_TEST_FOLDER: str = os.path.join("app", "ml", "test")
-    ML_TEST_OUTPUT_FOLDER: str = os.path.join("app", "ml", "output_test")
+    ML_PREPROCESSED_IMAGES_FOLDER: str = os.path.join("app", "ml", "preprocessed_images")
     ML_VALIDATION_FOLDER: str = os.path.join("app", "ml", "validation")
 
     IMAGE_RESIZE_1: int = 1200

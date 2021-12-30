@@ -1,8 +1,7 @@
 import io
 import base64
 import time
-import aiofiles
-from os import path, remove
+from os import path
 from typing import Union
 
 from PIL import Image
@@ -10,7 +9,6 @@ import cv2
 import numpy as np
 from starlette.datastructures import UploadFile
 
-from app.api import deps
 from app.core.config import settings
 from app.crud import crud_user
 from app.db.session import SessionLocal
@@ -40,33 +38,42 @@ def generate_file_name(directory: str, username: str):
     return file_name
 
 
-async def save_user_image(file: Union[bytes, UploadFile], username: str):
+async def create_dataset(file: Union[bytes, UploadFile], username: str):
+    time_start = time.perf_counter()
     user_dir = get_user_datasets_directory(username)
-    file_name = generate_file_name(user_dir, username)
-    file_path = path.join(user_dir, file_name)
     if isinstance(file, bytes):
         image_bytes = file[file.find(b'/9'):]
         image = Image.open(io.BytesIO(base64.b64decode(image_bytes)))
-        # image.resize((220, 220))
-        image.save(file_path)
     else:
-        async with aiofiles.open(file_path, 'wb') as out_file:
-            content = await file.read()
-            await out_file.write(content)
-    detected_faces = detect_face_from_image_path(file_path)
+        content = file.file.read()
+        image = Image.open(io.BytesIO(content))
+    detected_faces = detect_face_on_image(image, save_preprocessing=True)
     if detected_faces:
         for detected_face in detected_faces:
+            file_name = generate_file_name(user_dir, username)
+            file_path = path.join(user_dir, file_name)
             cv2.imwrite(file_path, detected_face)
-    else:
-        # remove(file_path)
-        file_path = None
-    return file_path
+
+    time_finish = time.perf_counter()
+    estimated_time = time_finish - time_start
+    list_images = get_list_files(user_dir)
+    result = {
+        "computation_time": round(estimated_time, 2),
+        "total_datasets": len(list_images)
+    }
+    print("--------------------------------")
+    print("FINISH CREATING DATASET")
+    print("RESULT", result)
+    return result
 
 
-def detect_faces_from_datasets_raw(username: str):
+def generate_datasets_from_folder(username: str):
+    time_start = time.perf_counter()
     user_dir = get_user_datasets_raw_directory(username)
     list_images = get_list_files(user_dir)
-    for file_name in list_images:
+    for (i, file_name) in enumerate(list_images):
+        print("--------------------------------")
+        print("IMAGE", i + 1)
         file_path = path.join(user_dir, file_name)
         detected_faces = detect_face_from_image_path(file_path, save_preprocessing=True)
         user_dataset_dir = get_user_datasets_directory(username)
@@ -75,44 +82,49 @@ def detect_faces_from_datasets_raw(username: str):
         if detected_faces:
             for detected_face in detected_faces:
                 cv2.imwrite(dataset_path, detected_face)
-    return "DONE"
+    time_finish = time.perf_counter()
+    estimated_time = time_finish - time_start
+    result = {
+        "computation_time": round(estimated_time, 2),
+        "total_datasets": len(list_images)
+    }
+    print("--------------------------------")
+    print("FINISH CREATING DATASET")
+    print("RESULT", result)
+    return result
 
 
-def detect_faces_from_datasets_raw_all():
+def generate_datasets_from_folder_all():
     image_paths = get_list_files(settings.ASSETS_DATASETS_RAW_FOLDER)
     for username in image_paths:
-        user_dir = get_user_datasets_raw_directory(username)
-        list_images = get_list_files(user_dir)
-        for file_name in list_images:
-            file_path = path.join(user_dir, file_name)
-            detected_faces = detect_face_from_image_path(file_path)
-            user_dataset_dir = get_user_datasets_directory(username)
-            file_name = generate_file_name(user_dataset_dir, username)
-            dataset_path = path.join(user_dataset_dir, file_name)
-            if detected_faces:
-                for detected_face in detected_faces:
-                    cv2.imwrite(dataset_path, detected_face)
+        generate_datasets_from_folder(username)
     return "DONE"
 
 
-def create_models(semester_code: str, course_code: str, validate: bool = False):
-    training_time_start = time.process_time()
-    file_path = train_datasets(semester_code, course_code)
-    training_time_finish = time.process_time()
+def create_models(semester_code: str, course_code: str, validate: bool = False, save_preprocessing=False,
+                  grid_search: bool = False):
+    training_time_start = time.perf_counter()
+    file_path = train_datasets(semester_code, course_code, save_preprocessing, grid_search)
+    training_time_finish = time.perf_counter()
     training_time = training_time_finish - training_time_start
 
     validating_time = 0
+    accuracy = 0
     if validate:
-        validating_time_start = time.process_time()
-        validate_model(semester_code, course_code)
+        validating_time_start = time.perf_counter()
+        accuracy = validate_model(semester_code, course_code, save_preprocessing)
         # file_path = validate_model(semester_code, course_code)
-        validating_time_finish = time.process_time()
+        validating_time_finish = time.perf_counter()
         validating_time = validating_time_finish - validating_time_start
 
+    computation_time = training_time + validating_time
+    accuracy = accuracy * 100
     result = {
         "file_path": file_path,
-        "training_time": training_time,
-        "validating_time": validating_time,
+        "accuracy": round(accuracy, 2),
+        "training_time": round(training_time, 2),
+        "validating_time": round(validating_time, 2),
+        "computation_time": round(computation_time, 2),
     }
     print("result", result)
     return result
@@ -133,16 +145,16 @@ def recognize_face(file: Union[bytes, UploadFile], semester_code: str, course_co
         else:
             image = image.resize((settings.IMAGE_RESIZE_2, settings.IMAGE_RESIZE_1))
 
-    detection_time_start = time.process_time()
-    detected_faces = detect_face_on_image(image)
-    detection_time_finish = time.process_time()
+    detection_time_start = time.perf_counter()
+    detected_faces = detect_face_on_image(image, return_box=True)
+    detection_time_finish = time.perf_counter()
     detection_time = detection_time_finish - detection_time_start
 
     image = np.array(image)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     db = SessionLocal()
 
-    recognition_time_start = time.process_time()
+    recognition_time_start = time.perf_counter()
     predictions = []
     if detected_faces:
         for result in detected_faces:
@@ -154,8 +166,8 @@ def recognize_face(file: Union[bytes, UploadFile], semester_code: str, course_co
             x, y, w, h = box
             x1, y1 = x + w, y + h
             cv2.rectangle(image, (x, y), (x1, y1), (0, 255, 0), 2)
-            cv2.putText(image, user_name, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 10)
-            cv2.putText(image, user_name, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+            cv2.putText(image, user_name, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 10)
+            cv2.putText(image, user_name, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
 
             prediction = {
                 "username": label,
@@ -163,7 +175,7 @@ def recognize_face(file: Union[bytes, UploadFile], semester_code: str, course_co
             }
             predictions.append(prediction)
             # print("RECOGNIZED USER", recognized_user)
-    recognition_time_finish = time.process_time()
+    recognition_time_finish = time.perf_counter()
     recognition_time = recognition_time_finish - recognition_time_start
 
     current_datetime = get_current_datetime()

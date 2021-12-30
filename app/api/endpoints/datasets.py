@@ -23,10 +23,9 @@ def get_list_datasets(db: Session = Depends(session.get_db)):
 def train(course_id: int = Form(...), semester: schemas.Semester = Depends(deps.get_active_semester),
           db: Session = Depends(session.get_db)):
     course = crud.course.get(db, course_id)
-    file_path = datasets.create_models(semester.code, course.code, validate=True)
-    return {
-        "file_path": file_path
-    }
+    result = datasets.create_models(semester.code, course.code, validate=True, save_preprocessing=True,
+                                    grid_search=False)
+    return result
 
 
 @router.post("/recognize", dependencies=[Depends(deps.get_current_active_user)])
@@ -34,31 +33,20 @@ def recognize(course_id: int = Form(...), file: Union[bytes, UploadFile] = File(
               semester: schemas.Semester = Depends(deps.get_active_semester), db: Session = Depends(session.get_db)):
     course = crud.course.get(db, course_id)
     results = datasets.recognize_face(file, semester.code, course.code)
-    # recognized_users = []
-    # for result in results.get("predictions"):
-    #     user = crud.user.get_by_username(db, username=result.get("label"))
-    #     recognized_users.append(user)
-    # print("RECOGNIZED USER", results.get("predictions"))
-
-    # result, box = datasets.recognize_face(file, semester.code, course.code)
     return results
 
 
 @router.post("/capture", dependencies=[Depends(deps.get_current_admin)])
 async def capture(username: str = Form(...), file: Union[bytes, UploadFile] = File(...)):
-    file_path = await datasets.save_user_image(file, username)
-    return {
-        "file_path": file_path
-    }
+    result = await datasets.create_dataset(file, username)
+    return result
 
 
 @router.post("/detect_from_raw", dependencies=[Depends(deps.get_current_admin)])
 def detect_from_raw(username: str = Form(...)):
-    file_path = datasets.detect_faces_from_datasets_raw(username)
-    # file_path = datasets.detect_faces_from_datasets_raw_all()
-    return {
-        "result": file_path
-    }
+    result = datasets.generate_datasets_from_folder(username)
+    # result = datasets.generate_datasets_from_folder_all()
+    return result
 
 
 @router.get("/{username}", dependencies=[Depends(deps.get_current_admin)])

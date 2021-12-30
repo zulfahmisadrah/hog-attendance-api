@@ -1,196 +1,169 @@
 import cv2
-import pickle
 import joblib
 from os import path
 
-from skimage import feature
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import classification_report
 from sklearn.model_selection import GridSearchCV
-from sklearn.svm import LinearSVC, SVC
+from sklearn.svm import SVC
 
 from app.core.config import settings
-from app.ml.face_detection import detect_face_on_image, detect_face_from_image_path
-from app.utils.file_helper import get_list_files, get_course_models_directory, get_hog_outputs_directory, \
-    get_user_datasets_directory
+from app.ml.face_detection import detect_face_from_image_path
+from app.services.preprocessing import get_hog_features, enhance_image, convert_to_grayscale
+from app.utils.commons import get_current_datetime
+from app.utils.file_helper import get_list_files, get_course_models_directory, get_extracted_images_directory, \
+    get_user_datasets_directory, get_dir, get_user_validation_directory
 
 
-def train_datasets(semester_code: str, course_code: str):
+def prepare_datasets(save_preprocessing: bool = False):
     print('--- PREPARING DATASETS ---')
+    preprocessed_images_dir = get_dir(settings.ML_PREPROCESSED_IMAGES_FOLDER)
+    current_datetime = get_current_datetime()
 
     images = []
     labels = []
-    # get all the image folder paths
-    image_paths = get_list_files(settings.DATASETS_FOLDER)
+    datasets = get_list_files(settings.DATASETS_FOLDER)
     total_images = 0
-    for username in image_paths:
-        # get all the image names
+    for username in datasets:
         user_directory_path = get_user_datasets_directory(username)
+        extracted_images_dir = get_extracted_images_directory(username)
+
         all_images = get_list_files(user_directory_path)
-        # iterate over the image names, get the label
-        # list_datasets = [path.join(user_dir, filename) for filename in all_images]
         total_images += len(all_images)
         for (i, image_name) in enumerate(all_images):
-            user_directory = path.join(user_directory_path, image_name)
-            user_image = cv2.imread(user_directory)
-            user_image = cv2.convertScaleAbs(user_image, alpha=settings.IMAGE_ALPHA, beta=settings.IMAGE_BETA)
-            cv2.imwrite(path.join(get_hog_outputs_directory(username), f"{username}_adjusted.{i+1}.jpg"), user_image)
-            user_image = cv2.cvtColor(user_image, cv2.COLOR_RGB2GRAY)
-            user_image = cv2.resize(user_image, (settings.HOG_RESIZE_WIDTH, settings.HOG_RESIZE_HEIGHT))
-            # get the HOG descriptor for the image
-            (hog_desc, hog_image) = feature.hog(user_image, orientations=settings.HOG_ORIENTATIONS, pixels_per_cell=settings.HOG_PIXELS_PER_CELL,
-                                                cells_per_block=settings.HOG_CELLS_PER_BLOCK, transform_sqrt=True, blrunock_norm='L2-Hys',
-                                                visualize=True)
-            user_output_directory = get_hog_outputs_directory(username)
-            output_file_name = f"{username}_hog.{i+1}.jpg"
-            output_path = path.join(user_output_directory, output_file_name)
+            counter = i + 1
+
+            image_path = path.join(user_directory_path, image_name)
+            image = cv2.imread(image_path)
+
+            # Image Enhancement
+            enhanced_image = enhance_image(image)
+            if save_preprocessing:
+                enhanced_image_path = path.join(preprocessed_images_dir, f"{current_datetime}_{counter}.4_enhanced.jpg")
+                cv2.imwrite(enhanced_image_path, enhanced_image)
+
+            # Grayscaling
+            gray_image = convert_to_grayscale(enhanced_image)
+            if save_preprocessing:
+                gray_image_path = path.join(preprocessed_images_dir, f"{current_datetime}_{counter}.5_gray.jpg")
+                cv2.imwrite(gray_image_path, gray_image)
+
+            # Resize
+            resized_image = cv2.resize(gray_image, (settings.HOG_RESIZE_WIDTH, settings.HOG_RESIZE_HEIGHT))
+            if save_preprocessing:
+                resized_image_path = path.join(preprocessed_images_dir, f"{current_datetime}_{counter}.6_resized.jpg")
+                cv2.imwrite(resized_image_path, resized_image)
+
+            # HOG Features
+            (hog_desc, hog_image) = get_hog_features(resized_image)
+            if save_preprocessing:
+                hog_path = path.join(preprocessed_images_dir, f"{current_datetime}_{counter}.7_hog.jpg")
+                cv2.imwrite(hog_path, hog_image * 255.)
+            output_path = path.join(extracted_images_dir, f"{image_name}_hog.jpg")
             cv2.imwrite(output_path, hog_image * 255.)
+
             images.append(hog_desc)
             labels.append(username)
-    print('{0} images from {1} datasets have been extracted'.format(total_images, len(image_paths)))
+    print('{0} images from {1} datasets have been extracted'.format(total_images, len(datasets)))
+    return images, labels
 
+
+def train_datasets(semester_code: str, course_code: str, save_preprocessing: bool = False, grid_search: bool = False):
+    images, labels = prepare_datasets(save_preprocessing)
     print('--- TRAINING MODEL ---')
-    parameters = {
-        'kernel': ['linear', 'rbf', 'poly', 'sigmoid'],
-        # 'C': [0.5, 1, 10, 100],
-        'C': [1e3, 5e3, 1e4, 5e4, 1e5],
-        'gamma': ['scale', 1, 0.1, 0.01, 0.001, 0.005],
-        # 'gamma': [0.1, 0.01, 0.001, 0.0001, 0.005, 0.0005],
-        'random_state': [0, 42]
-    }
-
-    # grid_search = GridSearchCV(estimator=SVC(),
-    #                            param_grid=parameters,
-    #                            n_jobs=6,
-    #                            verbose=1,
-    #                            scoring='accuracy'
-    # )
-    # grid_search.fit(images, labels)
-    # print(f"Best Score: {grid_search.best_score_}")
-    # best_params = grid_search.best_estimator_.get_params()
-    # print("Best Parameters: ")
-    # for param in parameters:
-    #     print(f"\t{param}: {best_params[param]}")
-
-    svm_model = SVC(kernel='sigmoid', C=1000.0, gamma=0.005, random_state=0, probability=True)
+    if grid_search:
+        parameters = {
+            'kernel': ['linear', 'rbf', 'poly', 'sigmoid'],
+            'C': [0.5, 1.0, 10, 50, 100, 1000],
+            'gamma': ['scale', 1, 0.1, 0.01, 0.001, 0.005],
+            'random_state': [0]
+        }
+        grid_search = GridSearchCV(estimator=SVC(), param_grid=parameters, n_jobs=6, verbose=1, scoring='accuracy')
+        grid_search.fit(images, labels)
+        print(f"Best Score: {grid_search.best_score_}")
+        best_params = grid_search.best_estimator_.get_params()
+        print("Best Parameters: ")
+        for param in parameters:
+            print(f"\t{param}: {best_params[param]}")
+        svm_model = SVC(kernel=best_params['kernel'], gamma=best_params['gamma'], C=best_params['C'],
+                        random_state=best_params['random_state'], probability=True)
+    else:
+        svm_model = SVC(kernel='sigmoid', C=50, gamma=0.01, random_state=0, probability=True)
+        # svm_model = SVC(kernel='sigmoid', C=1000.0, gamma=0.005, random_state=0, probability=True)
     svm_model.fit(images, labels)
-
-    # svm_model = SVC(kernel=best_params['kernel'], gamma=best_params['gamma'], C=best_params['C'], random_state=best_params['random_state'])
-    # svm_model.fit(images, labels)
-
     course_directory = get_course_models_directory(course_code)
     model_name = f"{semester_code}.joblib"
     model_path = path.join(course_directory, model_name)
-    # joblib.dump(grid_search, model_path)
     joblib.dump(svm_model, model_path)
-    # pickle.dump(svm_model, open(model_path, 'wb'))
     print('--- MODEL CREATED ---')
     return model_path
 
 
-def validate_model(semester_code: str, course_code: str):
+def validate_model(semester_code: str, course_code: str, save_preprocessing=False):
     print('--- TESTING MODEL ---')
+    preprocessed_images_dir = get_dir(settings.ML_PREPROCESSED_IMAGES_FOLDER)
+    current_datetime = get_current_datetime()
+
     validation_images = []
     validation_labels = []
-    # recognized_users = []
     validation_files = get_list_files(settings.ML_VALIDATION_FOLDER)
+    total_images = 0
     for username in validation_files:
-        user_validation_directory_path = path.join(settings.ML_VALIDATION_FOLDER, username)
+        user_validation_directory_path = get_user_validation_directory(username)
+        extracted_images_dir = get_extracted_images_directory(username)
+
         all_images = get_list_files(user_validation_directory_path)
+        total_images += len(all_images)
         for (i, image_name) in enumerate(all_images):
+            counter = i + 1
+
             user_directory = path.join(user_validation_directory_path, image_name)
             user_image = cv2.imread(user_directory)
-            cv2.imwrite(path.join(get_hog_outputs_directory(username), f"{username}_val_input.{i + 1}.jpg"),
-                        user_image)
-            # detected_faces = detect_face_on_image(user_image)
-            print("DETECTING FACE ON ", image_name)
-            detected_faces = detect_face_from_image_path(user_directory, save_preprocessing=True)
+            if save_preprocessing:
+                input_path = path.join(preprocessed_images_dir, f"{current_datetime}_val_{counter}.0_input.jpg")
+                cv2.imwrite(input_path, user_image)
+
+            detected_faces = detect_face_from_image_path(user_directory, save_preprocessing)
             if detected_faces:
                 for detected_face in detected_faces:
-                    # detected_face, box = result
-                    # user_image = detected_face
-                    user_image = cv2.convertScaleAbs(detected_face, alpha=settings.IMAGE_ALPHA, beta=settings.IMAGE_BETA)
-                    cv2.imwrite(path.join(get_hog_outputs_directory(username), f"{username}_val_adjusted.{i + 1}.jpg"),
-                                user_image)
-                    user_image = cv2.cvtColor(user_image, cv2.COLOR_RGB2GRAY)
-                    cv2.imwrite(path.join(get_hog_outputs_directory(username), f"{username}_val_gray.{i + 1}.jpg"),
-                                user_image)
-                    user_image = cv2.resize(user_image, (settings.HOG_RESIZE_WIDTH, settings.HOG_RESIZE_HEIGHT))
-                    cv2.imwrite(path.join(get_hog_outputs_directory(username), f"{username}_val_resized.{i + 1}.jpg"),
-                                user_image)
-                    # get the HOG descriptor for the image
-                    (hog_desc, hog_image) = feature.hog(user_image, orientations=settings.HOG_ORIENTATIONS, pixels_per_cell=settings.HOG_PIXELS_PER_CELL,
-                                                        cells_per_block=settings.HOG_CELLS_PER_BLOCK, transform_sqrt=True,
-                                                        block_norm='L2-Hys',
-                                                        visualize=True)
-                    user_output_directory = get_hog_outputs_directory(username)
-                    output_file_name = f"{username}_val_hog.{i + 1}.jpg"
-                    output_path = path.join(user_output_directory, output_file_name)
+                    # Image Enhancement
+                    enhanced_image = enhance_image(detected_face)
+                    if save_preprocessing:
+                        file_name = f"{current_datetime}_val_{counter}.4_enhanced.jpg"
+                        enhanced_path = path.join(preprocessed_images_dir, file_name)
+                        cv2.imwrite(enhanced_path, enhanced_image)
+
+                    # Grayscaling
+                    gray_image = convert_to_grayscale(enhanced_image)
+                    if save_preprocessing:
+                        file_name = f"{current_datetime}_val_{counter}.5_gray.jpg"
+                        gray_image_path = path.join(preprocessed_images_dir, file_name)
+                        cv2.imwrite(gray_image_path, gray_image)
+
+                    # Resize
+                    resized_image = cv2.resize(gray_image, (settings.HOG_RESIZE_WIDTH, settings.HOG_RESIZE_HEIGHT))
+                    if save_preprocessing:
+                        file_name = f"{current_datetime}_val_{counter}.6_resized.jpg"
+                        resized_image_path = path.join(preprocessed_images_dir, file_name)
+                        cv2.imwrite(resized_image_path, resized_image)
+
+                    # HOG Features
+                    (hog_desc, hog_image) = get_hog_features(resized_image)
+                    if save_preprocessing:
+                        hog_path = path.join(preprocessed_images_dir, f"{current_datetime}_{counter}.7_hog.jpg")
+                        cv2.imwrite(hog_path, hog_image * 255.)
+                    output_path = path.join(extracted_images_dir, f"{username}_{counter}_val_hog.jpg")
                     cv2.imwrite(output_path, hog_image * 255.)
+
                     validation_images.append(hog_desc)
                     validation_labels.append(username)
-    model_name = f"{semester_code}.joblib"
+
     course_directory = get_course_models_directory(course_code)
+    model_name = f"{semester_code}.joblib"
     model_path = path.join(course_directory, model_name)
-    # svm_model = pickle.load(open(model_path, 'rb'))
     svm_model = joblib.load(model_path)
     recognized_users = svm_model.predict(validation_images)
-    # recognized_users = grid_search.predict(validation_images)
-    # accuracy_lin = linear.score(validation_images, validation_labels)
-    # accuracy_poly = poly.score(validation_images, validation_labels)
-    # accuracy_rbf = rbf.score(validation_images, validation_labels)
-    # accuracy_sig = sig.score(validation_images, validation_labels)
-    # print("Accuracy Linear Kernel:", accuracy_lin)
-    # print("Accuracy accuracy_poly Kernel:", accuracy_poly)
-    # print("Accuracy accuracy_rbf Kernel:", accuracy_rbf)
-    # print("Accuracy accuracy_sig Kernel:", accuracy_sig)
     print("recognized_users", recognized_users)
     report = classification_report(validation_labels, recognized_users)
     print(report)
-    # print(confusion_matrix(validation_labels, recognized_users, labels=validation_files))
-
-
-def validate_from_validation_folder(semester_code: str, course_code: str):
-    print('--- TESTING MODEL ---')
-    validation_images = []
-    validation_labels = []
-    # recognized_users = []
-    validation_files = get_list_files(settings.ML_VALIDATION_FOLDER)
-    for username in validation_files:
-        user_validation_directory_path = path.join(settings.ML_VALIDATION_FOLDER, username)
-        all_images = get_list_files(user_validation_directory_path)
-        for (i, image_name) in enumerate(all_images):
-            user_directory = path.join(user_validation_directory_path, image_name)
-            user_image = cv2.imread(user_directory)
-            cv2.imwrite(path.join(get_hog_outputs_directory(username), f"{username}_val_input.{i + 1}.jpg"),
-                        user_image)
-            # detected_faces = detect_face_on_image(user_image)
-            detected_faces = detect_face_from_image_path(user_directory)
-            if detected_faces:
-                for detected_face in detected_faces:
-                    # detected_face, box = result
-                    # user_image = detected_face
-                    user_image = cv2.convertScaleAbs(detected_face, alpha=settings.IMAGE_ALPHA,
-                                                     beta=settings.IMAGE_BETA)
-                    cv2.imwrite(path.join(get_hog_outputs_directory(username), f"{username}_val_adjusted.{i + 1}.jpg"),
-                                user_image)
-                    user_image = cv2.cvtColor(user_image, cv2.COLOR_RGB2GRAY)
-                    user_image = cv2.resize(user_image, (settings.HOG_RESIZE_WIDTH, settings.HOG_RESIZE_HEIGHT))
-                    # get the HOG descriptor for the image
-                    (hog_desc, hog_image) = feature.hog(user_image, orientations=settings.HOG_ORIENTATIONS, pixels_per_cell=settings.HOG_PIXELS_PER_CELL,
-                                                        cells_per_block=settings.HOG_CELLS_PER_BLOCK, transform_sqrt=True,
-                                                        block_norm='L2-Hys',
-                                                        visualize=True)
-                    user_output_directory = get_hog_outputs_directory(username)
-                    output_file_name = f"{username}_val_hog.{i + 1}.jpg"
-                    output_path = path.join(user_output_directory, output_file_name)
-                    cv2.imwrite(output_path, hog_image * 255.)
-                    validation_images.append(hog_desc)
-                    validation_labels.append(username)
-    model_name = f"{semester_code}.joblib"
-    course_directory = get_course_models_directory(course_code)
-    model_path = path.join(course_directory, model_name)
-    # svm_model = pickle.load(open(model_path, 'rb'))
-    svm_model = joblib.load(model_path)
-    recognized_users = svm_model.predict(validation_images)
-    report = classification_report(validation_labels, recognized_users)
-    print(report)
+    report = classification_report(validation_labels, recognized_users, output_dict=True)
+    return report["accuracy"]
