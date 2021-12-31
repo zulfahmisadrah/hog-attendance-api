@@ -82,11 +82,17 @@ def rotate_image(img, angle, center=None):
 
 def resize_image(image):
     height, width = image.shape[:2]
-    if height > settings.IMAGE_RESIZE_1 or width > settings.IMAGE_RESIZE_1:
-        if height > width:
-            image = cv2.resize(image, (settings.IMAGE_RESIZE_1, settings.IMAGE_RESIZE_2))
+    longer_size = height if height > width else width
+    orientation = "portrait" if longer_size == height else "landscape"
+    if longer_size > settings.IMAGE_RESIZE_2:
+        new_longer_size = settings.IMAGE_RESIZE_2
+        scale = float(new_longer_size/float(longer_size))
+        if orientation == "portrait":
+            new_width = int(float(width) * scale)
+            image = cv2.resize(image, (new_width, new_longer_size))
         else:
-            image = cv2.resize(image, (settings.IMAGE_RESIZE_2, settings.IMAGE_RESIZE_1))
+            new_height = int(float(height * scale))
+            image = cv2.resize(image, (new_longer_size, new_height))
     return image
 
 
@@ -148,11 +154,11 @@ def detect_face_on_image(img: Union[Image, ndarray], save_preprocessing: bool = 
     preprocessed_images_dir = get_dir(settings.ML_PREPROCESSED_IMAGES_FOLDER)
     current_datetime = get_current_datetime()
 
-    if save_preprocessing:
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        capture_path = path.join(preprocessed_images_dir, f"{current_datetime}.0_input.jpg")
-        cv2.imwrite(capture_path, img)
-        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    # if save_preprocessing:
+    #     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    #     capture_path = path.join(preprocessed_images_dir, f"{current_datetime}.0_input.jpg")
+    #     cv2.imwrite(capture_path, img)
+    #     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 
     # Detect Face using MTCNN
     detecting_time_start = time.perf_counter()

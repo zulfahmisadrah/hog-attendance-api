@@ -30,7 +30,7 @@ def get_hog_features(
 
 
 def enhance_image(image, alpha=settings.IMAGE_ALPHA, beta=settings.IMAGE_BETA):
-    enhanced_image = cv2.convertScaleAbs(image, alpha, beta)
+    enhanced_image = cv2.convertScaleAbs(image, alpha=alpha, beta=beta)
     return enhanced_image
 
 

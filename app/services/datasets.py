@@ -104,7 +104,7 @@ def generate_datasets_from_folder_all():
 def create_models(semester_code: str, course_code: str, validate: bool = False, save_preprocessing=False,
                   grid_search: bool = False):
     training_time_start = time.perf_counter()
-    file_path = train_datasets(semester_code, course_code, save_preprocessing, grid_search)
+    file_path = train_datasets(semester_code, course_code, save_preprocessing=False, grid_search=grid_search)
     training_time_finish = time.perf_counter()
     training_time = training_time_finish - training_time_start
 

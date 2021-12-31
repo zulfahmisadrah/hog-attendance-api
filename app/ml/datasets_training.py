@@ -17,7 +17,6 @@ from app.utils.file_helper import get_list_files, get_course_models_directory, g
 def prepare_datasets(save_preprocessing: bool = False):
     print('--- PREPARING DATASETS ---')
     preprocessed_images_dir = get_dir(settings.ML_PREPROCESSED_IMAGES_FOLDER)
-    current_datetime = get_current_datetime()
 
     images = []
     labels = []
@@ -31,6 +30,7 @@ def prepare_datasets(save_preprocessing: bool = False):
         total_images += len(all_images)
         for (i, image_name) in enumerate(all_images):
             counter = i + 1
+            current_datetime = get_current_datetime()
 
             image_path = path.join(user_directory_path, image_name)
             image = cv2.imread(image_path)
@@ -101,7 +101,6 @@ def train_datasets(semester_code: str, course_code: str, save_preprocessing: boo
 def validate_model(semester_code: str, course_code: str, save_preprocessing=False):
     print('--- TESTING MODEL ---')
     preprocessed_images_dir = get_dir(settings.ML_PREPROCESSED_IMAGES_FOLDER)
-    current_datetime = get_current_datetime()
 
     validation_images = []
     validation_labels = []
@@ -115,6 +114,7 @@ def validate_model(semester_code: str, course_code: str, save_preprocessing=Fals
         total_images += len(all_images)
         for (i, image_name) in enumerate(all_images):
             counter = i + 1
+            current_datetime = get_current_datetime()
 
             user_directory = path.join(user_validation_directory_path, image_name)
             user_image = cv2.imread(user_directory)
