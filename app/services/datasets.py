@@ -4,6 +4,7 @@ import time
 from os import path
 from typing import Union
 
+import aiofiles
 from PIL import Image
 import cv2
 import numpy as np
@@ -15,6 +16,7 @@ from app.db.session import SessionLocal
 from app.ml.face_detection import detect_face_from_image_path, detect_face_on_image
 from app.ml.datasets_training import train_datasets, validate_model
 from app.ml.face_recognition import recognize
+from app.services.image_processing import resize_image
 from app.utils.commons import get_current_datetime
 from app.utils.file_helper import get_list_files, get_total_files, get_user_datasets_directory, \
     get_user_datasets_raw_directory, get_dir
@@ -29,7 +31,13 @@ def get_user_datasets(username: str):
 def generate_file_name(directory: str, username: str):
     files = get_list_files(directory)
     total_files = get_total_files(directory)
-    list_numbers = [int(file.split('.')[1]) for file in files]
+    list_numbers = []
+    for (i, file_name) in enumerate(files):
+        split_file_name = file_name.split('.')
+        if len(split_file_name) > 1:
+            if split_file_name[1].isnumeric():
+                number = split_file_name.index(1)
+                list_numbers.append(number)
     missing_numbers = [x for x in range(1, total_files + 1) if x not in list_numbers]
     if missing_numbers:
         file_name = f"{username}.{missing_numbers[0]}.jpeg"
@@ -38,36 +46,29 @@ def generate_file_name(directory: str, username: str):
     return file_name
 
 
-async def create_dataset(file: Union[bytes, UploadFile], username: str):
-    time_start = time.perf_counter()
-    user_dir = get_user_datasets_directory(username)
+async def save_raw_dataset(file: Union[bytes, UploadFile], username: str):
+    user_dir = get_user_datasets_raw_directory(username)
+    file_name = generate_file_name(user_dir, username)
+    file_path = path.join(user_dir, file_name)
     if isinstance(file, bytes):
         image_bytes = file[file.find(b'/9'):]
         image = Image.open(io.BytesIO(base64.b64decode(image_bytes)))
+        image.save(file_path)
     else:
-        content = file.file.read()
-        image = Image.open(io.BytesIO(content))
-    detected_faces = detect_face_on_image(image, save_preprocessing=True)
-    if detected_faces:
-        for detected_face in detected_faces:
-            file_name = generate_file_name(user_dir, username)
-            file_path = path.join(user_dir, file_name)
-            cv2.imwrite(file_path, detected_face)
-
-    time_finish = time.perf_counter()
-    estimated_time = time_finish - time_start
+        async with aiofiles.open(file_path, 'wb') as out_file:
+            content = await file.read()
+            await out_file.write(content)
     list_images = get_list_files(user_dir)
     result = {
-        "computation_time": round(estimated_time, 2),
-        "total_datasets": len(list_images)
+        "total_raw_datasets": len(list_images)
     }
     print("--------------------------------")
-    print("FINISH CREATING DATASET")
+    print("FINISH SAVE IMAGES")
     print("RESULT", result)
     return result
 
 
-def generate_datasets_from_folder(username: str):
+def generate_datasets_from_folder(username: str, save_preprocessing=False):
     time_start = time.perf_counter()
     user_dir = get_user_datasets_raw_directory(username)
     list_images = get_list_files(user_dir)
@@ -75,7 +76,7 @@ def generate_datasets_from_folder(username: str):
         print("--------------------------------")
         print("IMAGE", i + 1)
         file_path = path.join(user_dir, file_name)
-        detected_faces = detect_face_from_image_path(file_path, save_preprocessing=True)
+        detected_faces = detect_face_from_image_path(file_path, save_preprocessing=save_preprocessing)
         user_dataset_dir = get_user_datasets_directory(username)
         file_name = generate_file_name(user_dataset_dir, username)
         dataset_path = path.join(user_dataset_dir, file_name)
@@ -138,12 +139,7 @@ def recognize_face(file: Union[bytes, UploadFile], semester_code: str, course_co
         content = file.file.read()
         image = Image.open(io.BytesIO(content))
 
-    width, height = image.size
-    if height > settings.IMAGE_RESIZE_1 or width > settings.IMAGE_RESIZE_1:
-        if height > width:
-            image = image.resize((settings.IMAGE_RESIZE_1, settings.IMAGE_RESIZE_2))
-        else:
-            image = image.resize((settings.IMAGE_RESIZE_2, settings.IMAGE_RESIZE_1))
+    image = resize_image(image)
 
     detection_time_start = time.perf_counter()
     detected_faces = detect_face_on_image(image, return_box=True)

@@ -1,146 +1,22 @@
-import math
 import time
 from typing import Union
 
-import cv2
-import numpy as np
-from PIL.Image import Image
-from mtcnn import MTCNN
 from os import path
-from numpy import ndarray
+from mtcnn import MTCNN
+from PIL.Image import Image
 
-from app.core.config import settings
-from app.utils.commons import get_current_datetime
+from app.services.image_processing import *
 from app.utils.file_helper import get_dir
+from app.utils.commons import get_current_datetime
 
 detector = MTCNN()
-
-
-def euclidean_distance(a, b):
-    x1 = a[0]
-    y1 = a[1]
-    x2 = b[0]
-    y2 = b[1]
-    return math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)))
-
-
-def rotate_point(origin, point, angle):
-    ox, oy = origin
-    px, py = point
-    qx = ox + math.cos(angle) * (px - ox) - math.sin(angle) * (py - oy)
-    qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
-    return int(qx), int(qy)
-
-
-def radian_to_degree(radian):
-    return (radian * 180) / math.pi
-
-
-def angle_with_direction(angle, direction):
-    if direction == -1:
-        angle = 90 - angle
-    return direction * angle
-
-
-def align_eyes(left_eye, right_eye):
-    # this function aligns given face in img based on left and right eye coordinates
-    left_eye_x, left_eye_y = left_eye
-    right_eye_x, right_eye_y = right_eye
-
-    # find rotation direction
-    if left_eye_y > right_eye_y:
-        point_3rd = (right_eye_x, left_eye_y)
-        direction = -1  # rotate same direction to clock
-    else:
-        point_3rd = (left_eye_x, right_eye_y)
-        direction = 1  # rotate inverse direction of clock
-
-    # find length of triangle edges
-    a = euclidean_distance(np.array(left_eye), np.array(point_3rd))
-    b = euclidean_distance(np.array(right_eye), np.array(point_3rd))
-    c = euclidean_distance(np.array(right_eye), np.array(left_eye))
-
-    # apply cosine rule
-    if b != 0 and c != 0:  # this multiplication causes division by zero in cos_a calculation
-        cos_a = (b * b + c * c - a * a) / (2 * b * c)
-        angle = np.arccos(cos_a)
-    else:
-        angle = 0
-    return angle, direction, point_3rd  # angle in radian
-
-
-def rotate_image(img, angle, center=None):
-    (h, w) = img.shape[:2]
-    if center:
-        (cX, cY) = center
-    else:
-        (cX, cY) = (w / 2, h / 2)
-    matrix = cv2.getRotationMatrix2D((cX, cY), angle, 1.0)
-    rotated_img = cv2.warpAffine(img, matrix, (w, h))
-    return rotated_img
-
-
-def resize_image(image):
-    height, width = image.shape[:2]
-    longer_size = height if height > width else width
-    orientation = "portrait" if longer_size == height else "landscape"
-    if longer_size > settings.IMAGE_RESIZE_2:
-        new_longer_size = settings.IMAGE_RESIZE_2
-        scale = float(new_longer_size/float(longer_size))
-        if orientation == "portrait":
-            new_width = int(float(width) * scale)
-            image = cv2.resize(image, (new_width, new_longer_size))
-        else:
-            new_height = int(float(height * scale))
-            image = cv2.resize(image, (new_longer_size, new_height))
-    return image
-
-
-def put_bounding_box_and_face_landmarks(img, box, keypoints):
-    x, y, w, h = box
-    cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-    cv2.circle(img, keypoints["left_eye"], 4, (0, 255, 0), 2)
-    cv2.circle(img, keypoints["right_eye"], 4, (0, 255, 0), 2)
-    cv2.circle(img, keypoints["nose"], 4, (0, 255, 0), 2)
-    cv2.circle(img, keypoints["mouth_left"], 4, (0, 255, 0), 2)
-    cv2.circle(img, keypoints["mouth_right"], 4, (0, 255, 0), 2)
-    return img
-
-
-def cut_forehead_in_box(box, keypoints):
-    x, y, w, h = box
-    # Cut half forehead above
-    left_eye_y = keypoints["left_eye"][1]
-    right_eye_y = keypoints["right_eye"][1]
-    highest_eye = right_eye_y if right_eye_y < left_eye_y else left_eye_y
-    half_forehead = (highest_eye - y) / 2
-    new_y = int(y + half_forehead)  # move y down to half forehead point
-    new_h = int(h - half_forehead)  # reduce height because half forehead removed
-    return x, new_y, w, new_h
-
-
-def crop_face(img, box, keypoints, cut_forehead=False):
-    x, y, w, h = box
-    if cut_forehead:
-        # Cut half forehead above
-        left_eye_y = keypoints["left_eye"][1]
-        right_eye_y = keypoints["right_eye"][1]
-        highest_eye = right_eye_y if right_eye_y < left_eye_y else left_eye_y
-        half_forehead = (highest_eye - y) / 2
-        new_y = int(y + half_forehead)  # move y down to half forehead point
-        new_h = int(h - half_forehead)  # reduce height because half forehead removed
-        # Crop face
-        cropped_face = img[int(new_y):int(new_y + new_h), int(x):int(x + w)]
-        return cropped_face, new_y, new_h
-    else:
-        cropped_face = img[int(y):int(y + h), int(x):int(x + w)]
-        return cropped_face
 
 
 def detect_face_from_image_path(image_path: str, save_preprocessing: bool = False):
     image_name = path.basename(path.normpath(image_path))
     img = cv2.imread(image_path)
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    print("-----------------------------------")
     print("DETECTING FACE ON ", image_name)
     detected_faces = detect_face_on_image(img, save_preprocessing)
     return detected_faces
@@ -219,4 +95,3 @@ def detect_face_on_image(img: Union[Image, ndarray], save_preprocessing: bool = 
             else:
                 detected_faces.append(detected_face)
     return detected_faces
-

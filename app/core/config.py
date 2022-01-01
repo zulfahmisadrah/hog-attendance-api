@@ -22,8 +22,7 @@ class Settings(BaseSettings):
     ML_PREPROCESSED_IMAGES_FOLDER: str = os.path.join("app", "ml", "preprocessed_images")
     ML_VALIDATION_FOLDER: str = os.path.join("app", "ml", "validation")
 
-    IMAGE_RESIZE_1: int = 1200
-    IMAGE_RESIZE_2: int = 1600
+    IMAGE_MAX_SIZE: int = 1600
     IMAGE_ALPHA: float = 1.5  # Contrast control (1.0-3.0)
     IMAGE_BETA: float = 10  # Brightness control (0-100)
 

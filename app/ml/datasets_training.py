@@ -8,7 +8,7 @@ from sklearn.svm import SVC
 
 from app.core.config import settings
 from app.ml.face_detection import detect_face_from_image_path
-from app.services.preprocessing import get_hog_features, enhance_image, convert_to_grayscale
+from app.services.image_processing import get_hog_features, enhance_image, convert_to_grayscale
 from app.utils.commons import get_current_datetime
 from app.utils.file_helper import get_list_files, get_course_models_directory, get_extracted_images_directory, \
     get_user_datasets_directory, get_dir, get_user_validation_directory

@@ -20,11 +20,11 @@ def get_list_datasets(db: Session = Depends(session.get_db)):
 
 
 @router.post("/train", dependencies=[Depends(deps.get_current_admin)])
-def train(course_id: int = Form(...), semester: schemas.Semester = Depends(deps.get_active_semester),
+def train(params: schemas.TrainingParams, semester: schemas.Semester = Depends(deps.get_active_semester),
           db: Session = Depends(session.get_db)):
-    course = crud.course.get(db, course_id)
-    result = datasets.create_models(semester.code, course.code, validate=True, save_preprocessing=True,
-                                    grid_search=False)
+    course = crud.course.get(db, params.course_id)
+    result = datasets.create_models(semester.code, course.code, validate=params.validate_model,
+                                    save_preprocessing=params.save_preprocessing, grid_search=params.deep_training)
     return result
 
 
@@ -38,13 +38,13 @@ def recognize(course_id: int = Form(...), file: Union[bytes, UploadFile] = File(
 
 @router.post("/capture", dependencies=[Depends(deps.get_current_admin)])
 async def capture(username: str = Form(...), file: Union[bytes, UploadFile] = File(...)):
-    result = await datasets.create_dataset(file, username)
+    result = await datasets.save_raw_dataset(file, username)
     return result
 
 
 @router.post("/detect_from_raw", dependencies=[Depends(deps.get_current_admin)])
-def detect_from_raw(username: str = Form(...)):
-    result = datasets.generate_datasets_from_folder(username)
+def detect_from_raw(params: schemas.DatasetParams):
+    result = datasets.generate_datasets_from_folder(params.username, params.save_preprocessing)
     # result = datasets.generate_datasets_from_folder_all()
     return result
 
