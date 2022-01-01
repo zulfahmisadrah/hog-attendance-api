@@ -1,6 +1,7 @@
 import time
 from typing import Union
 
+import cv2
 from os import path
 from mtcnn import MTCNN
 from PIL.Image import Image

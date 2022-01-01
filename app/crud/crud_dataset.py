@@ -10,11 +10,11 @@ from app.core.config import settings
 from app.crud import crud_user
 from app.models.schemas import Dataset
 from app.services import get_user_datasets
-from app.utils.file_helper import get_list_files, get_user_dataset_file
+from app.utils.file_helper import get_list_files, get_user_dataset_file, get_dir
 
 
 def get_list_datasets(db: Session):
-    list_username = get_list_files(settings.DATASETS_FOLDER)
+    list_username = get_list_files(get_dir(settings.DATASETS_FOLDER))
     list_datasets = []
     for username in list_username:
         student = crud_user.user.get_by_username(db, username=username)

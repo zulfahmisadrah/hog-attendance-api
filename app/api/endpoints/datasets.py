@@ -44,8 +44,8 @@ async def capture(username: str = Form(...), file: Union[bytes, UploadFile] = Fi
 
 @router.post("/detect_from_raw", dependencies=[Depends(deps.get_current_admin)])
 def detect_from_raw(params: schemas.DatasetParams):
-    result = datasets.generate_datasets_from_folder(params.username, params.save_preprocessing)
-    # result = datasets.generate_datasets_from_folder_all()
+    # result = datasets.generate_datasets_from_folder(params.username, params.save_preprocessing)
+    result = datasets.generate_datasets_from_folder_all()
     return result
 
 

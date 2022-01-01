@@ -36,7 +36,7 @@ def generate_file_name(directory: str, username: str):
         split_file_name = file_name.split('.')
         if len(split_file_name) > 1:
             if split_file_name[1].isnumeric():
-                number = split_file_name.index(1)
+                number = int(split_file_name[1])
                 list_numbers.append(number)
     missing_numbers = [x for x in range(1, total_files + 1) if x not in list_numbers]
     if missing_numbers:
