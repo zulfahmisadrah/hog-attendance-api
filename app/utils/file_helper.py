@@ -2,6 +2,7 @@ from typing import List
 from os import path, listdir, mkdir
 
 from app.core.config import settings
+from app.resources.enums import DatasetType
 
 
 def create_directory_if_not_exist(directory: str) -> str:
@@ -34,23 +35,32 @@ def get_result_file(file_name: str) -> str:
     return path.join(settings.ASSETS_RESULT_FOLDER, file_name)
 
 
-def get_user_datasets_directory(username: str) -> str:
-    directory_path = path.join(get_dir(settings.DATASETS_FOLDER), username)
-    return get_dir(directory_path)
+def get_datasets_directory(dataset_type: DatasetType) -> str:
+    return get_dir(path.join(get_dir(settings.ML_DATASETS_FOLDER), dataset_type))
 
 
-def get_user_datasets_raw_directory(username: str) -> str:
-    directory_path = path.join(get_dir(settings.ASSETS_DATASETS_RAW_FOLDER), username)
-    return get_dir(directory_path)
+def get_datasets_raw_directory(dataset_type: DatasetType) -> str:
+    return get_dir(path.join(get_dir(settings.ML_DATASETS_RAW_FOLDER), dataset_type))
 
 
-def get_user_validation_directory(username: str) -> str:
-    directory_path = path.join(get_dir(settings.ML_VALIDATION_FOLDER), username)
-    return get_dir(directory_path)
+def get_user_datasets_directory(dataset_type: DatasetType, username: str) -> str:
+    return get_dir(path.join(get_datasets_directory(dataset_type), username))
 
 
-def get_user_dataset_file(username: str, file_name: str) -> str:
-    file_path = path.join(get_dir(settings.DATASETS_FOLDER), username, file_name)
+def get_user_datasets_raw_directory(dataset_type: DatasetType, username: str) -> str:
+    return get_dir(path.join(get_datasets_raw_directory(dataset_type), username))
+
+
+def get_preprocessed_images_directory(dataset_type: DatasetType) -> str:
+    return get_dir(path.join(get_dir(settings.ML_PREPROCESSED_IMAGES_FOLDER), dataset_type))
+
+
+def get_user_preprocessed_images_directory(dataset_type: DatasetType, username: str) -> str:
+    return get_dir(path.join(get_preprocessed_images_directory(dataset_type), username))
+
+
+def get_user_dataset_file(dataset_type: DatasetType, username: str, file_name: str) -> str:
+    file_path = path.join(get_user_datasets_directory(dataset_type, username), file_name)
     return file_path
 
 

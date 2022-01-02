@@ -1,31 +1,57 @@
 import io
 import base64
 import time
-from os import path
-from typing import Union
+from typing import Union, Any
+from os import path, remove
+from shutil import rmtree
 
-import aiofiles
-from PIL import Image
 import cv2
+import aiofiles
 import numpy as np
+from PIL import Image
+from fastapi import status
+from fastapi.responses import Response
+from sqlalchemy.orm import Session
 from starlette.datastructures import UploadFile
 
 from app.core.config import settings
 from app.crud import crud_user
+from app.models.schemas import Dataset, DatasetTotal
 from app.db.session import SessionLocal
 from app.ml.face_detection import detect_face_from_image_path, detect_face_on_image
 from app.ml.datasets_training import train_datasets, validate_model
 from app.ml.face_recognition import recognize
+from app.resources.enums import DatasetType
 from app.services.image_processing import resize_image
 from app.utils.commons import get_current_datetime
 from app.utils.file_helper import get_list_files, get_total_files, get_user_datasets_directory, \
-    get_user_datasets_raw_directory, get_dir
+    get_user_datasets_raw_directory, get_dir, get_user_dataset_file, get_datasets_directory, get_datasets_raw_directory
 
 
-def get_user_datasets(username: str):
-    user_dir = get_user_datasets_directory(username)
+def get_user_datasets(username: str, dataset_type: DatasetType = DatasetType.TRAINING):
+    user_dir = get_user_datasets_directory(dataset_type, username)
     list_datasets = get_list_files(user_dir)
     return list_datasets
+
+
+def get_user_datasets_raw(username: str, dataset_type: DatasetType = DatasetType.TRAINING):
+    user_dir = get_user_datasets_raw_directory(dataset_type, username)
+    list_datasets = get_list_files(user_dir)
+    return list_datasets
+
+
+def get_user_total_datasets_all(username: str) -> DatasetTotal:
+    total_datasets_raw_train = get_total_files(get_user_datasets_raw_directory(DatasetType.TRAINING, username))
+    total_datasets_raw_val = get_total_files(get_user_datasets_raw_directory(DatasetType.VALIDATION, username))
+    total_datasets_train = get_total_files(get_user_datasets_directory(DatasetType.TRAINING, username))
+    total_datasets_val = get_total_files(get_user_datasets_directory(DatasetType.VALIDATION, username))
+    total = DatasetTotal(
+        datasets_raw_train=total_datasets_raw_train,
+        datasets_raw_val=total_datasets_raw_val,
+        datasets_train=total_datasets_train,
+        datasets_val=total_datasets_val
+    )
+    return total
 
 
 def generate_file_name(directory: str, username: str):
@@ -46,8 +72,20 @@ def generate_file_name(directory: str, username: str):
     return file_name
 
 
-async def save_raw_dataset(file: Union[bytes, UploadFile], username: str):
-    user_dir = get_user_datasets_raw_directory(username)
+def get_user_sample_dataset(username: str, dataset_type: DatasetType = DatasetType.TRAINING):
+    sample = None
+    user_datasets = get_user_datasets(username)
+    if user_datasets:
+        # sample_image_path = user_datasets[0]
+        sample_image_path = get_user_dataset_file(dataset_type, username, user_datasets[0])
+        with open(sample_image_path, "rb") as imageFile:
+            sample = base64.b64encode(imageFile.read())
+    return sample
+
+
+async def save_raw_dataset(username: str, file: Union[bytes, UploadFile],
+                           dataset_type: DatasetType = DatasetType.TRAINING):
+    user_dir = get_user_datasets_raw_directory(dataset_type, username)
     file_name = generate_file_name(user_dir, username)
     file_path = path.join(user_dir, file_name)
     if isinstance(file, bytes):
@@ -68,16 +106,24 @@ async def save_raw_dataset(file: Union[bytes, UploadFile], username: str):
     return result
 
 
-def generate_datasets_from_folder(username: str, save_preprocessing=False):
+def generate_datasets_from_raw_dir(username: str, dataset_type: DatasetType = DatasetType.TRAINING,
+                                   save_preprocessing=False):
+    user_dir = get_user_datasets_raw_directory(dataset_type, username)
+    list_datasets_raw = get_list_files(user_dir)
+    if not list_datasets_raw:
+        return None
+
+    user_dataset_dir = get_user_datasets_directory(dataset_type, username)
+    total_datasets = get_total_files(user_dataset_dir)
+    if total_datasets > 0:
+        rmtree(user_dataset_dir)
+        user_dataset_dir = get_user_datasets_directory(dataset_type, username)
     time_start = time.perf_counter()
-    user_dir = get_user_datasets_raw_directory(username)
-    list_images = get_list_files(user_dir)
-    for (i, file_name) in enumerate(list_images):
+    for (i, file_name) in enumerate(list_datasets_raw):
         print("--------------------------------")
         print("IMAGE", i + 1)
         file_path = path.join(user_dir, file_name)
         detected_faces = detect_face_from_image_path(file_path, save_preprocessing=save_preprocessing)
-        user_dataset_dir = get_user_datasets_directory(username)
         file_name = generate_file_name(user_dataset_dir, username)
         dataset_path = path.join(user_dataset_dir, file_name)
         if detected_faces:
@@ -85,9 +131,11 @@ def generate_datasets_from_folder(username: str, save_preprocessing=False):
                 cv2.imwrite(dataset_path, detected_face)
     time_finish = time.perf_counter()
     estimated_time = time_finish - time_start
+
+    total_datasets = get_total_files(user_dataset_dir)
     result = {
         "computation_time": round(estimated_time, 2),
-        "total_datasets": len(list_images)
+        "total_datasets": total_datasets
     }
     print("--------------------------------")
     print("FINISH CREATING DATASET")
@@ -95,17 +143,30 @@ def generate_datasets_from_folder(username: str, save_preprocessing=False):
     return result
 
 
-def generate_datasets_from_folder_all():
-    image_paths = get_list_files(settings.ASSETS_DATASETS_RAW_FOLDER)
-    for username in image_paths:
-        generate_datasets_from_folder(username)
-    return "DONE"
+def generate_datasets_from_folder_all(dataset_type: DatasetType = DatasetType.TRAINING, save_preprocessing=False):
+    list_datasets_raw = get_list_files(get_datasets_raw_directory(dataset_type))
+    total_users = 0
+    total_datasets = 0
+    computation_time = 0
+    for username in list_datasets_raw:
+        result = generate_datasets_from_raw_dir(username, dataset_type, save_preprocessing)
+        if result:
+            total_users += 1
+            total_datasets += result["total_datasets"]
+            computation_time += result["computation_time"]
+    result = {
+        "total_users": total_users,
+        "total_datasets": total_datasets,
+        "computation_time": round(computation_time, 2),
+        "average_computation_time": round(computation_time/total_users, 2) or 0,
+    }
+    return result
 
 
 def create_models(semester_code: str, course_code: str, validate: bool = False, save_preprocessing=False,
                   grid_search: bool = False):
     training_time_start = time.perf_counter()
-    file_path = train_datasets(semester_code, course_code, save_preprocessing=False, grid_search=grid_search)
+    file_path = train_datasets(semester_code, course_code, save_preprocessing, grid_search)
     training_time_finish = time.perf_counter()
     training_time = training_time_finish - training_time_start
 
@@ -114,7 +175,6 @@ def create_models(semester_code: str, course_code: str, validate: bool = False, 
     if validate:
         validating_time_start = time.perf_counter()
         accuracy = validate_model(semester_code, course_code, save_preprocessing)
-        # file_path = validate_model(semester_code, course_code)
         validating_time_finish = time.perf_counter()
         validating_time = validating_time_finish - validating_time_start
 
@@ -184,8 +244,33 @@ def recognize_face(file: Union[bytes, UploadFile], semester_code: str, course_co
         "image_name": image_name,
         "predictions": predictions,
         "total_detection": len(detected_faces),
-        "detection_time": detection_time,
-        "recognition_time": recognition_time
+        "detection_time": round(detection_time, 2),
+        "recognition_time": round(recognition_time, 2),
+        "computation_time": round(recognition_time+detection_time, 2)
     }
     print(results)
     return results
+
+
+def get_list_datasets(db: Session, dataset_type: DatasetType = DatasetType.TRAINING):
+    list_username = get_list_files(get_datasets_directory(dataset_type))
+    list_datasets = []
+    for username in list_username:
+        student = crud_user.user.get_by_username(db, username=username)
+        user_datasets = get_user_datasets(username)
+        total = get_user_total_datasets_all(username)
+        sample = get_user_sample_dataset(username, dataset_type)
+        dataset = Dataset(
+            user=student,
+            file_names=user_datasets,
+            total=total,
+            sample=sample
+        )
+        list_datasets.append(dataset)
+    return list_datasets
+
+
+def delete_user_dataset(username: str, file_name: str, dataset_type: DatasetType = DatasetType.TRAINING) -> Any:
+    file_path = get_user_dataset_file(dataset_type, username, file_name)
+    remove(file_path)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

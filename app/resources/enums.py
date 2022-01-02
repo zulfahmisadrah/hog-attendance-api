@@ -29,3 +29,8 @@ class AttendanceStatus(str, Enum):
     Hadir = "Hadir"
     Izin = "Izin"
     Sakit = "Sakit"
+
+
+class DatasetType(str, Enum):
+    TRAINING = "train"
+    VALIDATION = "val"

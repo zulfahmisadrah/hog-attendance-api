@@ -2,18 +2,32 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
-from app.models.schemas import UserStudent
+from app.models.schemas import UserSimple
+from app.resources.enums import DatasetType
+
+
+class DatasetTotal(BaseModel):
+    datasets_raw_train: int
+    datasets_raw_val: int
+    datasets_train: int
+    datasets_val: int
 
 
 class Dataset(BaseModel):
-    user: UserStudent
+    user: UserSimple
     file_names: List[str]
-    total: int
+    total: DatasetTotal
     sample: Optional[bytes] = None
 
 
 class DatasetParams(BaseModel):
     username: str
+    dataset_type: DatasetType = DatasetType.TRAINING
+
+
+class GenerateDatasetParams(BaseModel):
+    usernames: List[str] = []
+    dataset_type: DatasetType = DatasetType.TRAINING
     save_preprocessing: bool = False
 
 
