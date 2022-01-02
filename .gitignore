@@ -141,12 +141,12 @@ cython_debug/
 alembic/
 app/auth.py
 app/ml/datasets/
+app/ml/datasets_raw/
 app/ml/extracted_images/
 app/ml/preprocessed_images/
 app/ml/models/
 app/ml/validation/
 app/ml/test/
 app/assets/avatar/
-app/assets/datasets_raw/
 app/assets/result/
 *.diff
