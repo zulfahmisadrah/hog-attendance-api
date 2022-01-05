@@ -24,7 +24,6 @@ class Settings(BaseSettings):
     ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models")
     ML_TEST_FOLDER: str = os.path.join("app", "ml", "test")
     ML_PREPROCESSED_IMAGES_FOLDER: str = os.path.join("app", "ml", "preprocessed_images")
-    ML_VALIDATION_FOLDER: str = os.path.join("app", "ml", "validation")
 
     IMAGE_MAX_SIZE: int = 1600
     IMAGE_ALPHA: float = 1.5  # Contrast control (1.0-3.0)
