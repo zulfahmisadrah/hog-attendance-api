@@ -1,5 +1,6 @@
+from shutil import rmtree
 from typing import List
-from os import path, listdir, mkdir
+from os import path, listdir, makedirs
 
 from app.core.config import settings
 from app.resources.enums import DatasetType
@@ -7,7 +8,7 @@ from app.resources.enums import DatasetType
 
 def create_directory_if_not_exist(directory: str) -> str:
     if not path.isdir(directory):
-        mkdir(directory)
+        makedirs(directory)
     return directory
 
 
@@ -21,6 +22,15 @@ def get_list_files(directory: str) -> List:
 
 def get_total_files(directory: str) -> int:
     return len(get_list_files(directory))
+
+
+def clear_files_in_dir(directory: str):
+    rmtree(directory)
+    makedirs(directory)
+
+
+def get_file_name_without_extension(filename: str):
+    return path.splitext(filename)[0] or filename
 
 
 def get_initial_data_file(file_name: str) -> str:
@@ -76,3 +86,21 @@ def get_extracted_images_directory(username: str) -> str:
 
 def get_course_models_files(course_code: str) -> List:
     return listdir(get_course_models_directory(course_code))
+
+
+def generate_file_name(directory: str, username: str, extension: str = ".jpeg"):
+    files = get_list_files(directory)
+    total_files = get_total_files(directory)
+    list_numbers = []
+    for (i, file_name) in enumerate(files):
+        split_file_name = file_name.split('.')
+        if len(split_file_name) > 1:
+            if split_file_name[1].isnumeric():
+                number = int(split_file_name[1])
+                list_numbers.append(number)
+    missing_numbers = [x for x in range(1, total_files + 1) if x not in list_numbers]
+    if missing_numbers:
+        file_name = f"{username}.{missing_numbers[0]}{extension}"
+    else:
+        file_name = f"{username}.{total_files + 1}{extension}"
+    return file_name

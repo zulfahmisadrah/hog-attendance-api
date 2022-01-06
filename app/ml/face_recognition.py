@@ -2,32 +2,37 @@ import joblib
 from os import path
 
 import cv2
-from skimage import feature
+import uuid
 
 from app.core.config import settings
+from app.services.image_processing import get_hog_features
 from app.utils.commons import get_current_datetime
-from app.utils.file_helper import get_course_models_directory
+from app.utils.file_helper import get_course_models_directory, get_dir
 
 
 def recognize(image, semester_code: str, course_code: str):
     current_datetime = get_current_datetime()
+    preprocessed_images_dir = get_dir(path.join(settings.ML_PREPROCESSED_IMAGES_FOLDER))
+    filename = f"{current_datetime}_{str(uuid.uuid4())}"
+
     user_image = image
-    capture_path = path.join(settings.ML_PREPROCESSED_IMAGES_FOLDER, f"{current_datetime}_1.face.jpg")
+    capture_path = path.join(preprocessed_images_dir, f"{filename}.1_face.jpg")
     cv2.imwrite(capture_path, user_image)
     user_image = cv2.convertScaleAbs(user_image, alpha=settings.IMAGE_ALPHA, beta=settings.IMAGE_BETA)
-    adjusted_path = path.join(settings.ML_PREPROCESSED_IMAGES_FOLDER, f"{current_datetime}_2.adjusted.jpg")
+    adjusted_path = path.join(preprocessed_images_dir, f"{filename}.2_adjusted.jpg")
     cv2.imwrite(adjusted_path, user_image)
+
     user_image = cv2.cvtColor(user_image, cv2.COLOR_RGB2GRAY)
-    gray_path = path.join(settings.ML_PREPROCESSED_IMAGES_FOLDER, f"{current_datetime}_3.gray.jpg")
+    gray_path = path.join(preprocessed_images_dir, f"{filename}.3_gray.jpg")
     cv2.imwrite(gray_path, user_image)
+
     resized_image = cv2.resize(user_image, (settings.HOG_RESIZE_WIDTH, settings.HOG_RESIZE_HEIGHT))
-    resized_path = path.join(settings.ML_PREPROCESSED_IMAGES_FOLDER, f"{current_datetime}_4.resized.jpg")
+    resized_path = path.join(preprocessed_images_dir, f"{filename}.4_resized.jpg")
     cv2.imwrite(resized_path, resized_image)
+
     # get the HOG descriptor for the test image
-    (hog_desc, hog_image) = feature.hog(resized_image, orientations=settings.HOG_ORIENTATIONS, pixels_per_cell=settings.HOG_PIXELS_PER_CELL,
-                                        cells_per_block=settings.HOG_CELLS_PER_BLOCK, transform_sqrt=True, block_norm='L2-Hys',
-                                        visualize=True)
-    hog_path = path.join(settings.ML_PREPROCESSED_IMAGES_FOLDER, f"{current_datetime}_5.hog.jpg")
+    (hog_desc, hog_image) = get_hog_features(resized_image)
+    hog_path = path.join(settings.ML_PREPROCESSED_IMAGES_FOLDER, f"{filename}.5_hog.jpg")
     cv2.imwrite(hog_path, hog_image * 255.)
     # pred = svm_model.predict(hog_desc.reshape(1, -1))
     # print("hog_desc", [hog_desc])

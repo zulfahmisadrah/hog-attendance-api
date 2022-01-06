@@ -7,7 +7,7 @@ from skimage.feature import hog
 from app.core.config import settings
 
 
-def resize_image(image, max_size=settings.IMAGE_MAX_SIZE):
+def resize_image_if_too_big(image, max_size=settings.IMAGE_MAX_SIZE):
     if not isinstance(image, ndarray):
         width, height = image.size
     else:

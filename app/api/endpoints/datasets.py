@@ -7,7 +7,7 @@ from app import crud
 from app.models import schemas
 from app.api import deps
 from app.db import session
-from app.resources.enums import DatasetType
+from app.resources.enums import DatasetType, AttendanceStatus
 from app.services import datasets
 
 router = APIRouter()
@@ -33,6 +33,23 @@ def recognize(course_id: int = Form(...), file: Union[bytes, UploadFile] = File(
               semester: schemas.Semester = Depends(deps.get_active_semester), db: Session = Depends(session.get_db)):
     course = crud.course.get(db, course_id)
     results = datasets.recognize_face(file, semester.code, course.code)
+    return results
+
+
+@router.post("/take_presence", dependencies=[Depends(deps.get_current_active_user)])
+def take_presence(meeting_id: int = Form(...), file: Union[bytes, UploadFile] = File(...),
+              semester: schemas.Semester = Depends(deps.get_active_semester), db: Session = Depends(session.get_db)):
+    meeting = crud.meeting.get(db, meeting_id)
+    results = datasets.recognize_face(file, semester.code, meeting.course.code)
+    for prediction in results['predictions']:
+        student = crud.student.get_by_username(db, username=prediction['username'])
+        attendance = crud.attendance.get_attendances_by_meeting_id_and_student_id(
+            db,
+            meeting_id=meeting_id,
+            student_id=student.id
+        )
+        attendance_in = schemas.AttendanceUpdate(status=AttendanceStatus.Hadir)
+        crud.attendance.update(db, db_obj=attendance, obj_in=attendance_in)
     return results
 
 

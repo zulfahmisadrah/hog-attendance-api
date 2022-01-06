@@ -6,12 +6,14 @@ from sqlalchemy.orm import Session
 from app import crud
 from app.crud.base import CRUDBase
 from app.models.domains import User, Student, CourseStudent
-from app.models.schemas import StudentUser
 from app.models.schemas.user import UserStudentCreate, UserUpdate
 from app.models.schemas.student import StudentCreate, StudentUpdate
 
 
 class CRUDStudent(CRUDBase[Student, StudentCreate, StudentUpdate]):
+    def get_by_username(self, db: Session, *, username: str) -> Student:
+        return db.query(Student).join(Student.user).filter(User.username == username).first()
+
     def get_by_username_or_name(self, db: Session, *, keyword: str, offset: int = 0, limit: int = 10) -> Student:
         keyword = "%{}%".format(keyword)
         return db.query(Student).join(Student.user) \

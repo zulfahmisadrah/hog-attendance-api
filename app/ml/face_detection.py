@@ -1,4 +1,5 @@
 import time
+from shutil import rmtree
 from typing import Union
 
 import cv2
@@ -7,30 +8,39 @@ from mtcnn import MTCNN
 from PIL.Image import Image
 
 from app.services.image_processing import *
-from app.utils.file_helper import get_dir
+from app.utils.file_helper import get_dir, get_total_files, generate_file_name
 from app.utils.commons import get_current_datetime
 
 detector = MTCNN()
 
 
-def detect_face_from_image_path(image_path: str, save_preprocessing: bool = False):
+def detect_face_from_image_path(image_path: str, save_path: str = "", save_preprocessing: bool = False):
     image_name = path.basename(path.normpath(image_path))
     img = cv2.imread(image_path)
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     print("-----------------------------------")
     print("DETECTING FACE ON ", image_name)
-    detected_faces = detect_face_on_image(img, save_preprocessing)
+    detected_faces = detect_face_on_image(img, save_path, save_preprocessing)
     return detected_faces
 
 
-def detect_face_on_image(img: Union[Image, ndarray], save_preprocessing: bool = False, return_box=False):
+def detect_face_on_image(img: Union[Image, ndarray], save_path: str = "", save_preprocessing: bool = False,
+                         resize_image: bool = True, return_box: bool = False):
     if not isinstance(img, ndarray):
         img = np.array(img)
-    img = resize_image(img)
+    img = resize_image_if_too_big(img) if resize_image else img
 
-    preprocessed_images_dir = get_dir(settings.ML_PREPROCESSED_IMAGES_FOLDER)
-    current_datetime = get_current_datetime()
+    if save_path:
+        # total_datasets = get_total_files(preprocessed_images_dir)
+        # if total_datasets > 0:
+        #     rmtree(preprocessed_images_dir)
+        #     preprocessed_images_dir = get_dir(path.join(get_dir(settings.ML_PREPROCESSED_IMAGES_FOLDER), save_path))
+        username = path.basename(path.normpath(save_path))
+        prefix_name = generate_file_name(save_path, username, extension="")
+    else:
+        prefix_name = get_current_datetime()
 
+    preprocessed_images_dir = save_path if save_path else get_dir(settings.ML_PREPROCESSED_IMAGES_FOLDER)
     # if save_preprocessing:
     #     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     #     capture_path = path.join(preprocessed_images_dir, f"{current_datetime}.0_input.jpg")
@@ -51,6 +61,8 @@ def detect_face_on_image(img: Union[Image, ndarray], save_preprocessing: bool = 
     detected_faces = []
     for (i, detection) in enumerate(detections):
         counter = i + 1
+        file_name_prefix = f"{prefix_name}.{counter}"
+
         score = detection["confidence"]
         print("DETECTION = ", detection)
         if score >= 0.97:
@@ -63,7 +75,7 @@ def detect_face_on_image(img: Union[Image, ndarray], save_preprocessing: bool = 
             img_bounding_box = np.copy(img)
             img_bounding_box = put_bounding_box_and_face_landmarks(img_bounding_box, box, keypoints)
             if save_preprocessing:
-                img_box_path = path.join(preprocessed_images_dir, f"{current_datetime}_{counter}.1_detection.jpg")
+                img_box_path = path.join(preprocessed_images_dir, f"{file_name_prefix}.1_detection.jpg")
                 cv2.imwrite(img_box_path, img_bounding_box)
 
             # Cut half forehead above
@@ -73,7 +85,7 @@ def detect_face_on_image(img: Union[Image, ndarray], save_preprocessing: bool = 
             # Crop face
             cropped_face = crop_face(img, bounding_box, keypoints)
             if save_preprocessing:
-                face_path = path.join(preprocessed_images_dir, f"{current_datetime}_{counter}.2_face.jpg")
+                face_path = path.join(preprocessed_images_dir, f"{file_name_prefix}.2_face.jpg")
                 cv2.imwrite(face_path, cropped_face)
 
             # Face alignment
@@ -88,7 +100,7 @@ def detect_face_on_image(img: Union[Image, ndarray], save_preprocessing: bool = 
             # Crop aligned face
             detected_face = crop_face(aligned_image, bounding_box, keypoints)
             if save_preprocessing:
-                aligned_path = path.join(preprocessed_images_dir, f"{current_datetime}_{counter}.3_aligned_face.jpg")
+                aligned_path = path.join(preprocessed_images_dir, f"{file_name_prefix}.3_aligned_face.jpg")
                 cv2.imwrite(aligned_path, detected_face)
 
             if return_box:
