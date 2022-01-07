@@ -1,7 +1,6 @@
 import cv2
 import joblib
 from os import path
-
 from sklearn.metrics import classification_report
 from sklearn.model_selection import GridSearchCV
 from sklearn.svm import SVC
@@ -90,7 +89,8 @@ def train_datasets(semester_code: str, course_code: str, save_preprocessing: boo
                         random_state=best_params['random_state'], probability=True)
     else:
         # svm_model = SVC(kernel='sigmoid', C=50, gamma=0.01, random_state=0, probability=True)
-        svm_model = SVC(kernel='linear', C=0.5, gamma='scale', random_state=0, probability=True)
+        # svm_model = SVC(kernel='linear', C=0.5, gamma='scale', random_state=0, probability=True)
+        svm_model = SVC(kernel='rbf', C=50, gamma=0.005, random_state=0, probability=True)
         # svm_model = SVC(kernel='sigmoid', C=1000.0, gamma=0.005, random_state=0, probability=True)
     svm_model.fit(images, labels)
     course_directory = get_course_models_directory(course_code)
