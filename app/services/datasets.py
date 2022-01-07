@@ -3,7 +3,6 @@ import base64
 import time
 from typing import Union, Any
 from os import path, remove
-from shutil import rmtree
 
 import cv2
 import aiofiles
@@ -214,9 +213,27 @@ def recognize_face(file: Union[bytes, UploadFile], semester_code: str, course_co
 
             x, y, w, h = box
             x1, y1 = x + w, y + h
+
+            width = image.shape[1]
+            if width > 4000:
+                font_scale = 2.4
+                thickness_white = 30
+                thickness_black = 6
+            elif width > 2500:
+                font_scale = 1.5
+                thickness_white = 15
+                thickness_black = 4
+            elif width > 1500:
+                font_scale = 0.8
+                thickness_white = 8
+                thickness_black = 2
+            else:
+                font_scale = 0.3
+                thickness_white = 4
+                thickness_black = 1
             cv2.rectangle(image, (x, y), (x1, y1), (0, 255, 0), 2)
-            cv2.putText(image, user_name, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 10)
-            cv2.putText(image, user_name, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+            cv2.putText(image, user_name, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, font_scale, (255, 255, 255), thickness_white)
+            cv2.putText(image, user_name, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, font_scale, (0, 0, 0), thickness_black)
 
             prediction = {
                 "username": label,
