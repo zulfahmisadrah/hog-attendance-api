@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     IMAGE_BETA: float = 10  # Brightness control (0-100)
 
     HOG_ORIENTATIONS: int = 9
-    HOG_PIXELS_PER_CELL: Tuple[int, int] = (8, 8)
+    HOG_PIXELS_PER_CELL: Tuple[int, int] = (10, 10)
     HOG_CELLS_PER_BLOCK: Tuple[int, int] = (2, 2)
     HOG_RESIZE_WIDTH: int = 90
     HOG_RESIZE_HEIGHT: int = 90
