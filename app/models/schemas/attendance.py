@@ -9,6 +9,7 @@ from app.resources.enums import AttendanceStatus
 
 class AttendanceBase(BaseModel):
     status: AttendanceStatus = AttendanceStatus.Absen
+    status_validate: AttendanceStatus = AttendanceStatus.Absen
     status_by_student: Optional[AttendanceStatus] = None
     note: Optional[str] = None
 

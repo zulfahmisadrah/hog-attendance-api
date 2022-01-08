@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 class Attendance(Base, CommonModel):
     status = Column(SQLEnum(AttendanceStatus), default=AttendanceStatus.Absen)
+    status_validate = Column(SQLEnum(AttendanceStatus), default=AttendanceStatus.Absen)
     status_by_student = Column(SQLEnum(AttendanceStatus))
     note = Column(String(255))
 
