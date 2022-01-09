@@ -15,15 +15,23 @@ class Settings(BaseSettings):
     ASSETS_AVATAR_FOLDER: str = os.path.join("app", "assets", "avatar")
     ASSETS_RESULT_FOLDER: str = os.path.join("app", "assets", "result")
     ML_DATASETS_RAW_FOLDER: str = os.path.join("app", "ml", "datasets_raw")
+    # ML_DATASETS_RAW_FOLDER: str = os.path.join("app", "ml", "datasets_raw_mask")
     ML_DATASETS_RAW_TRAIN_FOLDER: str = os.path.join(ML_DATASETS_RAW_FOLDER, "train")
     ML_DATASETS_RAW_VAL_FOLDER: str = os.path.join(ML_DATASETS_RAW_FOLDER, "val")
     ML_DATASETS_FOLDER: str = os.path.join("app", "ml", "datasets")
+    # ML_DATASETS_FOLDER: str = os.path.join("app", "ml", "datasets_mask")
     ML_DATASETS_TRAIN_FOLDER: str = os.path.join(ML_DATASETS_FOLDER, "train")
     ML_DATASETS_VAL_FOLDER: str = os.path.join(ML_DATASETS_FOLDER, "val")
     ML_EXTRACTED_IMAGES_FOLDER: str = os.path.join("app", "ml", "extracted_images")
-    ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models")
+    # ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models")
+    ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models_f")
+    # ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models_mask")
     ML_TEST_FOLDER: str = os.path.join("app", "ml", "test")
     ML_PREPROCESSED_IMAGES_FOLDER: str = os.path.join("app", "ml", "preprocessed_images")
+    ML_MODEL_FACENET: str = os.path.join("app", "ml", "pretrained_models", "facenet_keras", "facenet_keras.h5")
+    ML_PLOTS_FOLDER: str = os.path.join("app", "ml", "plots")
+    USE_FACENET: bool = True
+    # USE_FACENET: bool = False
 
     IMAGE_MAX_SIZE: int = 1600
     IMAGE_ALPHA: float = 1.5  # Contrast control (1.0-3.0)
@@ -34,6 +42,7 @@ class Settings(BaseSettings):
     HOG_CELLS_PER_BLOCK: Tuple[int, int] = (2, 2)
     HOG_RESIZE_WIDTH: int = 90
     HOG_RESIZE_HEIGHT: int = 90
+    FACENET_INPUT_SIZE: Tuple[int, int] = (160, 160)
 
     WEB_HOST: str = os.getenv("WEB_HOST", "127.0.0.1")
     WEB_PORT: int = os.getenv("WEB_PORT", 8000)
