@@ -1,10 +1,18 @@
 import cv2
 import math
 import numpy as np
+from os import path
 from numpy import ndarray
+import matplotlib.pyplot as plt
 from skimage.feature import hog
+from sklearn.manifold import TSNE
+from tensorflow.keras.models import load_model
 
 from app.core.config import settings
+from app.utils.file_helper import get_dir
+
+if settings.USE_FACENET:
+    facenet_model = load_model(settings.ML_MODEL_FACENET)
 
 
 def resize_image_if_too_big(image, max_size=settings.IMAGE_MAX_SIZE):
@@ -16,7 +24,7 @@ def resize_image_if_too_big(image, max_size=settings.IMAGE_MAX_SIZE):
     orientation = "portrait" if longer_size == height else "landscape"
     if longer_size > max_size:
         new_longer_size = max_size
-        scale = float(new_longer_size/float(longer_size))
+        scale = float(new_longer_size / float(longer_size))
         if orientation == "portrait":
             new_width = int(float(width) * scale)
             new_height = new_longer_size
@@ -173,3 +181,38 @@ def convert_to_grayscale(image):
 def resize_input_hog(image):
     resized_image = cv2.resize(image, (settings.HOG_RESIZE_WIDTH, settings.HOG_RESIZE_HEIGHT))
     return resized_image
+
+
+def get_embedding(face_pixels):
+    # scale pixel values
+    face_pixels = face_pixels.astype('float32')
+    # standardize pixel values across channels (global)
+    mean, std = face_pixels.mean(), face_pixels.std()
+    face_pixels = (face_pixels - mean) / std
+    # transform face into one sample
+    samples = np.expand_dims(face_pixels, axis=0)
+    # make prediction to get embedding
+    yhat = facenet_model.predict(samples)
+    return yhat[0]
+
+
+def create_scatter_plot(features, labels, filename='plot_scatter.png'):
+    embedded = np.array(features)
+    targets = np.array(labels)
+    tsne = TSNE(n_components=2)
+    compressed_features = tsne.fit_transform(embedded)
+
+    colors = [
+        '#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50',
+        '#8BC34A', '#CDDC39', '#FFEB3B', '#ffc107', '#FF9800', '#FF5722', '#795548', '#9E9E9E', '#000000', '#607D8B',
+        '#B71C1C', '#880E4F', '#4A148C', '#311B92', '#1A237E', '#0D47A1',
+    ]
+
+    plt.figure(figsize=(15, 15))
+
+    for i, t in enumerate(set(targets)):
+        idx = targets == t
+        plt.scatter(compressed_features[idx, 0], compressed_features[idx, 1], label=t, c=colors[i % len(colors)])
+
+    plt.legend(bbox_to_anchor=(1, 1))
+    plt.savefig(path.join(get_dir(settings.ML_PLOTS_FOLDER), filename))
