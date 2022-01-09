@@ -8,7 +8,7 @@ from mtcnn import MTCNN
 from PIL.Image import Image
 
 from app.services.image_processing import *
-from app.utils.file_helper import get_dir, get_total_files, generate_file_name
+from app.utils.file_helper import get_dir, generate_file_name
 from app.utils.commons import get_current_datetime
 
 detector = MTCNN()
