@@ -111,7 +111,7 @@ def generate_datasets_from_raw_dir(username: str, dataset_type: DatasetType = Da
     time_start = time.perf_counter()
     for (i, file_name) in enumerate(list_datasets_raw):
         print("--------------------------------")
-        print("IMAGE", i + 1)
+        print(f"IMAGE {i + 1}/{len(list_datasets_raw)} of {username}")
         file_path = path.join(user_dir, file_name)
         save_path = path.join(dataset_type, username)
         detected_faces = detect_face_from_image_path(file_path, save_path=preprocessed_dir,
@@ -140,7 +140,9 @@ def generate_datasets_from_folder_all(dataset_type: DatasetType = DatasetType.TR
     total_users = 0
     total_datasets = 0
     computation_time = 0
-    for username in list_datasets_raw:
+    for i, username in enumerate(list_datasets_raw):
+        print(f"{i+1}/{len(list_datasets_raw)}")
+        print("================================")
         result = generate_datasets_from_raw_dir(username, dataset_type, save_preprocessing)
         if result:
             total_users += 1
@@ -150,7 +152,7 @@ def generate_datasets_from_folder_all(dataset_type: DatasetType = DatasetType.TR
         "total_users": total_users,
         "total_datasets": total_datasets,
         "computation_time": round(computation_time, 2),
-        "average_computation_time": round(computation_time/total_users, 2) or 0,
+        "average_computation_time": round(computation_time/total_datasets, 2) if total_datasets > 0 else 0
     }
     return result
 
@@ -183,7 +185,7 @@ def create_models(semester_code: str, course_code: str, validate: bool = False, 
     return result
 
 
-def recognize_face(file: Union[bytes, UploadFile], semester_code: str, course_code: str):
+def recognize_face(file: Union[bytes, UploadFile], semester_code: str, course_code: str, save_preprocessing=False):
     if isinstance(file, bytes):
         image_bytes = file[file.find(b'/9'):]
         image = Image.open(io.BytesIO(base64.b64decode(image_bytes)))
@@ -194,7 +196,8 @@ def recognize_face(file: Union[bytes, UploadFile], semester_code: str, course_co
     # image = resize_image_if_too_big(image)
 
     detection_time_start = time.perf_counter()
-    detected_faces = detect_face_on_image(image, resize_image=False, return_box=True)
+    detected_faces = detect_face_on_image(image, resize_image=False, return_box=True,
+                                          save_preprocessing=save_preprocessing)
     detection_time_finish = time.perf_counter()
     detection_time = detection_time_finish - detection_time_start
 
@@ -207,7 +210,7 @@ def recognize_face(file: Union[bytes, UploadFile], semester_code: str, course_co
     if detected_faces:
         for result in detected_faces:
             detected_face, box = result
-            label = recognize(detected_face, semester_code, course_code)
+            label = recognize(detected_face, semester_code, course_code, save_preprocessing=save_preprocessing)
             user = crud_user.user.get_by_username(db, username=label)
             user_name = user.name
 
