@@ -32,7 +32,7 @@ def train(params: schemas.TrainingParams, semester: schemas.Semester = Depends(d
 def recognize(course_id: int = Form(...), file: Union[bytes, UploadFile] = File(...),
               semester: schemas.Semester = Depends(deps.get_active_semester), db: Session = Depends(session.get_db)):
     course = crud.course.get(db, course_id)
-    results = datasets.recognize_face(file, semester.code, course.code)
+    results = datasets.recognize_face(file, semester.code, course.code, save_preprocessing=True)
     return results
 
 
@@ -55,7 +55,9 @@ def generate_datasets_from_raw(params: schemas.GenerateDatasetParams):
         total_users = 0
         total_datasets = 0
         computation_time = 0
-        for username in params.usernames:
+        for i, username in enumerate(params.usernames):
+            print(f"{i + 1}/{len(params.usernames)}")
+            print("================================")
             result = datasets.generate_datasets_from_raw_dir(username, params.dataset_type, params.save_preprocessing)
             if result:
                 total_users += 1
@@ -64,7 +66,7 @@ def generate_datasets_from_raw(params: schemas.GenerateDatasetParams):
         results["total_users"] = total_users
         results["total_datasets"] = total_datasets
         results["computation_time"] = round(computation_time, 2)
-        results["average_computation_time"] = round(computation_time/total_users, 2) or 0
+        results["average_computation_time"] = round(computation_time/total_datasets, 2) if total_datasets > 0 else 0
     return results
 
 
