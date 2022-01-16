@@ -8,8 +8,8 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from app import crud
+from app.core.auth import auth
 from app.models import domains
-from app.core import security
 from app.core.config import settings
 from app.db.session import SessionLocal
 
@@ -32,12 +32,8 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[security.ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-    except (JWTError, ValidationError):
+    username: str = auth.decode_token(token)
+    if username is None:
         raise credentials_exception
     user = crud.user.get_by_username(db, username=username)
     if user is None:
