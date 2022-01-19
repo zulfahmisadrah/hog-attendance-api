@@ -58,6 +58,7 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/api"
     SECRET_KEY: str = secrets.token_urlsafe(32)
 
+    ALGORITHM = 'HS256'
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 120
     REFRESH_TOKEN_EXPIRE_MINUTES: int = 1440
     # BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = ['http://localhost:3000', 'http://192.168.1.16:3000/']
