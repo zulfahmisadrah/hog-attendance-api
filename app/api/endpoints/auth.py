@@ -1,16 +1,14 @@
-from datetime import timedelta
 from typing import Any, Union
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Form
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app import crud
+from app.core.auth import auth
 from app.models import domains, schemas
 
 from app.api import deps
-from app.core import security
-from app.core.config import settings
 
 router = APIRouter()
 
@@ -25,14 +23,23 @@ def login_access_token(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect username or password")
     elif not crud.user.is_active(user):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User is inactive")
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    refresh_token_expires = timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
-    payload = {
-        "access_token": security.create_access_token(user.username, expires_delta=access_token_expires),
-        "refresh_token": security.create_access_token(user.username, expires_delta=refresh_token_expires),
-        "token_type": "Bearer"
-    }
-    return payload
+    token = schemas.Token(
+        access_token=auth.encode_token(user.username),
+        refresh_token=auth.encode_refresh_token(user.username),
+        token_type="Bearer"
+    )
+    return token
+
+
+@router.post("/refresh", response_model=schemas.Token)
+def refresh_access_token(refresh_token: str = Form(...)) -> Any:
+    new_token = auth.decode_refresh_token(refresh_token)
+    token = schemas.Token(
+        access_token=new_token,
+        refresh_token=refresh_token,
+        token_type="Bearer"
+    )
+    return token
 
 
 @router.post("/me", response_model=Union[schemas.UserStudent, schemas.UserLecturer, schemas.User])
