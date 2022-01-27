@@ -7,6 +7,7 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from app.core.auth import auth
 from app.core.config import settings
 from app.crud import crud_role
 from app.crud.base import CRUDBase
@@ -15,7 +16,6 @@ from app.resources.enums import RoleEnum
 from app.models.domains import User, Student, Lecturer
 from app.models.schemas import UserCreate, UserUpdate, UserStudentCreate, UserLecturerCreate, UserRolesCreate, \
     UserPasswordUpdate
-from app.core.security import get_password_hash, verify_password
 from app.utils.commons import get_current_datetime
 
 
@@ -26,7 +26,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def create(self, db: Session, *, obj_in: Union[UserCreate, UserRolesCreate]) -> User:
         user_dict = jsonable_encoder(obj_in.copy(exclude={"roles"}))
         if user_dict["password"]:
-            hashed_password = get_password_hash(user_dict["password"])
+            hashed_password = auth.encode_password(user_dict["password"])
             user_dict["password"] = hashed_password
         try:
             new_user = User(**user_dict)
@@ -85,7 +85,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         return super().update(db, db_obj=db_obj, obj_in=update_data)
 
     def update_password(self, db: Session, *, db_obj: User, obj_in: UserPasswordUpdate) -> User:
-        hashed_password = get_password_hash(obj_in.new_password)
+        hashed_password = auth.encode_password(obj_in.new_password)
         db_obj.password = hashed_password
         db.query(User).filter_by(username=db_obj.username).update({User.password: hashed_password})
         db.commit()
@@ -96,7 +96,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         user = self.get_by_username(db, username=username)
         if not user:
             return None
-        elif not verify_password(password, user.password):
+        elif not auth.verify_password(password, user.password):
             return None
         return user
 
