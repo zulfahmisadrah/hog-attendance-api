@@ -35,6 +35,9 @@ class CRUDMeeting(CRUDBase[Meeting, MeetingCreate, MeetingUpdate]):
         #     meeting_data.attendances = self.get_meeting_attendances(db, meeting_id=meeting_data.id)
         return meetings
 
+    def get_meetings_by_course_id(self, db: Session, *, course_id: int) -> List[Meeting]:
+        return db.query(Meeting).filter(Meeting.course_id == course_id).all()
+
     def get_meeting_today(self, db: Session):
         current_datetime = datetime.now()
         return db.query(Meeting).filter(Meeting.date == current_datetime.date()).all()

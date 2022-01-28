@@ -90,3 +90,9 @@ def get_meeting_attendances(meeting_id: int, db: Session = Depends(session.get_d
     get_meeting(meeting_id, db)
     data = crud.meeting.get_meeting_attendances(db, meeting_id=meeting_id)
     return data
+
+
+@router.get("/course/{course_id}", response_model=List[schemas.Meeting],
+            dependencies=[Depends(deps.get_current_admin)])
+def get_course_meetings(course_id: int, db: Session = Depends(session.get_db)):
+    return crud.meeting.get_meetings_by_course_id(db, course_id=course_id)
