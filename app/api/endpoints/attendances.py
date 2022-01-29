@@ -34,7 +34,8 @@ def get_my_attendances(
 
 @router.post("/take_presence", dependencies=[Depends(deps.get_current_active_user)])
 def take_presence(meeting_id: int = Form(...), validate: bool = Form(...), file: Union[bytes, UploadFile] = File(...),
-              semester: schemas.Semester = Depends(deps.get_active_semester), db: Session = Depends(session.get_db)):
+                  semester: schemas.Semester = Depends(deps.get_active_semester),
+                  db: Session = Depends(session.get_db)):
     meeting = crud.meeting.get(db, meeting_id)
     results = datasets.recognize_face(file, semester.code, meeting.course.code, save_preprocessing=True)
     for prediction in results['predictions']:
@@ -104,3 +105,9 @@ def get_my_meeting_attendance(
 ):
     return crud.attendance.get_attendances_by_meeting_id_and_student_id(db, meeting_id=meeting_id,
                                                                         student_id=current_user.student.id)
+
+
+@router.get("/course/{course_id}", response_model=List[schemas.Attendance],
+            dependencies=[Depends(deps.get_current_admin)])
+def get_course_meetings_attendances(course_id: int, db: Session = Depends(session.get_db)):
+    return crud.attendance.get_course_attendances(db, course_id=course_id)
