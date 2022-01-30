@@ -14,8 +14,11 @@ from app.resources import strings
 
 
 class CRUDCourse(CRUDBase[Course, CourseCreate, CourseUpdate]):
-    def get_course_lecturers(self, db: Session, *, course_id: int, semester_id: int) -> CourseLecturer:
-        return db.query(CourseLecturer).filter(
+    def get_course(self, db: Session, *, code: str) -> Course:
+        return db.query(Course).filter(Course.code == code).first()
+
+    def get_course_lecturers(self, db: Session, *, course_id: int, semester_id: int) -> List[Lecturer]:
+        course_lecturers = db.query(CourseLecturer).filter(
             CourseLecturer.semester_id == semester_id,
             CourseLecturer.course_id == course_id
         ).all()
