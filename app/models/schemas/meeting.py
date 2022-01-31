@@ -7,6 +7,7 @@ from . import StudentUserSimple
 from .schedule import ScheduleSimple
 from .core import DateTimeModelMixin, IDMixin
 from app.resources.enums import DayOfWeek, MeetingStatus, AttendanceStatus
+from .semester import SemesterSimple
 
 
 class MeetingBase(BaseModel):
@@ -21,6 +22,7 @@ class MeetingBase(BaseModel):
 
 class MeetingCreate(MeetingBase):
     date: Union[date, str]
+    semester_id: int
     course_id: int
     schedule_id: int
 
@@ -48,6 +50,7 @@ class AttendanceSimple(IDMixin):
 
 
 class Meeting(DateTimeModelMixin, MeetingBase, IDMixin):
+    semester: SemesterSimple
     course: MeetingCourse
     schedule: ScheduleSimple
     attendances: List[AttendanceSimple] = []

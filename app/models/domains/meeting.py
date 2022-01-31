@@ -8,6 +8,7 @@ from app.db.base_class import Base
 from app.resources.enums import DayOfWeek, MeetingStatus
 
 if TYPE_CHECKING:
+    from .semester import Semester
     from .course import Course
     from .schedule import Schedule
 
@@ -23,6 +24,9 @@ class Meeting(Base, CommonModel):
 
     course_id = Column(BigInteger, ForeignKey("course.id"))
     course = relationship("Course", back_populates="meetings")
+
+    semester_id = Column(BigInteger, ForeignKey("semester.id"))
+    semester = relationship("Semester")
 
     schedule_id = Column(BigInteger, ForeignKey("schedule.id"))
     schedule = relationship("Schedule", back_populates="meetings")
