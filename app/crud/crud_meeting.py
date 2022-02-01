@@ -20,10 +20,9 @@ class CRUDMeeting(CRUDBase[Meeting, MeetingCreate, MeetingUpdate]):
         if meeting_data.status != MeetingStatus.Terjadwal:
             attendances_student_id = [attendance.student.id for attendance in attendances]
             if not attendances or len(attendances) != len(course_students):
-                for course_student in course_students:
-                    student_id = course_student.student.id
-                    if student_id not in attendances_student_id:
-                        attendance = Attendance(meeting_id=meeting_id, student_id=student_id)
+                for student in course_students:
+                    if student.id not in attendances_student_id:
+                        attendance = Attendance(meeting_id=meeting_id, student_id=student.id)
                         db.add(attendance)
                 db.commit()
                 attendances = crud.attendance.get_attendances_by_meeting_id(db, meeting_id=meeting_id)

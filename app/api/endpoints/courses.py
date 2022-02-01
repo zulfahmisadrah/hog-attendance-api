@@ -60,12 +60,7 @@ def get_course_lecturers(course_id: int, semester_id: Optional[int] = None, db: 
         semester = get_semester(semester_id, db)
     else:
         semester = crud.semester.get_active_semester(db)
-    data = crud.course.get_course_lecturers(db, course_id=course_id, semester_id=semester.id)
-    list_lecturers = []
-    for course_lecturer in data:
-        lecturer = schemas.LecturerUserSimple.from_orm(course_lecturer.lecturer)
-        list_lecturers.append(lecturer)
-    return list_lecturers
+    return crud.course.get_course_lecturers(db, course_id=course_id, semester_id=semester.id)
 
 
 @router.get("/{course_id}/students", response_model=List[schemas.StudentUserSimple],
@@ -76,12 +71,7 @@ def get_course_students(course_id: int, semester_id: Optional[int] = None, db: S
         semester = get_semester(semester_id, db)
     else:
         semester = crud.semester.get_active_semester(db)
-    data = crud.course.get_course_students(db, course_id=course_id, semester_id=semester.id)
-    list_students = []
-    for course_student in data:
-        student = schemas.StudentUserSimple.from_orm(course_student.student)
-        list_students.append(student)
-    return list_students
+    return crud.course.get_course_students(db, course_id=course_id, semester_id=semester.id)
 
 
 @router.post("/{course_id}/lecturers", response_model=List[schemas.StudentUserSimple],
@@ -90,16 +80,9 @@ def add_course_lecturers(
         course_id: int,
         obj_in: schemas.CourseLecturersUpdate,
         db: Session = Depends(session.get_db),
-        semester: schemas.Semester = Depends(deps.get_active_semester)
 ):
     get_course(course_id, db)
-    crud.course.add_course_lecturers(db, course_id=course_id, obj_in=obj_in)
-    data = crud.course.get_course_lecturers(db, course_id=course_id, semester_id=semester.id)
-    list_lecturers = []
-    for course_lecturer in data:
-        lecturer = schemas.LecturerUserSimple.from_orm(course_lecturer.lecturer)
-        list_lecturers.append(lecturer)
-    return list_lecturers
+    return crud.course.add_course_lecturers(db, course_id=course_id, obj_in=obj_in)
 
 
 @router.post("/{course_id}/students", response_model=List[schemas.StudentUserSimple],
@@ -108,34 +91,19 @@ def add_course_students(
         course_id: int,
         obj_in: schemas.CourseStudentsUpdate,
         db: Session = Depends(session.get_db),
-        semester: schemas.Semester = Depends(deps.get_active_semester)
 ):
     get_course(course_id, db)
-    crud.course.add_course_students(db, course_id=course_id, obj_in=obj_in)
-    data = crud.course.get_course_students(db, course_id=course_id, semester_id=semester.id)
-    list_students = []
-    for course_student in data:
-        student = schemas.StudentUserSimple.from_orm(course_student.student)
-        list_students.append(student)
-    return list_students
+    return crud.course.add_course_students(db, course_id=course_id, obj_in=obj_in)
 
 
-@router.delete("/{course_id}/lecturers", response_model=List[schemas.StudentUserSimple],
-               dependencies=[Depends(deps.get_current_active_user)])
+@router.delete("/{course_id}/lecturers", response_model=List[schemas.LecturerUserSimple], dependencies=[Depends(deps.get_current_active_user)])
 def remove_course_lecturers(
         course_id: int,
         obj_in: schemas.CourseLecturersUpdate,
         db: Session = Depends(session.get_db),
-        semester: schemas.Semester = Depends(deps.get_active_semester)
 ):
     get_course(course_id, db)
-    crud.course.delete_course_lecturers(db, course_id=course_id, obj_in=obj_in)
-    data = crud.course.get_course_lecturers(db, course_id=course_id, semester_id=semester.id)
-    list_lecturers = []
-    for course_lecturer in data:
-        lecturer = schemas.LecturerUserSimple.from_orm(course_lecturer.lecturer)
-        list_lecturers.append(lecturer)
-    return list_lecturers
+    return crud.course.delete_course_lecturers(db, course_id=course_id, obj_in=obj_in)
 
 
 @router.delete("/{course_id}/students", response_model=List[schemas.StudentUserSimple],
@@ -144,13 +112,6 @@ def remove_course_students(
         course_id: int,
         obj_in: schemas.CourseStudentsUpdate,
         db: Session = Depends(session.get_db),
-        semester: schemas.Semester = Depends(deps.get_active_semester)
 ):
     get_course(course_id, db)
-    crud.course.delete_course_students(db, course_id=course_id, obj_in=obj_in)
-    data = crud.course.get_course_students(db, course_id=course_id, semester_id=semester.id)
-    list_students = []
-    for course_student in data:
-        student = schemas.StudentUserSimple.from_orm(course_student.student)
-        list_students.append(student)
-    return list_students
+    return crud.course.delete_course_students(db, course_id=course_id, obj_in=obj_in)
