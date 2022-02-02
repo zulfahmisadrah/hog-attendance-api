@@ -4,23 +4,30 @@ from os import path
 
 from tqdm import tqdm
 from sklearn.svm import SVC
+from sqlalchemy.orm import Session
 from sklearn.metrics import classification_report
 from sklearn.model_selection import GridSearchCV
 
+from app.api import deps
 from app.core.config import settings
+from app.crud.crud_course import course
 from app.resources.enums import DatasetType
 from app.services.image_processing import get_hog_features, enhance_image, convert_to_grayscale, get_embedding, \
     create_scatter_plot
 from app.utils.file_helper import get_list_files, get_course_models_directory, get_extracted_images_directory, \
-    get_user_datasets_directory, get_datasets_directory, get_user_preprocessed_images_directory, \
-    get_file_name_without_extension
+    get_user_datasets_directory, get_user_preprocessed_images_directory, get_file_name_without_extension
 
 
-def prepare_datasets(dataset_type: DatasetType = DatasetType.TRAINING, save_preprocessing: bool = False,
+def prepare_datasets(db: Session, course_code: str, dataset_type: DatasetType = DatasetType.TRAINING, save_preprocessing: bool = False,
                      use_facenet: bool = settings.USE_FACENET):
     features = []
     labels = []
-    datasets = get_list_files(get_datasets_directory(dataset_type))
+
+    course_data = course.get_course(db, code=course_code)
+    semester = deps.get_active_semester(db)
+    list_students = course.get_course_students(db, course_id=course_data.id, semester_id=semester.id)
+
+    datasets = [student.user.username for student in list_students]
     total_labels = 0
     for user_index, username in enumerate(tqdm(datasets)):
         user_datasets_dir = get_user_datasets_directory(dataset_type, username)
@@ -44,6 +51,7 @@ def prepare_datasets(dataset_type: DatasetType = DatasetType.TRAINING, save_prep
                 else:
                     # Image Enhancement
                     enhanced_image = enhance_image(image)
+                    # enhanced_image = image
                     if save_preprocessing:
                         enhanced_image_path = path.join(preprocessed_images_dir, f"{file_name_prefix}.4_enhanced.jpg")
                         cv2.imwrite(enhanced_image_path, enhanced_image)
@@ -73,9 +81,9 @@ def prepare_datasets(dataset_type: DatasetType = DatasetType.TRAINING, save_prep
     return features, labels
 
 
-def train_datasets(semester_code: str, course_code: str, save_preprocessing: bool = False, grid_search: bool = False):
+def train_datasets(db: Session, semester_code: str, course_code: str, save_preprocessing: bool = False, grid_search: bool = False):
     print('--- PREPARING TRAINING DATASETS ---')
-    features, labels = prepare_datasets(DatasetType.TRAINING, save_preprocessing)
+    features, labels = prepare_datasets(db, course_code, DatasetType.TRAINING, save_preprocessing)
     print('--- TRAINING MODEL ---')
     if grid_search:
         parameters = {
@@ -95,12 +103,13 @@ def train_datasets(semester_code: str, course_code: str, save_preprocessing: boo
                         random_state=best_params['random_state'], probability=True)
     else:
         if settings.USE_FACENET:
-            svm_model = SVC(kernel='rbf', C=10, gamma=0.01, random_state=0, probability=True)  # mask 92%
-            # svm_model = SVC(kernel='linear', C=0.5, gamma='scale', random_state=0, probability=True) # 100%
+            svm_model = SVC(kernel='linear', C=0.5, gamma='scale', random_state=0, probability=True)  # 100%, 98% val 10, 100% 5
+            # svm_model = SVC(kernel='rbf', C=10, gamma=0.01, random_state=0, probability=True)  # mask 92%
+            # svm_model = SVC(kernel='rbf', C=50, gamma=0.005, random_state=0, probability=True)  # mask only 73%
         else:
-            # svm_model = SVC(kernel='rbf', C=50, gamma=0.005, random_state=0, probability=True)  # 95%
-            svm_model = SVC(kernel='sigmoid', C=50, gamma=0.01, random_state=0, probability=True) # mask 67%
-            # svm_model = SVC(kernel='linear', C=0.5, gamma='scale', random_state=0, probability=True) # 94%
+            svm_model = SVC(kernel='rbf', C=50, gamma=0.005, random_state=0, probability=True)  # 95%
+            # svm_model = SVC(kernel='poly', C=0.5, gamma='scale', random_state=0, probability=True) # 90% val 10
+            # svm_model = SVC(kernel='sigmoid', C=50, gamma=0.01, random_state=0, probability=True) # mask 67%, mask only 63%, 5 84%
     svm_model.fit(features, labels)
     course_directory = get_course_models_directory(course_code)
     model_name = f"{semester_code}.joblib"
@@ -111,9 +120,9 @@ def train_datasets(semester_code: str, course_code: str, save_preprocessing: boo
     return model_path
 
 
-def validate_model(semester_code: str, course_code: str, save_preprocessing=False):
+def validate_model(db: Session, semester_code: str, course_code: str, save_preprocessing=False):
     print('--- PREPARING TESTING DATASETS ---')
-    validation_images, validation_labels = prepare_datasets(DatasetType.VALIDATION, save_preprocessing)
+    validation_images, validation_labels = prepare_datasets(db, course_code, DatasetType.VALIDATION, save_preprocessing)
     print('--- TESTING MODEL ---')
     course_directory = get_course_models_directory(course_code)
     model_name = f"{semester_code}.joblib"
