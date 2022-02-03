@@ -157,10 +157,10 @@ def generate_datasets_from_folder_all(dataset_type: DatasetType = DatasetType.TR
     return result
 
 
-def create_models(semester_code: str, course_code: str, validate: bool = False, save_preprocessing=False,
+def create_models(db: Session, semester_code: str, course_code: str, validate: bool = False, save_preprocessing=False,
                   grid_search: bool = False):
     training_time_start = time.perf_counter()
-    file_path = train_datasets(semester_code, course_code, save_preprocessing, grid_search)
+    file_path = train_datasets(db, semester_code, course_code, save_preprocessing, grid_search)
     training_time_finish = time.perf_counter()
     training_time = training_time_finish - training_time_start
 
@@ -168,7 +168,7 @@ def create_models(semester_code: str, course_code: str, validate: bool = False, 
     accuracy = 0
     if validate:
         validating_time_start = time.perf_counter()
-        accuracy = validate_model(semester_code, course_code, save_preprocessing)
+        accuracy = validate_model(db, semester_code, course_code, save_preprocessing)
         validating_time_finish = time.perf_counter()
         validating_time = validating_time_finish - validating_time_start
 
