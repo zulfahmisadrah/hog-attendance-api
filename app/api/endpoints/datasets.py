@@ -23,7 +23,7 @@ def get_list_datasets(db: Session = Depends(session.get_db)):
 def train(params: schemas.TrainingParams, semester: schemas.Semester = Depends(deps.get_active_semester),
           db: Session = Depends(session.get_db)):
     course = crud.course.get(db, params.course_id)
-    result = datasets.create_models(semester.code, course.code, validate=params.validate_model,
+    result = datasets.create_models(db, semester.code, course.code, validate=params.validate_model,
                                     save_preprocessing=params.save_preprocessing, grid_search=params.deep_training)
     return result
 
