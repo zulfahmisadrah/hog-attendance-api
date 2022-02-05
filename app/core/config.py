@@ -11,32 +11,41 @@ load_dotenv()
 class Settings(BaseSettings):
     PROJECT_NAME: str = os.getenv("PROJECT_NAME", "PROJECT")
 
+    # USE_FACENET: bool = True
+    USE_FACENET: bool = False
     INITIAL_DATA_FOLDER: str = os.path.join("app", "db", "data")
     ASSETS_AVATAR_FOLDER: str = os.path.join("app", "assets", "avatar")
     ASSETS_RESULT_FOLDER: str = os.path.join("app", "assets", "result")
-    # ML_DATASETS_RAW_FOLDER: str = os.path.join("app", "ml", "datasets_raw")
-    ML_DATASETS_RAW_FOLDER: str = os.path.join("app", "ml", "datasets_raw_mask_3")
+
+    ML_DATASETS_RAW_FOLDER: str = os.path.join("app", "ml", "datasets_raw")
+    # ML_DATASETS_RAW_FOLDER: str = os.path.join("app", "ml", "datasets_raw_5")
+    # ML_DATASETS_RAW_FOLDER: str = os.path.join("app", "ml", "datasets_raw_val_10")
+    # ML_DATASETS_RAW_FOLDER: str = os.path.join("app", "ml", "datasets_raw_mask_3")
+    # ML_DATASETS_RAW_FOLDER: str = os.path.join("app", "ml", "datasets_raw_mask_only")
     # ML_DATASETS_RAW_FOLDER: str = os.path.join("app", "ml", "datasets_raw_mask_only_3")
     ML_DATASETS_RAW_TRAIN_FOLDER: str = os.path.join(ML_DATASETS_RAW_FOLDER, "train")
     ML_DATASETS_RAW_VAL_FOLDER: str = os.path.join(ML_DATASETS_RAW_FOLDER, "val")
-    # ML_DATASETS_FOLDER: str = os.path.join("app", "ml", "datasets")
-    ML_DATASETS_FOLDER: str = os.path.join("app", "ml", "datasets_mask")
+
+    ML_DATASETS_FOLDER: str = os.path.join("app", "ml", "datasets")
+    # ML_DATASETS_FOLDER: str = os.path.join("app", "ml", "datasets_5")
+    # ML_DATASETS_FOLDER: str = os.path.join("app", "ml", "datasets_val_10")
+    # ML_DATASETS_FOLDER: str = os.path.join("app", "ml", "datasets_mask")
+    # ML_DATASETS_FOLDER: str = os.path.join("app", "ml", "datasets_mask_3")
     # ML_DATASETS_FOLDER: str = os.path.join("app", "ml", "datasets_mask_only")
     ML_DATASETS_TRAIN_FOLDER: str = os.path.join(ML_DATASETS_FOLDER, "train")
     ML_DATASETS_VAL_FOLDER: str = os.path.join(ML_DATASETS_FOLDER, "val")
+
+    ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models_f" if USE_FACENET else "models")
+    # ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models_5_f" if USE_FACENET else "models_5")
+    # ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models_val_10_f" if USE_FACENET else "models_val_10")
+    # ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models_mask_f" if USE_FACENET else "models_mask")
+    # ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models_mask_only_f" if USE_FACENET else "models_mask_only")
+
     ML_EXTRACTED_IMAGES_FOLDER: str = os.path.join("app", "ml", "extracted_images")
-    # ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models")
-    # ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models_mask")
-    # ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models_mask_only")
-    ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models_f")
-    # ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models_mask_f")
-    # ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models_mask_only_f")
     ML_TEST_FOLDER: str = os.path.join("app", "ml", "test")
     ML_PREPROCESSED_IMAGES_FOLDER: str = os.path.join("app", "ml", "preprocessed_images")
     ML_MODEL_FACENET: str = os.path.join("app", "ml", "pretrained_models", "facenet_keras", "facenet_keras.h5")
     ML_PLOTS_FOLDER: str = os.path.join("app", "ml", "plots")
-    USE_FACENET: bool = True
-    # USE_FACENET: bool = False
 
     IMAGE_MAX_SIZE: int = 1600
     IMAGE_ALPHA: float = 1.5  # Contrast control (1.0-3.0)
