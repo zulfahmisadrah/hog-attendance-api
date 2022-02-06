@@ -1,6 +1,6 @@
 from typing import Generator
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Form
 from fastapi.security import OAuth2PasswordBearer
 from fastapi_permissions import Everyone, Authenticated, configure_permissions
 from jose import jwt, JWTError
@@ -55,6 +55,20 @@ def get_current_superuser(current_user: domains.User = Depends(get_current_activ
 
 def get_current_admin(current_user: domains.User = Depends(get_current_active_user)) -> domains.User:
     if not crud.user.is_admin(current_user):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User doesn't have enough privileges")
+    return current_user
+
+
+def get_admin_or_specific_username(username: str,
+                                   current_user: domains.User = Depends(get_current_active_user)) -> domains.User:
+    if not (crud.user.is_admin(current_user) or current_user.username == username):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User doesn't have enough privileges")
+    return current_user
+
+
+def get_admin_or_specific_username_form_data(username: str = Form(...),
+                                             current_user: domains.User = Depends(get_current_active_user)) -> domains.User:
+    if not (crud.user.is_admin(current_user) or current_user.username == username):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User doesn't have enough privileges")
     return current_user
 
