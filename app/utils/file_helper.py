@@ -74,6 +74,11 @@ def get_user_dataset_file(dataset_type: DatasetType, username: str, file_name: s
     return file_path
 
 
+def get_user_dataset_raw_file(dataset_type: DatasetType, username: str, file_name: str) -> str:
+    file_path = path.join(get_user_datasets_raw_directory(dataset_type, username), file_name)
+    return file_path
+
+
 def get_course_models_directory(course_code: str) -> str:
     directory_path = path.join(get_dir(settings.ML_MODELS_FOLDER), course_code)
     return get_dir(directory_path)
