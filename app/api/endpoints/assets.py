@@ -3,7 +3,7 @@ from fastapi.responses import FileResponse
 
 from app.resources.enums import DatasetType
 from app.utils.file_helper import get_avatar_file, get_user_dataset_file, get_result_file, get_list_files, \
-    get_user_datasets_directory
+    get_user_datasets_directory, get_user_dataset_raw_file
 
 router = APIRouter()
 
@@ -30,6 +30,12 @@ def get_dataset_sample(username: str):
 @router.get("/dataset/{dataset_type}/{username}/{file_name}")
 def get_dataset(dataset_type: DatasetType, username: str, file_name: str):
     dataset = get_user_dataset_file(dataset_type, username, file_name)
+    return FileResponse(dataset)
+
+
+@router.get("/dataset-raw/{dataset_type}/{username}/{file_name}")
+def get_raw_dataset(dataset_type: DatasetType, username: str, file_name: str):
+    dataset = get_user_dataset_raw_file(dataset_type, username, file_name)
     return FileResponse(dataset)
 
 
