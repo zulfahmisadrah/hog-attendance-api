@@ -41,8 +41,12 @@ def get_avatar_file(file_name: str) -> str:
     return path.join(settings.ASSETS_AVATAR_FOLDER, file_name)
 
 
-def get_result_file(file_name: str) -> str:
-    return path.join(settings.ASSETS_RESULT_FOLDER, file_name)
+def get_meeting_results_directory(semester_code: str, course_code: str, meeting_id: int) -> str:
+    return get_dir(path.join(settings.ASSETS_RESULT_FOLDER, semester_code, course_code, str(meeting_id)))
+
+
+def get_result_file(semester_code: str, course_code: str, meeting_id: int, file_name: str) -> str:
+    return path.join(get_meeting_results_directory(semester_code, course_code, meeting_id), file_name)
 
 
 def get_datasets_directory(dataset_type: DatasetType) -> str:
