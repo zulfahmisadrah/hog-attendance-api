@@ -14,3 +14,4 @@ from .lecturer import Lecturer
 from .course_student import CourseStudent
 from .course_lecturer import CourseLecturer
 from .attendance import Attendance
+from .site_setting import SiteSetting
