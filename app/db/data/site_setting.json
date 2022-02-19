@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "setting_type": "ML_FACE_RECOGNITION_METHOD",
+    "setting_value": "FACENET",
+    "created_by_id": 1,
+    "modified_by_id": 1
+  },
+  {
+    "id": 2,
+    "setting_type": "ML_DATASETS_WITH_MASK",
+    "setting_value": "1",
+    "created_by_id": 1,
+    "modified_by_id": 1
+  }
+]
