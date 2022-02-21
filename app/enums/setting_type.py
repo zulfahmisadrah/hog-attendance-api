@@ -1,0 +1,6 @@
+from enum import Enum
+
+
+class SettingType(str, Enum):
+    ML_FACE_RECOGNITION_METHOD = "ML_FACE_RECOGNITION_METHOD"
+    ML_DATASETS_WITH_MASK = "ML_DATASETS_WITH_MASK"
