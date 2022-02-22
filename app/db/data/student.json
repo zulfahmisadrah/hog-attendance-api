@@ -268,5 +268,175 @@
     "student": {
       "department_id": 5
     }
+  },
+  {
+    "id": 31,
+    "name": "Muh. Fajar Madani",
+    "username": "D121201049",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 5,
+      "year": 2020
+    }
+  },
+  {
+    "id": 32,
+    "name": "Mutia Rahman",
+    "username": "D121201058",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 5,
+      "year": 2020
+    }
+  },
+  {
+    "id": 33,
+    "name": "Nabila",
+    "username": "D121201060",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 5,
+      "year": 2020
+    }
+  },
+  {
+    "id": 34,
+    "name": "Mutiah Chaerunnisa",
+    "username": "D121201064",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 5,
+      "year": 2020
+    }
+  },
+  {
+    "id": 35,
+    "name": "Teguh Ikhtiar Rhamdanu",
+    "username": "D121201067",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 5,
+      "year": 2020
+    }
+  },
+  {
+    "id": 36,
+    "name": "Rischa Nurul Hidayati",
+    "username": "D121201068",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 5,
+      "year": 2020
+    }
+  },
+  {
+    "id": 37,
+    "name": "Muh. Agung Sabillah",
+    "username": "D121201075",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 5,
+      "year": 2020
+    }
+  },
+  {
+    "id": 38,
+    "name": "Calvin Rinaldy Leonard",
+    "username": "D121201079",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 5,
+      "year": 2020
+    }
+  },
+  {
+    "id": 39,
+    "name": "Amidatun Nasyati Yusri",
+    "username": "D121201080",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 5,
+      "year": 2020
+    }
+  },
+  {
+    "id": 40,
+    "name": "Agunawan Ali Nur",
+    "username": "D121201081",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 5,
+      "year": 2020
+    }
+  },
+  {
+    "id": 41,
+    "name": "Alfaiz Muhammad",
+    "username": "D121201090",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 5,
+      "year": 2020
+    }
+  },
+  {
+    "id": 42,
+    "name": "Muhamad Rizal Soeid",
+    "username": "D121201093",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 5,
+      "year": 2020
+    }
+  },
+  {
+    "id": 43,
+    "name": "Muh. Adil Nusabakti M.",
+    "username": "D121201094",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 5,
+      "year": 2020
+    }
+  },
+  {
+    "id": 44,
+    "name": "A. Muh. Dzaky Siraj N.",
+    "username": "D121201095",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 5,
+      "year": 2020
+    }
+  },
+  {
+    "id": 45,
+    "name": "Ahmad Ali Husain",
+    "username": "D121201097",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 5,
+      "year": 2020
+    }
+  },
+  {
+    "id": 46,
+    "name": "Kelvin Mala Taulabi",
+    "username": "D121201098",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 5,
+      "year": 2020
+    }
+  },
+  {
+    "id": 47,
+    "name": "Rifyal Muhammad Imsan",
+    "username": "D121201099",
+    "password": "Pass@1234",
+    "student": {
+      "department_id": 5,
+      "year": 2020
+    }
   }
 ]
