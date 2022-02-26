@@ -11,3 +11,4 @@ from .meeting import Meeting, MeetingCreate, MeetingUpdate
 from .attendance import Attendance, AttendanceCreate, AttendanceUpdate
 from .token import Token, TokenPayload
 from .dataset import Dataset, TrainingParams, GenerateDatasetParams, DatasetTotal, DatasetParams
+from .site_setting import SiteSetting, SiteSettingCreate, SiteSettingUpdate
