@@ -9,3 +9,4 @@ from .crud_schedule import schedule
 from .crud_course import course
 from .crud_meeting import meeting
 from .crud_attendance import attendance
+from .crud_site_setting import site_setting
