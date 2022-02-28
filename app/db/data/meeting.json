@@ -52,5 +52,23 @@
     "semester_id": 2,
     "course_id": 3,
     "schedule_id": 3
+  },
+  {
+    "id": 7,
+    "name": "Metode Komputasi Numerik #1",
+    "number": 1,
+    "date": "2022-03-07",
+    "semester_id": 2,
+    "course_id": 4,
+    "schedule_id": 1
+  },
+  {
+    "id": 8,
+    "name": "Metode Komputasi Numerik #2",
+    "number": 2,
+    "date": "2022-03-14",
+    "semester_id": 2,
+    "course_id": 4,
+    "schedule_id": 1
   }
 ]
