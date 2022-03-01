@@ -43,10 +43,15 @@ def get_raw_dataset(dataset_type: DatasetType, username: str, file_name: str):
     return FileResponse(dataset)
 
 
-@router.get("/result/{meeting_id}/{file_name}")
-def get_result(meeting_id: int, file_name: str,
+@router.get("/result/{course_id}/{meeting_id}/{file_name}")
+def get_result(course_id: int, meeting_id: int, file_name: str,
                current_semester: schemas.Semester = Depends(deps.get_active_semester),
                db: Session = Depends(deps.get_db)):
-    meeting = crud.meeting.get(db, meeting_id)
-    result = get_result_file(current_semester.code, meeting.course.code, meeting_id, file_name)
+    if meeting_id != 0:
+        meeting = crud.meeting.get(db, meeting_id)
+    if course_id == 0 and meeting_id != 0:
+        course_code = meeting.course.code
+    else:
+        course_code = crud.course.get(db, course_id).code
+    result = get_result_file(current_semester.code, course_code, meeting_id, file_name)
     return FileResponse(result)
