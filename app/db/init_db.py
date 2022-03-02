@@ -16,4 +16,4 @@ def init_db(db: Session) -> None:
     DBSeeder(db, crud.schedule, schemas.ScheduleCreate).load_from_json("schedule.json")
     DBSeeder(db, crud.course, schemas.CourseCreate).load_from_json("course.json")
     DBSeeder(db, crud.meeting, schemas.MeetingCreate).load_from_json("meeting.json")
-
+    DBSeeder(db, crud.site_setting, schemas.SiteSetting).load_from_json("site_setting.json")
