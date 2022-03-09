@@ -35,7 +35,10 @@ class Settings(BaseSettings):
     ML_DATASETS_TRAIN_FOLDER: str = os.path.join(ML_DATASETS_FOLDER, "train")
     ML_DATASETS_VAL_FOLDER: str = os.path.join(ML_DATASETS_FOLDER, "val")
 
-    ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models_f" if USE_FACENET else "models")
+    ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models")
+    ML_MODELS_FOLDER_FACENET: str = os.path.join("app", "ml", "models_f")
+
+    # ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models_f" if USE_FACENET else "models")
     # ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models_5_f" if USE_FACENET else "models_5")
     # ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models_val_10_f" if USE_FACENET else "models_val_10")
     # ML_MODELS_FOLDER: str = os.path.join("app", "ml", "models_mask_f" if USE_FACENET else "models_mask")
