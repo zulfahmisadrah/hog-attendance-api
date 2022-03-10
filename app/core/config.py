@@ -50,6 +50,9 @@ class Settings(BaseSettings):
     ML_MODEL_FACENET: str = os.path.join("app", "ml", "pretrained_models", "facenet_keras", "facenet_keras.h5")
     ML_PLOTS_FOLDER: str = os.path.join("app", "ml", "plots")
 
+    ML_THRESHOLD_FACE_DETECTION: float = 0.97
+    ML_THRESHOLD_FACE_DETECTION_MASKED: float = 0.83
+
     IMAGE_MAX_SIZE: int = 1600
     IMAGE_ALPHA: float = 1.5  # Contrast control (1.0-3.0)
     IMAGE_BETA: float = 10  # Brightness control (0-100)
