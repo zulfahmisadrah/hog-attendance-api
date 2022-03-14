@@ -10,6 +10,7 @@ from sklearn.model_selection import GridSearchCV
 
 from app.api import deps
 from app.core.config import settings
+from app.crud import crud_site_setting
 from app.crud.crud_course import course
 from app.resources.enums import DatasetType
 from app.services.image_processing import get_hog_features, enhance_image, convert_to_grayscale, get_embedding, \
@@ -18,8 +19,10 @@ from app.utils.file_helper import get_list_files, get_course_models_directory, g
     get_user_datasets_directory, get_user_preprocessed_images_directory, get_file_name_without_extension
 
 
-def prepare_datasets(db: Session, course_code: str, dataset_type: DatasetType = DatasetType.TRAINING, save_preprocessing: bool = False,
-                     use_facenet: bool = settings.USE_FACENET):
+def prepare_datasets(db: Session, course_code: str, dataset_type: DatasetType = DatasetType.TRAINING,
+                     save_preprocessing: bool = False):
+    use_facenet = crud_site_setting.site_setting.use_facenet(db)
+
     features = []
     labels = []
 
@@ -81,8 +84,11 @@ def prepare_datasets(db: Session, course_code: str, dataset_type: DatasetType = 
     return features, labels
 
 
-def train_datasets(db: Session, semester_code: str, course_code: str, save_preprocessing: bool = False, grid_search: bool = False):
+def train_datasets(db: Session, semester_code: str, course_code: str, save_preprocessing: bool = False,
+                   grid_search: bool = False):
     print('--- PREPARING TRAINING DATASETS ---')
+    use_facenet = crud_site_setting.site_setting.use_facenet(db)
+    print("use_facenet", use_facenet)
     features, labels = prepare_datasets(db, course_code, DatasetType.TRAINING, save_preprocessing)
     print('--- TRAINING MODEL ---')
     if grid_search:
@@ -102,9 +108,10 @@ def train_datasets(db: Session, semester_code: str, course_code: str, save_prepr
         svm_model = SVC(kernel=best_params['kernel'], gamma=best_params['gamma'], C=best_params['C'],
                         random_state=best_params['random_state'], probability=True)
     else:
-        if settings.USE_FACENET:
-            svm_model = SVC(kernel='linear', C=0.5, gamma='scale', random_state=0, probability=True)  # 100%, 98% val 10, 100% 5
-            # svm_model = SVC(kernel='rbf', C=10, gamma=0.01, random_state=0, probability=True)  # mask 92%
+        if use_facenet:
+            # svm_model = SVC(kernel='rbf', C=50, gamma=0.001, random_state=0, probability=True)  # 98% 2020
+            # svm_model = SVC(kernel='linear', C=0.5, gamma='scale', random_state=0, probability=True)  # 100%, 98% val 10, 100% 5
+            svm_model = SVC(kernel='rbf', C=10, gamma=0.01, random_state=0, probability=True)  # mask 92%
             # svm_model = SVC(kernel='rbf', C=50, gamma=0.005, random_state=0, probability=True)  # mask only 73%
         else:
             svm_model = SVC(kernel='rbf', C=50, gamma=0.005, random_state=0, probability=True)  # 95%
