@@ -22,3 +22,4 @@ aiofiles~=0.7.0
 tensorflow~=2.3.0
 matplotlib~=3.5.1
 tqdm~=4.62.3
+httpx~=0.22.0
