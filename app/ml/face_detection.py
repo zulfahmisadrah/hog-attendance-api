@@ -7,6 +7,7 @@ from os import path
 from mtcnn import MTCNN
 from PIL.Image import Image
 
+from app.db.session import SessionLocal
 from app.services.image_processing import *
 from app.utils.file_helper import get_dir, generate_file_name
 from app.utils.commons import get_current_datetime
@@ -14,18 +15,19 @@ from app.utils.commons import get_current_datetime
 detector = MTCNN()
 
 
-def detect_face_from_image_path(image_path: str, save_path: str = "", save_preprocessing: bool = False):
+def detect_face_from_image_path(image_path: str, save_path: str = "", multiple_faces: bool = False,
+                                save_preprocessing: bool = False):
     image_name = path.basename(path.normpath(image_path))
     img = cv2.imread(image_path)
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     print("-----------------------------------")
     print("DETECTING FACE ON ", image_name)
-    detected_faces = detect_face_on_image(img, save_path, save_preprocessing)
+    detected_faces = detect_face_on_image(img, save_path, save_preprocessing, multiple_faces=multiple_faces)
     return detected_faces
 
 
 def detect_face_on_image(img: Union[Image, ndarray], save_path: str = "", save_preprocessing: bool = False,
-                         resize_image: bool = True, return_box: bool = False):
+                         resize_image: bool = True, multiple_faces: bool = True, return_box: bool = False):
     if not isinstance(img, ndarray):
         img = np.array(img)
     img = resize_image_if_too_big(img) if resize_image else img
@@ -59,13 +61,32 @@ def detect_face_on_image(img: Union[Image, ndarray], save_path: str = "", save_p
     print(f"DETECTION TIME = {detection_time} s")
 
     detected_faces = []
+    highest_conf = 0
     for (i, detection) in enumerate(detections):
         counter = i + 1
         file_name_prefix = f"{prefix_name}.{counter}"
 
+        # capture_path = path.join(preprocessed_images_dir, f"{file_name_prefix}.0_input.jpg")
+        # cv2.imwrite(capture_path, img)
+
         score = detection["confidence"]
         print("DETECTION = ", detection)
-        if score >= 0.97:
+
+        db = SessionLocal()
+        with_masked_datasets = crud_site_setting.site_setting.datasets_with_mask(db)
+
+        if with_masked_datasets:
+            threshold = settings.ML_THRESHOLD_FACE_DETECTION_MASKED
+        else:
+            threshold = settings.ML_THRESHOLD_FACE_DETECTION
+
+        if multiple_faces:
+            is_detection_accepted = score >= threshold
+        else:
+            is_detection_accepted = score >= threshold and score >= highest_conf
+
+        if is_detection_accepted:
+            highest_conf = score
             box = detection["box"]
             keypoints = detection["keypoints"]
             left_eye = keypoints["left_eye"]
