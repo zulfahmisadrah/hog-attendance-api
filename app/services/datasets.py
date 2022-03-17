@@ -25,7 +25,7 @@ from app.services.image_processing import resize_image_if_too_big
 from app.utils.commons import get_current_datetime
 from app.utils.file_helper import get_list_files, get_total_files, get_user_datasets_directory, \
     get_user_datasets_raw_directory, get_dir, get_user_dataset_file, get_datasets_directory, get_datasets_raw_directory, \
-    generate_file_name, get_user_preprocessed_images_directory, clear_files_in_dir
+    generate_file_name, get_user_preprocessed_images_directory, clear_files_in_dir, get_meeting_results_directory
 
 
 def get_user_datasets(username: str, dataset_type: DatasetType = DatasetType.TRAINING):
@@ -80,6 +80,7 @@ async def save_raw_dataset(username: str, file: Union[bytes, UploadFile],
             await out_file.write(content)
     list_images = get_list_files(user_dir)
     result = {
+        "image_name": file_name,
         "total_raw_datasets": len(list_images)
     }
     print("--------------------------------")
@@ -118,6 +119,7 @@ def generate_datasets_from_raw_dir(username: str, dataset_type: DatasetType = Da
                                                      save_preprocessing=save_preprocessing)
         file_name = generate_file_name(user_dataset_dir, username)
         dataset_path = path.join(user_dataset_dir, file_name)
+        print("SAVED", len(detected_faces))
         if detected_faces:
             for detected_face in detected_faces:
                 cv2.imwrite(dataset_path, detected_face)
@@ -185,7 +187,8 @@ def create_models(db: Session, semester_code: str, course_code: str, validate: b
     return result
 
 
-def recognize_face(file: Union[bytes, UploadFile], semester_code: str, course_code: str, save_preprocessing=False):
+def recognize_face(db: Session, file: Union[bytes, UploadFile], semester_code: str, course_code: str, meeting_id: int,
+                   save_preprocessing=False):
     if isinstance(file, bytes):
         image_bytes = file[file.find(b'/9'):]
         image = Image.open(io.BytesIO(base64.b64decode(image_bytes)))
@@ -203,14 +206,13 @@ def recognize_face(file: Union[bytes, UploadFile], semester_code: str, course_co
 
     image = np.array(image)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    db = SessionLocal()
 
     recognition_time_start = time.perf_counter()
     predictions = []
     if detected_faces:
         for result in detected_faces:
             detected_face, box = result
-            label = recognize(detected_face, semester_code, course_code, save_preprocessing=save_preprocessing)
+            label = recognize(db, detected_face, semester_code, course_code, save_preprocessing=save_preprocessing)
             user = crud_user.user.get_by_username(db, username=label)
             user_name = user.name
 
@@ -248,7 +250,7 @@ def recognize_face(file: Union[bytes, UploadFile], semester_code: str, course_co
     recognition_time = recognition_time_finish - recognition_time_start
 
     current_datetime = get_current_datetime()
-    result_dir = get_dir(settings.ASSETS_RESULT_FOLDER)
+    result_dir = get_meeting_results_directory(semester_code, course_code, meeting_id)
     image_name = f"{current_datetime}_{semester_code}_{course_code}.jpg"
     result_path = path.join(result_dir, image_name)
     cv2.imwrite(result_path, image)
