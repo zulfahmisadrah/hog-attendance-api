@@ -4,14 +4,17 @@ from os import path
 import cv2
 import uuid
 
+from sqlalchemy.orm import Session
+
 from app.core.config import settings
+from app.crud import crud_site_setting
 from app.services.image_processing import get_hog_features, enhance_image, convert_to_grayscale, get_embedding
 from app.utils.commons import get_current_datetime
 from app.utils.file_helper import get_course_models_directory, get_dir
 
 
-def recognize(face_image, semester_code: str, course_code: str, save_preprocessing: bool = False,
-              use_facenet: bool = settings.USE_FACENET):
+def recognize(db: Session, face_image, semester_code: str, course_code: str, save_preprocessing: bool = False):
+    use_facenet = crud_site_setting.site_setting.use_facenet(db)
     current_datetime = get_current_datetime()
     preprocessed_images_dir = get_dir(path.join(settings.ML_PREPROCESSED_IMAGES_FOLDER))
     file_name_prefix = f"{current_datetime}_{str(uuid.uuid4())}"
@@ -27,6 +30,7 @@ def recognize(face_image, semester_code: str, course_code: str, save_preprocessi
     else:
         # Image Enhancement
         enhanced_image = enhance_image(image)
+        # enhanced_image = image
         if save_preprocessing:
             enhanced_image_path = path.join(preprocessed_images_dir, f"{file_name_prefix}.4_enhanced.jpg")
             cv2.imwrite(enhanced_image_path, enhanced_image)
