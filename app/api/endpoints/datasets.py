@@ -32,11 +32,11 @@ def train(params: schemas.TrainingParams, semester: schemas.Semester = Depends(d
 def recognize(course_id: int = Form(...), file: Union[bytes, UploadFile] = File(...),
               semester: schemas.Semester = Depends(deps.get_active_semester), db: Session = Depends(session.get_db)):
     course = crud.course.get(db, course_id)
-    results = datasets.recognize_face(file, semester.code, course.code, save_preprocessing=True)
+    results = datasets.recognize_face(db, file, semester.code, course.code, meeting_id=0, save_preprocessing=True)
     return results
 
 
-@router.post("/capture", dependencies=[Depends(deps.get_current_admin)])
+@router.post("/capture", dependencies=[Depends(deps.get_admin_or_specific_username_form_data)])
 async def capture(username: str = Form(...), dataset_type: DatasetType = Form(...),
                   files: List[Union[bytes, UploadFile]] = File(...)):
     result = {}
@@ -66,7 +66,7 @@ def generate_datasets_from_raw(params: schemas.GenerateDatasetParams):
         results["total_users"] = total_users
         results["total_datasets"] = total_datasets
         results["computation_time"] = round(computation_time, 2)
-        results["average_computation_time"] = round(computation_time/total_datasets, 2) if total_datasets > 0 else 0
+        results["average_computation_time"] = round(computation_time / total_datasets, 2) if total_datasets > 0 else 0
     return results
 
 
@@ -76,7 +76,7 @@ def get_list_user_datasets(username: str):
     return result
 
 
-@router.get("/{dataset_type}/{username}", dependencies=[Depends(deps.get_current_admin)])
+@router.get("/{dataset_type}/{username}", dependencies=[Depends(deps.get_admin_or_specific_username)])
 def get_list_user_datasets(dataset_type: DatasetType, username: str):
     list_datasets = datasets.get_user_datasets(username, dataset_type)
     return list_datasets
