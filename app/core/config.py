@@ -100,6 +100,10 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_PASSWORD: str = os.getenv("FIRST_SUPERUSER_PASSWORD", "123456")
     USERS_OPEN_REGISTRATION: bool = False
 
+    NEOSIA_API_HEADER_TOKEN: str = os.getenv("NEOSIA_API_HEADER_TOKEN", "")
+    NEOSIA_API_BASE_URL: str = "https://customapi.neosia.unhas.ac.id/"
+    NEOSIA_API_AUTH_STUDENT: str = f"{NEOSIA_API_BASE_URL}checkMahasiswa"
+
     class Config:
         case_sensitive = True
 
