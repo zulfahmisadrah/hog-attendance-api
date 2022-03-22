@@ -9,10 +9,12 @@ from sklearn.manifold import TSNE
 from tensorflow.keras.models import load_model
 
 from app.core.config import settings
+from app.crud import crud_site_setting
 from app.utils.file_helper import get_dir
 
-if settings.USE_FACENET:
-    facenet_model = load_model(settings.ML_MODEL_FACENET)
+# use_facenet = crud_site_setting.site_setting.use_facenet(db)
+# if settings.USE_FACENET:
+facenet_model = load_model(settings.ML_MODEL_FACENET)
 
 
 def resize_image_if_too_big(image, max_size=settings.IMAGE_MAX_SIZE):
