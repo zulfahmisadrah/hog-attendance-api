@@ -18,9 +18,9 @@ logger = logging.getLogger(__name__)
 security = HTTPBearer()
 app = FastAPI()
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--seed', default=False, action='store_true', help="Seed database with initial data")
-args = vars(parser.parse_args())
+# parser = argparse.ArgumentParser()
+# parser.add_argument('--seed', default=False, action='store_true', help="Seed database with initial data")
+# args = vars(parser.parse_args())
 
 
 def init() -> None:
@@ -31,12 +31,12 @@ def init() -> None:
 def main() -> None:
     LOGGING_CONFIG["formatters"]["default"]["fmt"] = "%(asctime)s %(levelprefix)s %(message)s"
 
-    if args["seed"]:
-        logger.info("Create initial data")
-        init()
-        logger.info("Initial data created")
+    # if args["seed"]:
+    logger.info("Create initial data")
+    init()
+    logger.info("Initial data created")
 
-    uvicorn.run("main:app", host=settings.WEB_HOST, port=settings.WEB_PORT, reload=settings.AUTO_RELOAD)
+    # uvicorn.run("main:app", host=settings.WEB_HOST, port=settings.WEB_PORT, reload=settings.AUTO_RELOAD)
 
 
 # Set all CORS enabled origins
@@ -57,5 +57,6 @@ def index():
     return {"messages": settings.PROJECT_NAME}
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
+main()
