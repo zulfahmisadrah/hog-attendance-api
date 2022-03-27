@@ -1,2 +1,2 @@
 @echo off
-"venv\Scripts\python.exe" "main.py" --seed
+"venv\Scripts\python.exe" "app\main.py" --seed
