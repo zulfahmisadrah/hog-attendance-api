@@ -2,6 +2,11 @@ Neo Presensi API
 
 REST API of Neo Presensi Web Application. Neo Presensi is a Multi-Face Recognition based Student Attendance System using Histogram of Oriented Gradients (HOG).
 
+Go to root project dir
+```
+cd /var/www/neoattendance_api
+```
+
 Crate Python Virtual Environment
 ```
 python -m venv venv
