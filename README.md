@@ -42,3 +42,13 @@ run app
 ```
 python main.py
 ```
+
+Production
+start
+```
+gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 127.0.0.1:8000 --access-logfile /var/log/gunicorn/access.log --error-logfile /var/log/gunicorn/error.log
+```
+stop
+```
+pkill gunicorn
+```
