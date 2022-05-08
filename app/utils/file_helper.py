@@ -18,7 +18,7 @@ def get_dir(dir_path: str) -> str:
     return create_directory_if_not_exist(dir_path)
 
 
-def get_list_files(directory: str) -> List:
+def get_list_files(directory: str) -> List[str]:
     return listdir(directory)
 
 
@@ -88,7 +88,6 @@ def get_user_dataset_raw_file(dataset_type: DatasetType, username: str, file_nam
 def get_course_models_directory(course_code: str) -> str:
     db = SessionLocal()
     use_facenet = crud_site_setting.site_setting.use_facenet(db)
-    print("use_facenet", use_facenet)
     model_dir = settings.ML_MODELS_FOLDER_FACENET if use_facenet else settings.ML_MODELS_FOLDER
     directory_path = path.join(get_dir(model_dir), course_code)
     return get_dir(directory_path)
