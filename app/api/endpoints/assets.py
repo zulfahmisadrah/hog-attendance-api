@@ -1,5 +1,7 @@
-from fastapi import APIRouter, Depends
-from fastapi.responses import FileResponse
+from os import path, remove
+
+from fastapi import APIRouter, Depends, status
+from fastapi.responses import FileResponse, Response
 from sqlalchemy.orm import Session
 
 from app import crud
@@ -14,10 +16,9 @@ router = APIRouter()
 
 @router.get("/avatar/{file_name}")
 def get_avatar(file_name: str):
-    if file_name == "null" or file_name == "undefined":
+    avatar = get_avatar_file(file_name)
+    if file_name == "null" or file_name == "undefined" or not path.exists(avatar):
         avatar = get_avatar_file("null.jpg")
-    else:
-        avatar = get_avatar_file(file_name)
     return FileResponse(avatar)
 
 
