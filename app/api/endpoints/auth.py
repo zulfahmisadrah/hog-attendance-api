@@ -11,6 +11,7 @@ from app.core.config import settings
 from app.models import domains, schemas
 
 from app.api import deps
+from app.utils.commons import parse_year_from_username
 
 router = APIRouter()
 
@@ -38,12 +39,13 @@ def login_access_token(
                 if user_local:
                     user = user_local
                 else:
-                    department = crud.department.get_by_username_parsing(form_data.username)
+                    department = crud.department.get_by_username_parsing(db, form_data.username)
                     user_in = schemas.UserStudentCreate(
                         name=form_data.username,
                         username=form_data.username,
                         password=form_data.password,
-                        student=schemas.StudentCreate(department_id=department.id)
+                        student=schemas.StudentCreate(department_id=department.id,
+                                                      year=parse_year_from_username(form_data.username))
                     )
                     user = crud.user.create_student(db, obj_in=user_in)
             else:
