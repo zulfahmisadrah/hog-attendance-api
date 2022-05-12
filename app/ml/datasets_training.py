@@ -2,7 +2,6 @@ import cv2
 import joblib
 from os import path
 
-from tqdm import tqdm
 from sklearn.svm import SVC
 from sqlalchemy.orm import Session
 from sklearn.metrics import classification_report
@@ -32,7 +31,7 @@ def prepare_datasets(db: Session, course_code: str, dataset_type: DatasetType = 
 
     datasets = [student.user.username for student in list_students]
     total_labels = 0
-    for user_index, username in enumerate(tqdm(datasets)):
+    for user_index, username in enumerate(datasets):
         user_datasets_dir = get_user_datasets_directory(dataset_type, username)
         preprocessed_images_dir = get_user_preprocessed_images_directory(dataset_type, username)
         extracted_images_dir = get_extracted_images_directory(username)
