@@ -88,13 +88,19 @@ class CRUDCourse(CRUDBase[Course, CourseCreate, CourseUpdate]):
             current_semester = crud.semester.get_active_semester(db)
             for lecturer_id in obj_in.lecturers:
                 lecturer = crud.lecturer.get(db, id=lecturer_id)
+                exist = db.query(CourseLecturer).filter_by(
+                    semester_id=current_semester.id,
+                    course_id=course_id,
+                    lecturer_id=lecturer.id
+                ).first()
                 if lecturer:
                     course_lecturer = CourseLecturer(
                         semester_id=current_semester.id,
                         course_id=course_id,
                         lecturer_id=lecturer.id
                     )
-                    db.add(course_lecturer)
+                    if not exist:
+                        db.add(course_lecturer)
                     list_lecturers.append(lecturer)
                 else:
                     raise HTTPException(
@@ -115,13 +121,19 @@ class CRUDCourse(CRUDBase[Course, CourseCreate, CourseUpdate]):
             current_semester = crud.semester.get_active_semester(db)
             for student_id in obj_in.students:
                 student = crud.student.get(db, id=student_id)
+                exist = db.query(CourseStudent).filter_by(
+                    semester_id=current_semester.id,
+                    course_id=course_id,
+                    student_id=student.id
+                ).first()
                 if student:
                     course_student = CourseStudent(
                         semester_id=current_semester.id,
                         course_id=course_id,
                         student_id=student.id
                     )
-                    db.add(course_student)
+                    if not exist:
+                        db.add(course_student)
                     list_students.append(student)
                 else:
                     raise HTTPException(
