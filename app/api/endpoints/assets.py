@@ -26,6 +26,7 @@ def get_avatar(file_name: str):
 def get_dataset_sample(username: str):
     datasets = get_list_files(get_user_datasets_directory(DatasetType.TRAINING, username))
     if datasets:
+        datasets.sort()
         sample = get_user_dataset_file(DatasetType.TRAINING, username, datasets[0])
     else:
         sample = get_avatar_file("null.jpg")
