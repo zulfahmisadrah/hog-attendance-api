@@ -46,11 +46,12 @@ def take_presence(meeting_id: int = Form(...), validate: bool = Form(...), file:
             meeting_id=meeting_id,
             student_id=student.id
         )
-        if validate:
-            attendance_in = schemas.AttendanceUpdate(status_validate=AttendanceStatus.Hadir)
-        else:
-            attendance_in = schemas.AttendanceUpdate(status=AttendanceStatus.Hadir)
-        crud.attendance.update(db, db_obj=attendance, obj_in=attendance_in)
+        if attendance:
+            if validate:
+                attendance_in = schemas.AttendanceUpdate(status_validate=AttendanceStatus.Hadir)
+            else:
+                attendance_in = schemas.AttendanceUpdate(status=AttendanceStatus.Hadir)
+            crud.attendance.update(db, db_obj=attendance, obj_in=attendance_in)
     return results
 
 
