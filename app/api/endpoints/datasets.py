@@ -19,6 +19,17 @@ def get_list_datasets(db: Session = Depends(session.get_db)):
     return list_datasets
 
 
+@router.get("/config", dependencies=[Depends(deps.get_current_admin)])
+def get_datasets_config(db: Session = Depends(session.get_db)):
+    face_recognition_method = crud.site_setting.use_facenet(db)
+    with_masked_datasets = crud.site_setting.datasets_with_mask(db)
+    result = {
+        "face_recognition_method": face_recognition_method,
+        "with_masked_datasets": with_masked_datasets
+    }
+    return result
+
+
 @router.post("/train", dependencies=[Depends(deps.get_current_admin)])
 def train(params: schemas.TrainingParams, semester: schemas.Semester = Depends(deps.get_active_semester),
           db: Session = Depends(session.get_db)):
