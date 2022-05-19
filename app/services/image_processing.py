@@ -218,3 +218,27 @@ def create_scatter_plot(features, labels, filename='plot_scatter.png'):
 
     plt.legend(bbox_to_anchor=(1, 1))
     plt.savefig(path.join(get_dir(settings.ML_PLOTS_FOLDER), filename))
+
+
+def plot_grid_search(cv_results, grid_param_1, grid_param_2, name_param_1, name_param_2,
+                     title="Grid Search Scores", filename="plot_grid_search.png"):
+    # Get Test Scores Mean and std for each grid search
+    scores_mean = cv_results['mean_test_score']
+    scores_mean = np.array(scores_mean).reshape(len(grid_param_2), len(grid_param_1))
+
+    scores_sd = cv_results['std_test_score']
+    scores_sd = np.array(scores_sd).reshape(len(grid_param_2), len(grid_param_1))
+
+    # Plot Grid search scores
+    _, ax = plt.subplots(1, 1)
+
+    # Param1 is the X-axis, Param 2 is represented as a different curve (color line)
+    for idx, val in enumerate(grid_param_2):
+        plt.plot(grid_param_1, scores_mean[idx, :], '-o', label=name_param_2 + ': ' + str(val))
+
+    ax.set_title(title, fontsize=20, fontweight='bold')
+    ax.set_xlabel(name_param_1, fontsize=16)
+    ax.set_ylabel("CV Average Score", fontsize=16)
+    ax.legend(loc="best")
+    ax.grid('on')
+    plt.savefig(path.join(get_dir(settings.ML_PLOTS_FOLDER), filename))
