@@ -58,6 +58,7 @@ def get_user_sample_dataset(username: str, dataset_type: DatasetType = DatasetTy
     sample = None
     user_datasets = get_user_datasets(username)
     if user_datasets:
+        user_datasets.sort()
         # sample_image_path = user_datasets[0]
         sample_image_path = get_user_dataset_file(dataset_type, username, user_datasets[0])
         with open(sample_image_path, "rb") as imageFile:
