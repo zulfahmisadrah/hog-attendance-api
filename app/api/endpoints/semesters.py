@@ -42,7 +42,6 @@ def get_semester(semester_id: int, db: Session = Depends(session.get_db)):
              dependencies=[Depends(deps.get_current_admin)])
 def create_next_semester(db: Session = Depends(session.get_db)):
     latest_semester = crud.semester.get_latest_semester(db)
-    print(latest_semester)
     semester_in = schemas.SemesterCreate(
         year=latest_semester.year if latest_semester.type == SemesterType.Genap else latest_semester.year + 1,
         type=SemesterType.Ganjil if latest_semester.type == SemesterType.Genap else SemesterType.Genap
