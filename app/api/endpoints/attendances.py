@@ -1,3 +1,4 @@
+from fastapi.logger import logger
 from typing import Union, List
 from fastapi import File, APIRouter, Depends, Form, status, UploadFile, HTTPException
 from sqlalchemy.orm import Session
@@ -12,7 +13,6 @@ from app.services import datasets
 from app.utils.file_helper import get_list_files, get_meeting_results_directory
 
 router = APIRouter()
-
 
 @router.get("/", response_model=List[schemas.Attendance], dependencies=[Depends(deps.get_current_active_user)])
 def get_list_attendances(db: Session = Depends(session.get_db), offset: int = 0, limit: int = 20):
@@ -40,6 +40,7 @@ def take_presence(meeting_id: int = Form(...), validate: bool = Form(...), file:
     meeting = crud.meeting.get(db, meeting_id)
     results = datasets.recognize_face(db, file, semester.code, meeting.course.code, meeting_id, save_preprocessing=True)
     for prediction in results['predictions']:
+        logger.info("prediction " + prediction)
         student = crud.student.get_by_username(db, username=prediction['username'])
         attendance = crud.attendance.get_attendances_by_meeting_id_and_student_id(
             db,
