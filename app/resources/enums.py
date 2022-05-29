@@ -34,3 +34,10 @@ class AttendanceStatus(str, Enum):
 class DatasetType(str, Enum):
     TRAINING = "train"
     VALIDATION = "val"
+
+
+class MeetingType(str, Enum):
+    NEAREST = "nearest"
+    TODAY = "today"
+    UPCOMING = "upcoming"
+    FINISHED = "finished"
