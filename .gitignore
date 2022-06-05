@@ -151,3 +151,5 @@ app/ml/test/
 app/assets/avatar/
 app/assets/result/
 *.diff
+*.csv
+*.xlsx
