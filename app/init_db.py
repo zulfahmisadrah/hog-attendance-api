@@ -4,9 +4,9 @@ from app.db.session import SessionLocal
 
 def init() -> None:
     db = SessionLocal()
-    print("Create initial data")
+    print("Seeding database...")
     init_db(db)
-    print("Initial data created")
+    print("DONE")
 
 
 if __name__ == "__main__":
