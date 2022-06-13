@@ -1,2 +1,2 @@
 @echo off
-"venv\Scripts\python.exe" "app\main.py" --seed
+"venv\Scripts\python.exe" "app\init_db.py"
