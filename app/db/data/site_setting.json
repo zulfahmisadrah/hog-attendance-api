@@ -12,5 +12,12 @@
     "setting_value": "1",
     "created_by_id": 1,
     "modified_by_id": 1
+  },
+  {
+    "id": 3,
+    "setting_type": "ML_PARAMS_KEY",
+    "setting_value": "2017",
+    "created_by_id": 1,
+    "modified_by_id": 1
   }
 ]
