@@ -19,6 +19,7 @@ class DBSeeder(Generic[ModelCRUD, CreateSchemaType]):
 
     def load_from_json(self, file_name: str):
         json_file = open(get_initial_data_file(file_name))
+        print(f"-{file_name}...")
         for data_dict in json.load(json_file):
             data = self.crud.get(self.db, id=data_dict.get("id"))
             if not data:
