@@ -1,4 +1,5 @@
 import joblib
+from fastapi.logger import logger
 from os import path
 
 import cv2
@@ -62,5 +63,7 @@ def recognize(db: Session, face_image, semester_code: str, course_code: str, sav
     prob_per_class_dictionary = dict(zip(svm_model.classes_, results))
     results_ordered_by_probability = sorted(zip(svm_model.classes_, results), key=lambda x: x[1], reverse=True)
     if pred:
+        logger.info(f"PREDICTION -- label: {pred[0]}, prob: {str(prob_per_class_dictionary[pred[0]])}, "
+                    f"others: {str(results_ordered_by_probability[1:4])}")
     return pred[0]
 
