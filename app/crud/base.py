@@ -1,3 +1,4 @@
+from fastapi.logger import logger
 from typing import Any, Generic, List, TypeVar, Type, Optional, Union, Dict
 
 from fastapi import HTTPException, status
@@ -12,7 +13,6 @@ from app.db.base_class import Base
 ModelType = TypeVar("ModelType", bound=Base)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
-
 
 class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     def __init__(self, model: Type[ModelType]):
@@ -32,11 +32,11 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             db.commit()
             db.refresh(db_obj)
         except IntegrityError as e:
-            print(e.args)
+            logger.error(e.args)
             db.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e.args[0]))
         except SQLAlchemyError as e:
-            print(e.args)
+            logger.error(e.args)
             db.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e.args[0]))
         return db_obj
