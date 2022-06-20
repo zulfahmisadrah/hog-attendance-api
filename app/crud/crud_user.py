@@ -1,3 +1,4 @@
+from fastapi.logger import logger
 from typing import Optional, Union, Dict, Any
 
 import aiofiles
@@ -43,7 +44,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             db.commit()
             db.refresh(new_user)
         except SQLAlchemyError as e:
-            print(e.args)
+            logger.error(e.args)
             db.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                                 detail=strings.ERROR_INTERNAL_SERVER_ERROR)
