@@ -1,3 +1,4 @@
+from fastapi.logger import logger
 from typing import List, Any
 
 from fastapi import HTTPException, status
@@ -76,7 +77,7 @@ class CRUDCourse(CRUDBase[Course, CourseCreate, CourseUpdate]):
                     )
             db.commit()
         except SQLAlchemyError as e:
-            print(e.args)
+            logger.error(e.args)
             db.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                                 detail=strings.ERROR_INTERNAL_SERVER_ERROR)
@@ -110,7 +111,7 @@ class CRUDCourse(CRUDBase[Course, CourseCreate, CourseUpdate]):
             db.commit()
             return list_lecturers
         except SQLAlchemyError as e:
-            print(e.args)
+            logger.error(e.args)
             db.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                                 detail=strings.ERROR_INTERNAL_SERVER_ERROR)
@@ -143,7 +144,7 @@ class CRUDCourse(CRUDBase[Course, CourseCreate, CourseUpdate]):
             db.commit()
             return list_students
         except SQLAlchemyError as e:
-            print(e.args)
+            logger.error(e.args)
             db.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                                 detail=strings.ERROR_INTERNAL_SERVER_ERROR)
@@ -168,7 +169,7 @@ class CRUDCourse(CRUDBase[Course, CourseCreate, CourseUpdate]):
             db.commit()
             return Response(status_code=status.HTTP_204_NO_CONTENT)
         except SQLAlchemyError as e:
-            print(e.args)
+            logger.error(e.args)
             db.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                                 detail=strings.ERROR_INTERNAL_SERVER_ERROR)
@@ -193,7 +194,7 @@ class CRUDCourse(CRUDBase[Course, CourseCreate, CourseUpdate]):
             db.commit()
             return Response(status_code=status.HTTP_204_NO_CONTENT)
         except SQLAlchemyError as e:
-            print(e.args)
+            logger.error(e.args)
             db.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                                 detail=strings.ERROR_INTERNAL_SERVER_ERROR)
