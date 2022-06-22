@@ -34,12 +34,36 @@ class CRUDMeeting(CRUDBase[Meeting, MeetingCreate, MeetingUpdate]):
         #     meeting_data.attendances = self.get_meeting_attendances(db, meeting_id=meeting_data.id)
         return meetings
 
-    def get_meetings_by_course_id(self, db: Session, *, course_id: int) -> List[Meeting]:
+    def get_meetings_by_course_id(self, db: Session, *, course_id: int, offset: int = 0, limit: int = 10) -> List[Meeting]:
         return db.query(Meeting).filter(Meeting.course_id == course_id).all()
 
-    def get_meeting_today(self, db: Session):
+    def get_meetings_today(self, db: Session, *, course_id: int, offset: int = 0, limit: int = 10) -> List[Meeting]:
         current_datetime = datetime.now()
-        return db.query(Meeting).filter(Meeting.date == current_datetime.date()).all()
+        return db.query(Meeting).filter(
+            Meeting.course_id == course_id,
+            Meeting.date == current_datetime.date()
+        ).offset(offset).limit(limit).all()
+
+    def get_meetings_nearest(self, db: Session, *, course_id: int, offset: int = 0, limit: int = 1) -> List[Meeting]:
+        current_datetime = datetime.now()
+        return db.query(Meeting).filter(
+            Meeting.course_id == course_id,
+            Meeting.date == current_datetime.date(),
+            Meeting.end_time >= current_datetime.time()
+        ).offset(offset).limit(limit).all()
+
+    def get_meetings_upcoming(self, db: Session, *, course_id: int, offset: int = 0, limit: int = 10) -> List[Meeting]:
+        current_datetime = datetime.now()
+        return db.query(Meeting).filter(
+            Meeting.course_id == course_id,
+            Meeting.date > current_datetime.date(),
+        ).offset(offset).limit(limit).all()
+
+    def get_meetings_finished(self, db: Session, *, course_id: int, offset: int = 0, limit: int = 10) -> List[Meeting]:
+        return db.query(Meeting).filter(
+            Meeting.course_id == course_id,
+            Meeting.status == MeetingStatus.Selesai,
+        ).offset(offset).limit(limit).all()
 
     def update_meetings_status(self, db: Session, meetings: List[Meeting]):
         current_datetime = datetime.now()
@@ -49,7 +73,7 @@ class CRUDMeeting(CRUDBase[Meeting, MeetingCreate, MeetingUpdate]):
             attendance_open_time = (datetime.combine(meeting_data.date, start_time) - timedelta(minutes=15))
             attendance_close_time = (datetime.combine(meeting_data.date, end_time) + timedelta(minutes=30))
             if current_datetime.date() == meeting_data.date \
-                    and attendance_open_time.time() <= current_datetime.time() < attendance_close_time.time() \
+                    and attendance_open_time.time() <= current_datetime.time() \
                     and meeting_data.status is not MeetingStatus.Berlangsung:
                 meeting_status = MeetingStatus.Berlangsung
             elif current_datetime.date() < meeting_data.date \
@@ -59,10 +83,10 @@ class CRUDMeeting(CRUDBase[Meeting, MeetingCreate, MeetingUpdate]):
                     and current_datetime.time() < attendance_open_time.time() \
                     and meeting_data.status is not MeetingStatus.Terjadwal:
                 meeting_status = MeetingStatus.Terjadwal
-            elif current_datetime.date() == meeting_data.date \
-                    and current_datetime.time() >= attendance_close_time.time() \
-                    and meeting_data.status is not MeetingStatus.Selesai:
-                meeting_status = MeetingStatus.Selesai
+            # elif current_datetime.date() == meeting_data.date \
+            #         and current_datetime.time() >= attendance_close_time.time() \
+            #         and meeting_data.status is not MeetingStatus.Selesai:
+            #     meeting_status = MeetingStatus.Selesai
             elif current_datetime.date() > meeting_data.date \
                     and meeting_data.status is not MeetingStatus.Selesai:
                 meeting_status = MeetingStatus.Selesai
