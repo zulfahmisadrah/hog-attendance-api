@@ -7,6 +7,7 @@ from app.api import deps
 from app.db import session
 from app.models import schemas
 from app.resources import strings
+from app.resources.enums import MeetingType
 
 router = APIRouter()
 
@@ -34,13 +35,46 @@ def get_my_meetings(
 ):
     if current_user.student:
         student_id = current_user.student.id
-        data = crud.student.get_student_courses(db, student_id=student_id, semester_id=current_semester.id)
+        user_courses = crud.student.get_student_courses(db, student_id=student_id, semester_id=current_semester.id)
     else:
         lecturer_id = current_user.lecturer.id
-        data = crud.lecturer.get_lecturer_courses(db, lecturer_id=lecturer_id, semester_id=current_semester.id)
+        user_courses = crud.lecturer.get_lecturer_courses(db, lecturer_id=lecturer_id, semester_id=current_semester.id)
     list_meetings = []
-    for lecturer_course in data:
-        meetings: List[schemas.Meeting] = lecturer_course.course.meetings
+    for user_course in user_courses:
+        meetings: List[schemas.Meeting] = user_course.course.meetings
+        crud.meeting.update_meetings_status(db, meetings)
+        list_meetings.extend(meetings)
+    return list_meetings
+
+
+@router.get("/me/{meeting_type}", response_model=List[schemas.Meeting])
+def get_my_meetings_today(
+        meeting_type: str,
+        db: Session = Depends(session.get_db),
+        offset: int = 0, limit: int = 10,
+        current_semester: schemas.Semester = Depends(deps.get_active_semester),
+        current_user: Union[schemas.UserLecturer, schemas.UserStudent] = Depends(deps.get_current_active_user)
+):
+    if current_user.student:
+        student_id = current_user.student.id
+        user_courses = crud.student.get_student_courses(db, student_id=student_id, semester_id=current_semester.id)
+    else:
+        lecturer_id = current_user.lecturer.id
+        user_courses = crud.lecturer.get_lecturer_courses(db, lecturer_id=lecturer_id, semester_id=current_semester.id)
+
+    if meeting_type == MeetingType.NEAREST:
+        get_meetings = crud.meeting.get_meetings_nearest
+    elif meeting_type == MeetingType.TODAY:
+        get_meetings = crud.meeting.get_meetings_today
+    elif meeting_type == MeetingType.UPCOMING:
+        get_meetings = crud.meeting.get_meetings_upcoming
+    elif meeting_type == MeetingType.FINISHED:
+        get_meetings = crud.meeting.get_meetings_finished
+    else:
+        get_meetings = crud.meeting.get_meetings_by_course_id
+    list_meetings = []
+    for user_course in user_courses:
+        meetings = get_meetings(db, course_id=user_course.course_id, offset=offset, limit=limit)
         crud.meeting.update_meetings_status(db, meetings)
         list_meetings.extend(meetings)
     return list_meetings
