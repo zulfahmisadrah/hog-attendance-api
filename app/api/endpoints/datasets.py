@@ -1,3 +1,4 @@
+from fastapi.logger import logger
 from typing import Union, List
 
 from fastapi import File, APIRouter, Depends, Form, status, UploadFile
@@ -48,11 +49,13 @@ def recognize(course_id: int = Form(...), file: Union[bytes, UploadFile] = File(
 
 
 @router.post("/capture", dependencies=[Depends(deps.get_admin_or_specific_username_form_data)])
-async def capture(username: str = Form(...), dataset_type: DatasetType = Form(...),
+async def capture(username: str = Form(...), dataset_type: DatasetType = Form(...), detect_face: bool = Form(...),
                   files: List[Union[bytes, UploadFile]] = File(...)):
     result = {}
     for file in files:
         result = await datasets.save_raw_dataset(username, file, dataset_type)
+    if detect_face:
+        result = datasets.generate_datasets_from_raw_dir(username, dataset_type)
     return result
 
 
@@ -64,18 +67,27 @@ def generate_datasets_from_raw(params: schemas.GenerateDatasetParams):
         results = result
     else:
         total_users = 0
+        total_datasets_raw = 0
         total_datasets = 0
+        total_failed = 0
+        total_rejected = 0
         computation_time = 0
         for i, username in enumerate(params.usernames):
-            print(f"{i + 1}/{len(params.usernames)}")
-            print("================================")
+            logger.info(f"{i + 1}/{len(params.usernames)}")
+            logger.info("================================")
             result = datasets.generate_datasets_from_raw_dir(username, params.dataset_type, params.save_preprocessing)
             if result:
                 total_users += 1
+                total_datasets_raw += result["total_datasets_raw"]
                 total_datasets += result["total_datasets"]
+                total_failed += result["total_failed"]
+                total_rejected += result["total_rejected"]
                 computation_time += result["computation_time"]
         results["total_users"] = total_users
+        results["total_datasets_raw"] = total_datasets_raw
         results["total_datasets"] = total_datasets
+        results["total_failed"] = total_failed
+        results["total_rejected"] = total_rejected
         results["computation_time"] = round(computation_time, 2)
         results["average_computation_time"] = round(computation_time / total_datasets, 2) if total_datasets > 0 else 0
     return results
