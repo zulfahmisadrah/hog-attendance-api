@@ -96,6 +96,7 @@ def generate_datasets_from_raw_dir(username: str, dataset_type: DatasetType = Da
     list_datasets_raw = get_list_files(user_dir)
     if not list_datasets_raw:
         return None
+    list_datasets_raw.sort()
 
     user_dataset_dir = get_user_datasets_directory(dataset_type, username)
     total_datasets = get_total_files(user_dataset_dir)
