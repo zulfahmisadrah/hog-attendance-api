@@ -100,6 +100,7 @@ def generate_datasets_from_raw_dir(username: str, dataset_type: DatasetType = Da
 
     user_dataset_dir = get_user_datasets_directory(dataset_type, username)
     total_datasets = get_total_files(user_dataset_dir)
+    total_rejected = 0
     if total_datasets > 0:
         clear_files_in_dir(user_dataset_dir)
 
@@ -113,15 +114,15 @@ def generate_datasets_from_raw_dir(username: str, dataset_type: DatasetType = Da
 
     time_start = time.perf_counter()
     for (i, file_name) in enumerate(list_datasets_raw):
-        print("--------------------------------")
-        print(f"IMAGE {i + 1}/{len(list_datasets_raw)} of {username}")
+        logger.info("--------------------------------")
+        logger.info(f"IMAGE {i + 1}/{len(list_datasets_raw)} of {username}")
         file_path = path.join(user_dir, file_name)
-        save_path = path.join(dataset_type, username)
-        detected_faces = detect_face_from_image_path(file_path, save_path=preprocessed_dir,
-                                                     save_preprocessing=save_preprocessing)
+        detection_result = detect_face_on_image(file_path, save_path=preprocessed_dir, multiple_faces=False,
+                                                save_preprocessing=save_preprocessing)
+        detected_faces = detection_result["detected_faces"]
+        total_rejected = total_rejected + detection_result["total_rejected"]
         file_name = generate_file_name(user_dataset_dir, username)
         dataset_path = path.join(user_dataset_dir, file_name)
-        print("SAVED", len(detected_faces))
         if detected_faces:
             for detected_face in detected_faces:
                 cv2.imwrite(dataset_path, detected_face)
@@ -131,11 +132,14 @@ def generate_datasets_from_raw_dir(username: str, dataset_type: DatasetType = Da
     total_datasets = get_total_files(user_dataset_dir)
     result = {
         "computation_time": round(estimated_time, 2),
-        "total_datasets": total_datasets
+        "total_datasets_raw": len(list_datasets_raw),
+        "total_datasets": total_datasets,
+        "total_failed": len(list_datasets_raw) - total_datasets,
+        "total_rejected": total_rejected
     }
-    print("--------------------------------")
-    print("FINISH CREATING DATASET")
-    print("RESULT", result)
+    logger.info("--------------------------------")
+    logger.info("FINISH CREATING DATASET")
+    logger.info("RESULT " + str(result))
     return result
 
 
