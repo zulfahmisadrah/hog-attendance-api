@@ -1,6 +1,7 @@
 import io
 import base64
 import time
+from fastapi.logger import logger
 from typing import Union, Any
 from os import path, remove
 
