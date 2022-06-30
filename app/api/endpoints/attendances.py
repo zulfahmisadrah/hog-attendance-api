@@ -40,7 +40,7 @@ def take_presence(meeting_id: int = Form(...), validate: bool = Form(...), file:
     meeting = crud.meeting.get(db, meeting_id)
     results = datasets.recognize_face(db, file, semester.code, meeting.course.code, meeting_id, save_preprocessing=True)
     for prediction in results['predictions']:
-        logger.info("prediction " + prediction)
+        logger.info("prediction " + str(prediction))
         student = crud.student.get_by_username(db, username=prediction['username'])
         attendance = crud.attendance.get_attendances_by_meeting_id_and_student_id(
             db,
