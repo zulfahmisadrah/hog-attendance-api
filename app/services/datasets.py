@@ -15,14 +15,12 @@ from sqlalchemy.orm import Session
 from starlette.datastructures import UploadFile
 
 from app.core.config import settings
-from app.crud import crud_user
+from app.crud import crud_user, crud_site_setting
+from app.enums.setting_type import SettingType
 from app.models.schemas import Dataset, DatasetTotal
-from app.db.session import SessionLocal
-from app.ml.face_detection import detect_face_from_image_path, detect_face_on_image
-from app.ml.datasets_training import train_datasets, validate_model
-from app.ml.face_recognition import recognize
+from app.ml.face_detection import detect_face_on_image
+from app.ml.datasets_training import train_datasets, validate_model, validate_model_using_train_data
 from app.resources.enums import DatasetType
-from app.services.image_processing import resize_image_if_too_big
 from app.utils.commons import get_current_datetime
 from app.utils.file_helper import get_list_files, get_total_files, get_user_datasets_directory, \
     get_user_datasets_raw_directory, get_dir, get_user_dataset_file, get_datasets_directory, get_datasets_raw_directory, \
