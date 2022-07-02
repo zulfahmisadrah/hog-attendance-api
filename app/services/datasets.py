@@ -83,9 +83,9 @@ async def save_raw_dataset(username: str, file: Union[bytes, UploadFile],
         "image_name": file_name,
         "total_raw_datasets": len(list_images)
     }
-    print("--------------------------------")
-    print("FINISH SAVE IMAGES")
-    print("RESULT", result)
+    logger.info("--------------------------------")
+    logger.info("FINISH SAVE IMAGES")
+    logger.info("RESULT " + str(result))
     return result
 
 
