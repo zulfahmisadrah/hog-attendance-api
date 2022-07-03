@@ -145,21 +145,30 @@ def generate_datasets_from_raw_dir(username: str, dataset_type: DatasetType = Da
 def generate_datasets_from_folder_all(dataset_type: DatasetType = DatasetType.TRAINING, save_preprocessing=False):
     list_datasets_raw = get_list_files(get_datasets_raw_directory(dataset_type))
     total_users = 0
+    total_datasets_raw = 0
     total_datasets = 0
+    total_failed = 0
+    total_rejected = 0
     computation_time = 0
     for i, username in enumerate(list_datasets_raw):
-        print(f"{i+1}/{len(list_datasets_raw)}")
-        print("================================")
+        logger.info(f"{i + 1}/{len(list_datasets_raw)}")
+        logger.info("================================")
         result = generate_datasets_from_raw_dir(username, dataset_type, save_preprocessing)
         if result:
             total_users += 1
+            total_datasets_raw += result["total_datasets_raw"]
             total_datasets += result["total_datasets"]
+            total_failed += result["total_failed"]
+            total_rejected += result["total_rejected"]
             computation_time += result["computation_time"]
     result = {
         "total_users": total_users,
+        "total_datasets_raw": total_datasets_raw,
         "total_datasets": total_datasets,
+        "total_failed": total_failed,
+        "total_rejected": total_rejected,
         "computation_time": round(computation_time, 2),
-        "average_computation_time": round(computation_time/total_datasets, 2) if total_datasets > 0 else 0
+        "average_computation_time": round(computation_time / total_datasets, 2) if total_datasets > 0 else 0
     }
     return result
 
