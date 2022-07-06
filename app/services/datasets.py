@@ -190,7 +190,12 @@ def create_models(db: Session, semester_code: str, course_code: str, validate: b
     accuracy = 0
     if validate:
         validating_time_start = time.perf_counter()
-        accuracy = validate_model(db, semester_code, course_code, save_preprocessing)
+        accuracy = validate_model(db, semester_code, course_code, save_preprocessing, params_key=params_key)
+        validating_time_finish = time.perf_counter()
+        validating_time = validating_time_finish - validating_time_start
+    else:
+        validating_time_start = time.perf_counter()
+        accuracy = score if grid_search else validate_model_using_train_data(db, semester_code, course_code, save_preprocessing, params_key=params_key)
         validating_time_finish = time.perf_counter()
         validating_time = validating_time_finish - validating_time_start
 
