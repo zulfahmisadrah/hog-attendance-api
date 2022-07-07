@@ -175,7 +175,7 @@ def generate_datasets_from_folder_all(dataset_type: DatasetType = DatasetType.TR
 
 def create_models(db: Session, semester_code: str, course_code: str, validate: bool = False, save_preprocessing=False,
                   grid_search: bool = False):
-    params_key = crud_site_setting.site_setting.get_setting(db, setting_type=SettingType.ML_PARAMS_KEY)
+    params_key = crud_site_setting.site_setting.get_setting(db, setting_type=SettingType.ML_PARAMS_KEY).setting_value
     training_time_start = time.perf_counter()
     if grid_search:
         file_path, score = train_datasets(db, semester_code, course_code, save_preprocessing, grid_search,
