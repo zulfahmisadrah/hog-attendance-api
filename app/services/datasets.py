@@ -208,7 +208,7 @@ def create_models(db: Session, semester_code: str, course_code: str, validate: b
         "validating_time": round(validating_time, 2),
         "computation_time": round(computation_time, 2),
     }
-    print("result", result)
+    logger.info("result " + str(result))
     return result
 
 
