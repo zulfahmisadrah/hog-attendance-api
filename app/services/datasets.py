@@ -224,8 +224,10 @@ def recognize_face(db: Session, file: Union[bytes, UploadFile], semester_code: s
     # image = resize_image_if_too_big(image)
 
     detection_time_start = time.perf_counter()
-    detected_faces = detect_face_on_image(image, resize_image=False, return_box=True,
-                                          save_preprocessing=save_preprocessing)
+    detection_result = detect_face_on_image(image, resize_image=False, return_box=True,
+                                            save_preprocessing=save_preprocessing, recognize_face=True,
+                                            semester_code=semester_code, course_code=course_code)
+    detected_faces = detection_result["detected_faces"]
     detection_time_finish = time.perf_counter()
     detection_time = detection_time_finish - detection_time_start
 
