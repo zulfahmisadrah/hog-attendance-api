@@ -238,8 +238,7 @@ def recognize_face(db: Session, file: Union[bytes, UploadFile], semester_code: s
     predictions = []
     if detected_faces:
         for result in detected_faces:
-            detected_face, box = result
-            label = recognize(db, detected_face, semester_code, course_code, save_preprocessing=save_preprocessing)
+            detected_face, box, label = result
             user = crud_user.user.get_by_username(db, username=label)
             user_name = user.name
 
