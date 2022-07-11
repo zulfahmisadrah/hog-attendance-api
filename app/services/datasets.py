@@ -271,7 +271,7 @@ def recognize_face(db: Session, file: Union[bytes, UploadFile], semester_code: s
                 "name": user_name
             }
             predictions.append(prediction)
-            # print("RECOGNIZED USER", recognized_user)
+            # logger.info("RECOGNIZED USER", recognized_user)
     recognition_time_finish = time.perf_counter()
     recognition_time = recognition_time_finish - recognition_time_start
 
@@ -287,9 +287,9 @@ def recognize_face(db: Session, file: Union[bytes, UploadFile], semester_code: s
         "total_detection": len(detected_faces),
         "detection_time": round(detection_time, 2),
         "recognition_time": round(recognition_time, 2),
-        "computation_time": round(recognition_time+detection_time, 2)
+        "computation_time": round(recognition_time + detection_time, 2)
     }
-    print(results)
+    logger.info(results)
     return results
 
 
