@@ -300,12 +300,10 @@ def get_list_datasets(db: Session, dataset_type: DatasetType = DatasetType.TRAIN
         student = crud_user.user.get_by_username(db, username=username)
         user_datasets = get_user_datasets(username)
         total = get_user_total_datasets_all(username)
-        sample = get_user_sample_dataset(username, dataset_type)
         dataset = Dataset(
             user=student,
             file_names=user_datasets,
             total=total,
-            sample=sample
         )
         list_datasets.append(dataset)
     return list_datasets
