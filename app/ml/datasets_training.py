@@ -1,5 +1,8 @@
 import cv2
 import joblib
+import json
+import numpy as np
+from fastapi.logger import logger
 from os import path
 
 from sklearn.svm import SVC
