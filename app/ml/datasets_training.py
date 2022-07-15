@@ -22,6 +22,22 @@ from app.utils.file_helper import get_list_files, get_course_models_directory, g
     get_user_datasets_directory, get_user_preprocessed_images_directory, get_file_name_without_extension
 
 
+class NumpyEncoder(json.JSONEncoder):
+    """ Special json encoder for numpy types """
+
+    def default(self, obj):
+        if isinstance(obj, (np.int_, np.intc, np.intp, np.int8,
+                            np.int16, np.int32, np.int64, np.uint8,
+                            np.uint16, np.uint32, np.uint64)):
+            return int(obj)
+        elif isinstance(obj, (np.float_, np.float16, np.float32,
+                              np.float64)):
+            return float(obj)
+        elif isinstance(obj, (np.ndarray,)):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
+
+
 def prepare_datasets(db: Session, course_code: str, dataset_type: DatasetType = DatasetType.TRAINING,
                      save_preprocessing: bool = False):
     use_facenet = crud_site_setting.site_setting.use_facenet(db)
