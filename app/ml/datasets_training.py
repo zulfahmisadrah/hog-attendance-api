@@ -299,17 +299,21 @@ def validate_model(db: Session, semester_code: str, course_code: str, save_prepr
     return report["accuracy"]
 
 
-def validate_model(db: Session, semester_code: str, course_code: str, save_preprocessing=False):
-    print('--- PREPARING TESTING DATASETS ---')
-    validation_images, validation_labels = prepare_datasets(db, course_code, DatasetType.VALIDATION, save_preprocessing)
-    print('--- TESTING MODEL ---')
+def validate_model_using_train_data(db: Session, semester_code: str, course_code: str, save_preprocessing=False,
+                                    params_key: str = "default"):
+    logger.info('--- PREPARING TRAINING DATASETS ---')
+    params = settings.hog_params.get(params_key) if settings.hog_params.get(params_key) else settings.hog_params[
+        'default']
+    val_features, val_labels = prepare_datasets(db, course_code, DatasetType.TRAINING, save_preprocessing,
+                                                params=params)
+    logger.info('--- TESTING MODEL ---')
     course_directory = get_course_models_directory(course_code)
     model_name = f"{semester_code}.joblib"
     model_path = path.join(course_directory, model_name)
     svm_model = joblib.load(model_path)
-    recognized_users = svm_model.predict(validation_images)
-    print("recognized_users", recognized_users)
-    report = classification_report(validation_labels, recognized_users)
-    print(report)
-    report = classification_report(validation_labels, recognized_users, output_dict=True)
+    predicted_labels = svm_model.predict(val_features)
+    logger.info("predicted_labels: " + str(predicted_labels))
+    report = classification_report(val_labels, predicted_labels)
+    logger.info(report)
+    report = classification_report(val_labels, predicted_labels, output_dict=True)
     return report["accuracy"]
