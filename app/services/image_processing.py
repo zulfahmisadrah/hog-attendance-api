@@ -154,7 +154,7 @@ def get_hog_features(
         block_norm='L2-Hys',
         visualize=True,
         feature_vector=True,
-        multichannel=None
+        channel_axis=None
 ):
     hog_desc, hog_image = hog(
         image,
@@ -165,7 +165,7 @@ def get_hog_features(
         block_norm=block_norm,
         visualize=visualize,
         feature_vector=feature_vector,
-        multichannel=multichannel
+        channel_axis=channel_axis
     )
     return hog_desc, hog_image
 
