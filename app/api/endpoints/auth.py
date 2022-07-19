@@ -1,9 +1,14 @@
+import logging
+import hashlib
 from typing import Any, Union
+from ast import literal_eval
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, status, Form
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from suds.client import Client
+from suds.transport.http import HttpAuthenticated
 
 from app import crud
 from app.core.auth import auth
