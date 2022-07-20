@@ -19,6 +19,8 @@ from app.api import deps
 from app.utils.commons import parse_year_from_username
 
 router = APIRouter()
+logging.basicConfig(level=logging.INFO)
+logging.getLogger('suds.client').setLevel(logging.DEBUG)
 
 
 @router.post("/login", response_model=schemas.Token)
