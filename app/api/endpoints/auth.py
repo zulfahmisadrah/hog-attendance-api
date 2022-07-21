@@ -28,35 +28,61 @@ def login_access_token(
         db: Session = Depends(deps.get_db),
         form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
-    user = crud.user.authenticate(db, username=form_data.username, password=form_data.password)
+    username = form_data.username
+    password = form_data.password
+    user = crud.user.authenticate(db, username=username, password=password)
     if not user:
-        with httpx.Client() as client:
-            headers = {
-                'token': settings.NEOSIA_API_HEADER_TOKEN,
-                'Content-Type': "application/x-www-form-urlencoded",
-            }
-            data = {
-                "username": form_data.username,
-                "password": form_data.password
-            }
-            response = client.post(settings.NEOSIA_API_AUTH_STUDENT, data=data, headers=headers)
-            result = response.json()['success']
-            if result == "1":
-                user_local = crud.user.get_by_username(db, username=form_data.username)
-                if user_local:
-                    user = user_local
-                else:
-                    department = crud.department.get_by_username_parsing(db, form_data.username)
-                    user_in = schemas.UserStudentCreate(
-                        name=form_data.username,
-                        username=form_data.username,
-                        password=form_data.password,
-                        student=schemas.StudentCreate(department_id=department.id,
-                                                      year=parse_year_from_username(form_data.username))
-                    )
-                    user = crud.user.create_student(db, obj_in=user_in)
+        # LECTURER
+        transport = HttpAuthenticated(username=settings.NEOSIA_SOAP_USERNAME, password=settings.NEOSIA_SOAP_PASSWORD)
+        soap_client = Client(settings.NEOSIA_SOAP_BASE_URL, transport=transport, timeout=10)
+        result = soap_client.service.login2(username, hashlib.md5(password.encode()).hexdigest())
+        if result != "[]":
+            result = literal_eval(result)
+            username = result.get("userAccount")
+            name = result.get("userNama")
+            user_local = crud.user.get_by_username(db, username=username)
+            if user_local:
+                user = user_local
             else:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect username or password")
+                department = crud.department.get_by_username_parsing(db, username)
+                user_in = schemas.UserLecturerCreate(
+                    name=name,
+                    username=username,
+                    password=password,
+                    lecturer=schemas.LecturerCreate(department_id=department.id if department else 12,
+                                                    nip=username)
+                )
+                user = crud.user.create_lecturer(db, obj_in=user_in)
+        else:
+            # STUDENT
+            with httpx.Client() as client:
+                headers = {
+                    'token': settings.NEOSIA_API_HEADER_TOKEN,
+                    'Content-Type': "application/x-www-form-urlencoded",
+                }
+                data = {
+                    "username": username,
+                    "password": password
+                }
+                response = client.post(settings.NEOSIA_API_AUTH_STUDENT, data=data, headers=headers)
+                result = response.json()['success']
+                if result == "1":
+                    user_local = crud.user.get_by_username(db, username=username)
+                    if user_local:
+                        user = user_local
+                    else:
+                        department = crud.department.get_by_username_parsing(db, username)
+                        user_in = schemas.UserStudentCreate(
+                            name=username,
+                            username=username,
+                            password=password,
+                            student=schemas.StudentCreate(department_id=department.id,
+                                                          year=parse_year_from_username(username))
+                        )
+                        user = crud.user.create_student(db, obj_in=user_in)
+                else:
+                    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                        detail="Incorrect username or password")
     elif not crud.user.is_active(user):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User is inactive")
 
