@@ -23,3 +23,5 @@ tensorflow~=2.3.0
 matplotlib~=3.5.1
 tqdm~=4.62.3
 httpx~=0.22.0
+pyyaml
+suds~=1.1.2
