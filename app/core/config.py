@@ -59,7 +59,7 @@ class Settings(BaseSettings):
 
     HOG_ORIENTATIONS: int = 9
     HOG_PIXELS_PER_CELL: Tuple[int, int] = (10, 10)
-    HOG_CELLS_PER_BLOCK: Tuple[int, int] = (2, 2)
+    HOG_CELLS_PER_BLOCK: Tuple[int, int] = (3, 3)
     HOG_RESIZE_WIDTH: int = 90
     HOG_RESIZE_HEIGHT: int = 90
     FACENET_INPUT_SIZE: Tuple[int, int] = (160, 160)
