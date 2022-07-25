@@ -103,6 +103,9 @@ class Settings(BaseSettings):
     NEOSIA_API_HEADER_TOKEN: str = os.getenv("NEOSIA_API_HEADER_TOKEN", "")
     NEOSIA_API_BASE_URL: str = "https://customapi.neosia.unhas.ac.id/"
     NEOSIA_API_AUTH_STUDENT: str = f"{NEOSIA_API_BASE_URL}checkMahasiswa"
+    NEOSIA_SOAP_BASE_URL: str = "http://apps.unhas.ac.id/nusoap/serviceApps.php?wsdl"
+    NEOSIA_SOAP_USERNAME: str = os.getenv("NEOSIA_SOAP_USERNAME", "admin")
+    NEOSIA_SOAP_PASSWORD: str = os.getenv("NEOSIA_SOAP_PASSWORD", "admin")
 
     class Config:
         case_sensitive = True
