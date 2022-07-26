@@ -107,6 +107,57 @@ class Settings(BaseSettings):
     NEOSIA_SOAP_USERNAME: str = os.getenv("NEOSIA_SOAP_USERNAME", "admin")
     NEOSIA_SOAP_PASSWORD: str = os.getenv("NEOSIA_SOAP_PASSWORD", "admin")
 
+    hog_params = {
+        'default': {
+            'alpha': IMAGE_ALPHA,
+            'beta': IMAGE_BETA,
+            'hog_width_height': (HOG_RESIZE_WIDTH, HOG_RESIZE_HEIGHT),
+            'hog_ppc': HOG_PIXELS_PER_CELL,
+            'hog_cpb': HOG_CELLS_PER_BLOCK
+        },
+        '2017': {
+            'alpha': 2,
+            'beta': 10,
+            'hog_width_height': (90, 90),
+            'hog_ppc': (10, 10),
+            'hog_cpb': (3, 3)
+        },
+        '2017_mask': {
+            'alpha': 1.5,
+            'beta': 10,
+            'hog_width_height': (90, 90),
+            'hog_ppc': (9, 9),
+            'hog_cpb': (2, 2)
+        },
+        '2020': {
+            'alpha': 1.5,
+            'beta': 10,
+            'hog_width_height': (90, 90),
+            'hog_ppc': (9, 9),
+            'hog_cpb': (2, 2)
+        },
+        '2020_mask': {
+            'alpha': 1.5,
+            'beta': 10,
+            'hog_width_height': (90, 90),
+            'hog_ppc': (9, 9),
+            'hog_cpb': (2, 2)
+        },
+        '2020_mix': {
+            'alpha': 1.5,
+            'beta': 10,
+            'hog_width_height': (90, 90),
+            'hog_ppc': (9, 9),
+            'hog_cpb': (2, 2)
+        },
+        '2021_mask': {
+            'alpha': 1.5,
+            'beta': 15,
+            'hog_width_height': (70, 70),
+            'hog_ppc': (8, 8),
+            'hog_cpb': (2, 2)
+        },
+    }
     class Config:
         case_sensitive = True
 
