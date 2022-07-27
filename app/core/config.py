@@ -158,6 +158,46 @@ class Settings(BaseSettings):
             'hog_cpb': (2, 2)
         },
     }
+
+    svm_params = {
+        'default': {
+            'kernel': 'rbf',
+            'C': 50,
+            'gamma': 0.001,
+            'random_state': 0
+        },
+        '2017': {
+            'kernel': 'rbf',
+            'C': 50,
+            'gamma': 0.005,
+            'random_state': 0
+        },
+        '2017_mask': {
+            'kernel': 'sigmoid',
+            'C': 50,
+            'gamma': 0.01,
+            'random_state': 0
+        },
+        '2020': {
+            'kernel': 'rbf',
+            'C': 50,
+            'gamma': 0.001,
+            'random_state': 0
+        },
+        '2020_mask': {
+            'kernel': 'sigmoid',
+            'C': 50,
+            'gamma': 0.01,
+            'random_state': 0
+        },
+        '2021_mask': {
+            'kernel': 'poly',
+            'C': 0.5,
+            'gamma': 'scale',
+            'random_state': 0
+        },
+    }
+
     class Config:
         case_sensitive = True
 
