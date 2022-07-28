@@ -12,7 +12,7 @@ class CRUDDepartment(CRUDBase[Department, DepartmentCreate, DepartmentUpdate]):
         return db.query(Department).filter(Department.faculty_id == faculty_id).all()
 
     def get_by_username_parsing(self, db: Session, username: str) -> Optional[Department]:
-        code = username[:3] if len(username) > 3 else ""
+        code = username[:3] if len(username) >= 3 else ""
         return db.query(Department).filter(Department.code == code).first()
 
 
