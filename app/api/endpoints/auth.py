@@ -49,7 +49,7 @@ def login_access_token(
                     name=name,
                     username=username,
                     password=password,
-                    lecturer=schemas.LecturerCreate(department_id=department.id if department else 12,
+                    lecturer=schemas.LecturerCreate(department_id=department.id if department else 5,
                                                     nip=username)
                 )
                 user = crud.user.create_lecturer(db, obj_in=user_in)
