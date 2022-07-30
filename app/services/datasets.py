@@ -234,6 +234,18 @@ def recognize_face(db: Session, file: Union[bytes, UploadFile], semester_code: s
 
     image = np.array(image)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    height, width = image.shape[:2]
+
+    current_datetime = get_current_datetime()
+    result_dir = get_meeting_results_directory(semester_code, course_code, meeting_id)
+    image_name = f"{current_datetime}_{semester_code}_{course_code}.jpg"
+
+    result_data = {
+        "image": {
+            "width": width,
+            "height": height
+        }
+    }
 
     recognition_time_start = time.perf_counter()
     predictions = []
