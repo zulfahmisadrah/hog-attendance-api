@@ -258,7 +258,6 @@ def recognize_face(db: Session, file: Union[bytes, UploadFile], semester_code: s
             x, y, w, h = box
             x1, y1 = x + w, y + h
 
-            width = image.shape[1]
             if width > 4000:
                 font_scale = 2.4
                 thickness_white = 30
@@ -281,8 +280,10 @@ def recognize_face(db: Session, file: Union[bytes, UploadFile], semester_code: s
 
             prediction = {
                 "username": label,
-                "name": user_name
+                "name": user_name,
+                "xywh": [x, y, w, h]
             }
+
             predictions.append(prediction)
             # logger.info("RECOGNIZED USER", recognized_user)
     recognition_time_finish = time.perf_counter()
