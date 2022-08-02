@@ -289,9 +289,7 @@ def recognize_face(db: Session, file: Union[bytes, UploadFile], semester_code: s
     recognition_time_finish = time.perf_counter()
     recognition_time = recognition_time_finish - recognition_time_start
 
-    current_datetime = get_current_datetime()
-    result_dir = get_meeting_results_directory(semester_code, course_code, meeting_id)
-    image_name = f"{current_datetime}_{semester_code}_{course_code}.jpg"
+
     result_path = path.join(result_dir, image_name)
     cv2.imwrite(result_path, image)
 
