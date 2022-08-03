@@ -14,7 +14,8 @@ from app.utils.commons import get_current_datetime
 from app.utils.file_helper import get_course_models_directory, get_dir
 
 
-def recognize(db: Session, face_image, semester_code: str, course_code: str, save_preprocessing: bool = False):
+def recognize(db: Session, face_image, semester_code: str, course_code: str, save_preprocessing: bool = False,
+              return_probability: bool = False):
     use_facenet = crud_site_setting.site_setting.use_facenet(db)
     current_datetime = get_current_datetime()
     preprocessed_images_dir = get_dir(path.join(settings.ML_PREPROCESSED_IMAGES_FOLDER))
