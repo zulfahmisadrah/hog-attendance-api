@@ -67,5 +67,7 @@ def recognize(db: Session, face_image, semester_code: str, course_code: str, sav
     if pred:
         logger.info(f"PREDICTION -- label: {pred[0]}, prob: {str(prob_per_class_dictionary[pred[0]])}, "
                     f"others: {str(results_ordered_by_probability[1:4])}")
-    return pred[0]
-
+    if return_probability:
+        return pred[0], probability
+    else:
+        return pred[0]
