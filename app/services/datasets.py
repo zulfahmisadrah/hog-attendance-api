@@ -293,6 +293,9 @@ def recognize_face(db: Session, file: Union[bytes, UploadFile], semester_code: s
     result_path = path.join(result_dir, image_name)
     cv2.imwrite(result_path, image)
 
+    result_data["predictions"] = predictions
+    image_result_json_path = path.join(result_dir, f"{image_name}.json")
+    json.dump(result_data, open(image_result_json_path, 'w'))
     results = {
         "image_name": image_name,
         "predictions": predictions,
